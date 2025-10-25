@@ -1,0 +1,92 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\github\\tdgame_unity\\td_fp_game\\assets\\scripts\\hudmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\hudmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\github\\tdgame_unity\\td_fp_game\\assets\\scripts\\scrapmetalpickup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\scrapmetalpickup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\assets\\scripts\\playerstats.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playerstats.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\assets\\scripts\\enemycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\enemycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HUDManager.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Scripts\\HUDManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\HUDManager.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Scripts\\HUDManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\HUDManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T01:14:58.654Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ScrapMetalPickup.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Scripts\\ScrapMetalPickup.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\ScrapMetalPickup.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Scripts\\ScrapMetalPickup.cs",
+              "RelativeToolTip": "Assets\\Scripts\\ScrapMetalPickup.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T01:14:25.365Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "EnemyController.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Scripts\\EnemyController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\EnemyController.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Scripts\\EnemyController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\EnemyController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T01:13:27.291Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PlayerStats.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Scripts\\PlayerStats.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerStats.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Scripts\\PlayerStats.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PlayerStats.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-25T01:11:56.987Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
