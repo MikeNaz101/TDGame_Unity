@@ -5,76 +5,123 @@ using UnityEngine.InputSystem;
 
 namespace StarterAssets
 {
-	public class StarterAssetsInputs : MonoBehaviour
-	{
-		[Header("Character Input Values")]
-		public Vector2 move;
-		public Vector2 look;
-		public bool jump;
-		public bool sprint;
+    public class StarterAssetsInputs : MonoBehaviour
+    {
+       [Header("Character Input Values")]
+       public Vector2 move;
+       public Vector2 look;
+       public bool jump;
+       public bool sprint;
 
-		[Header("Movement Settings")]
-		public bool analogMovement;
+       // --- WEAPON INPUTS (Publicly Polled by WeaponController) ---
+       [Header("Weapon Input Values")]
+       [Tooltip("True when the Fire button is pressed, False when released.")]
+       public bool fire; 
+       [Tooltip("True when the Aim button is pressed, False when released.")]
+       public bool aim; 
+       [Tooltip("True when the Reload button is pressed.")]
+       public bool reload; 
 
-		[Header("Mouse Cursor Settings")]
-		public bool cursorLocked = true;
-		public bool cursorInputForLook = true;
+       [Header("Movement Settings")]
+       public bool analogMovement;
+
+       [Header("Mouse Cursor Settings")]
+       public bool cursorLocked = true;
+       public bool cursorInputForLook = true;
 
 #if ENABLE_INPUT_SYSTEM
-		public void OnMove(InputValue value)
-		{
-			MoveInput(value.Get<Vector2>());
-		}
+       // --- MOVEMENT/LOOK CALLBACKS (Invoked by PlayerInput) ---
 
-		public void OnLook(InputValue value)
-		{
-			if(cursorInputForLook)
-			{
-				LookInput(value.Get<Vector2>());
-			}
-		}
+       public void OnMove(InputValue value)
+       {
+          MoveInput(value.Get<Vector2>());
+       }
 
-		public void OnJump(InputValue value)
-		{
-			JumpInput(value.isPressed);
-		}
+       public void OnLook(InputValue value)
+       {
+          if(cursorInputForLook)
+          {
+             LookInput(value.Get<Vector2>());
+          }
+       }
 
-		public void OnSprint(InputValue value)
-		{
-			SprintInput(value.isPressed);
-		}
+       public void OnJump(InputValue value)
+       {
+          JumpInput(value.isPressed);
+       }
+
+       public void OnSprint(InputValue value)
+       {
+          SprintInput(value.isPressed);
+       }
+       
+       // --- WEAPON CALLBACKS (Invoked by PlayerInput) ---
+
+       public void OnFire(InputValue value)
+       {
+          // We read the state of the button (true for pressed, false for released)
+          FireInput(value.isPressed);
+       }
+       
+       public void OnAim(InputValue value)
+       {
+          AimInput(value.isPressed);
+       }
+
+       public void OnReload(InputValue value)
+       {
+          ReloadInput(value.isPressed);
+       }
+
 #endif
 
+       // --- INPUT SETTERS ---
 
-		public void MoveInput(Vector2 newMoveDirection)
-		{
-			move = newMoveDirection;
-		} 
+       public void MoveInput(Vector2 newMoveDirection)
+       {
+          move = newMoveDirection;
+       } 
 
-		public void LookInput(Vector2 newLookDirection)
-		{
-			look = newLookDirection;
-		}
+       public void LookInput(Vector2 newLookDirection)
+       {
+          look = newLookDirection;
+       }
 
-		public void JumpInput(bool newJumpState)
-		{
-			jump = newJumpState;
-		}
+       public void JumpInput(bool newJumpState)
+       {
+          jump = newJumpState;
+       }
 
-		public void SprintInput(bool newSprintState)
-		{
-			sprint = newSprintState;
-		}
-		
-		private void OnApplicationFocus(bool hasFocus)
-		{
-			SetCursorState(cursorLocked);
-		}
+       public void SprintInput(bool newSprintState)
+       {
+          sprint = newSprintState;
+       }
+       
+       public void FireInput(bool newFireState)
+       {
+          fire = newFireState;
+       } 
 
-		private void SetCursorState(bool newState)
-		{
-			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
-		}
-	}
-	
+       public void AimInput(bool newAimState)
+       {
+          aim = newAimState;
+       } 
+
+       public void ReloadInput(bool newReloadState)
+       {
+          reload = newReloadState;
+       } 
+
+       
+       private void OnApplicationFocus(bool hasFocus)
+       {
+          SetCursorState(cursorLocked);
+       }
+
+       private void SetCursorState(bool newState)
+       {
+          Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
+       }
+    }
+    
 }

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4ce2252deb9ff049bc095a7214974d5, type: 3}
+  m_Name: AR_AssaultRifle_Data
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  weaponName: Assault Rifle
+  weaponPrefab: {fileID: 1396857973655360118, guid: ee9c6e6555bcf0a498f8e747fdf73ce8, type: 3}
+  bulletPrefab: {fileID: 8479983748241459406, guid: 167038338c6f0eb44b39bcfffcffe316, type: 3}
+  damage: 10
+  fireRate: 0.25
+  isAutomatic: 1
+  maxAmmo: 30
+  reloadTime: 2
+  reserveAmmo: 29
+  recoilKickback: 0.5
+  aimDownSightsPosition: {x: 0, y: 0, z: 0}
+  adsSpeed: 8
