@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 94111296ffd51b84e87cfbec03d5baaf
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 247174
+  packageName: DOG Full Animations - Alaskan Malamute
+  packageVersion: 1.0
+  assetPath: Assets/Dog_AlaskanMalamute/Animator/AlaskanMalamute3.controller
+  uploadId: 563398

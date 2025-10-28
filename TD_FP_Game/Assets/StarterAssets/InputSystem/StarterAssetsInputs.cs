@@ -22,6 +22,14 @@ namespace StarterAssets
        [Tooltip("True when the Reload button is pressed.")]
        public bool reload; 
 
+       // --- NEW BUILD INPUTS (Publicly Polled by WeaponController) ---
+       [Header("Build Input Values")]
+       [Tooltip("True when the Build button (Q) is pressed, False when released.")]
+       public bool build;
+       [Tooltip("Value from the Scroll Wheel for menu navigation.")]
+       public float menuScroll;
+
+
        [Header("Movement Settings")]
        public bool analogMovement;
 
@@ -59,7 +67,6 @@ namespace StarterAssets
 
        public void OnFire(InputValue value)
        {
-          // We read the state of the button (true for pressed, false for released)
           FireInput(value.isPressed);
        }
        
@@ -72,6 +79,19 @@ namespace StarterAssets
        {
           ReloadInput(value.isPressed);
        }
+       
+       // --- NEW BUILD CALLBACKS (Invoked by PlayerInput) ---
+
+       public void OnBuild(InputValue value)
+       {
+          BuildInput(value.isPressed);
+       }
+
+       public void OnMenuScroll(InputValue value)
+       {
+          MenuScrollInput(value.Get<float>());
+       }
+
 
 #endif
 
@@ -111,6 +131,18 @@ namespace StarterAssets
        {
           reload = newReloadState;
        } 
+       
+       public void BuildInput(bool newBuildState)
+       {
+           build = newBuildState;
+       }
+       
+       public void MenuScrollInput(float newScrollValue)
+       {
+           // Scroll wheel returns a vector (usually Y-axis), but we only need the float value
+           menuScroll = newScrollValue;
+       }
+
 
        
        private void OnApplicationFocus(bool hasFocus)

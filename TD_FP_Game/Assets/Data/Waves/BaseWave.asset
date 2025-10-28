@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4526baae6c420b44ad95340a8af3843, type: 3}
+  m_Name: BaseWave
+  m_EditorClassIdentifier: Assembly-CSharp::WaveConfig
+  waveName: Wave 1
+  preparationTime: 10
+  enemyGroups:
+  - enemyType: {fileID: 11400000, guid: 2455d0491877f1e40bb903079e05d214, type: 2}
+    count: 10
+    spawnInterval: 5

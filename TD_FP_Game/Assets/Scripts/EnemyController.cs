@@ -1,40 +1,48 @@
 using UnityEngine;
-using UnityEngine.AI; // IMPORTANT: Required for NavMeshAgent
+using UnityEngine.AI; // Required for NavMeshAgent
+using System.Collections; // Required for Coroutines
 
 public class EnemyController : MonoBehaviour
 {
-    // --- Public Variables ---
-    public float health = 50f;
-    public GameObject scrapMetalPrefab;
-    public Transform playerTarget; // Assigned in Inspector (Drag the Player here)
+    // --- Public Variables (Set by WaveManager) ---
+    [HideInInspector] public float health; // Set by WaveManager from EnemyData
+    [HideInInspector] public GameObject scrapMetalPrefab; // Set by EnemyData (if needed)
+    [HideInInspector] public Transform playerTarget; // The target (likely the Energy Core)
+
+    // --- Configuration ---
     public float detectionRange = 15f;
     public float attackRange = 2.5f;
-    public float attackDamage = 10f;
+    public float attackDamage = 10f; // Can also be set by EnemyData
     public float attackCooldown = 2f;
 
-    // --- Private Variables ---
+    // --- Private References ---
     private NavMeshAgent agent;
     private float timeSinceLastAttack;
     private PlayerStats playerStats; // Reference to the player's stats script
+    private WaveManager waveManager; // Reference to the central manager
 
     void Start()
     {
-        // Get the required components
+        // 1. Get required components
         agent = GetComponent<NavMeshAgent>();
-        
-        // Find the player's target automatically if not set
-        if (playerTarget == null)
-        {
-            playerTarget = GameObject.FindGameObjectWithTag("Player").transform;
-        }
+        timeSinceLastAttack = attackCooldown; 
 
-        // Get the PlayerStats component for damaging the player
+        // 2. Find required managers in the scene
+        waveManager = FindObjectOfType<WaveManager>();
+
+        // 3. Find the PlayerStats script on the target (if the target is the player)
         if (playerTarget != null)
         {
+            // Note: If playerTarget is the CORE, this should be FindObjectOfType<PlayerStats>();
+            // If the core is the target, we only need to attack the core, not the player.
+            // Assuming the core target is the player's position for now (as per early design)
             playerStats = playerTarget.GetComponent<PlayerStats>();
         }
 
-        timeSinceLastAttack = attackCooldown; // Ready to attack immediately
+        if (agent == null || waveManager == null)
+        {
+            Debug.LogError("Enemy setup error: NavMeshAgent or WaveManager is missing/null.", this);
+        }
     }
 
     // Function equivalent to Unreal's Event AnyDamage
@@ -62,11 +70,24 @@ public class EnemyController : MonoBehaviour
         {
             MoveToPlayer();
         }
-        // NOTE: If distance is > detectionRange, the enemy stops.
+        else
+        {
+            // Stop if target is too far
+            if (agent != null && agent.isActiveAndEnabled)
+            {
+                agent.isStopped = true;
+            }
+        }
     }
 
     void MoveToPlayer()
     {
+        if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
+        {
+            Debug.LogWarning("Agent not ready or off NavMesh.", this);
+            return;
+        }
+
         // 1. Tell the NavMeshAgent to calculate a path and move.
         agent.isStopped = false;
         agent.SetDestination(playerTarget.position);
@@ -78,11 +99,16 @@ public class EnemyController : MonoBehaviour
 
     void AttackPlayer()
     {
-        // 1. Stop moving so the attack is stable
-        agent.isStopped = true;
+        if (agent != null && agent.isActiveAndEnabled)
+        {
+            // 1. Stop moving so the attack is stable
+            agent.isStopped = true;
+        }
 
         // 2. Face the player before attacking
-        transform.LookAt(playerTarget);
+        Vector3 lookPosition = playerTarget.position;
+        lookPosition.y = transform.position.y; // Keep Y level to prevent tilting
+        transform.LookAt(lookPosition);
 
         // 3. Handle the attack cooldown
         timeSinceLastAttack += Time.deltaTime;
@@ -92,10 +118,8 @@ public class EnemyController : MonoBehaviour
             // Execute the attack
             if (playerStats != null)
             {
-                // Damage logic would go into PlayerStats.cs (we'll assume a TakeDamage method there)
-                // For now, let's just log it:
-                Debug.Log("Enemy attacks Player for " + attackDamage + " damage!");
-                // **TODO:** Implement playerStats.TakeDamage(attackDamage);
+                playerStats.TakeDamage(attackDamage);
+                Debug.Log("Enemy attacks target for " + attackDamage + " damage!");
             }
             timeSinceLastAttack = 0f;
         }
@@ -108,7 +132,18 @@ public class EnemyController : MonoBehaviour
         {
             Instantiate(scrapMetalPrefab, transform.position, Quaternion.identity);
         }
-        // 2. Destroy the Enemy
+        
+        // 2. Notify the WaveManager before destroying
+        if (waveManager != null)
+        {
+            waveManager.EnemyDestroyed();
+        }
+        else
+        {
+            Debug.LogError("WaveManager not found! Cannot report enemy destruction.");
+        }
+
+        // 3. Destroy the Enemy
         Destroy(gameObject);
     }
 }

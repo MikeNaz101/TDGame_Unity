@@ -1,0 +1,120 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq; // Required for LINQ extensions (Count())
+
+public class WaveManager : MonoBehaviour
+{
+    [Header("Wave Configuration")]
+    [Tooltip("List of all wave configuration assets for the level.")]
+    public WaveConfig[] waves;
+
+    [Header("Spawn Points")]
+    [Tooltip("List of transforms where enemies can spawn.")]
+    public Transform[] spawnPoints;
+
+    [Header("Core Reference")]
+    [Tooltip("The central core/base the enemies are targeting.")]
+    public Transform coreTarget;
+
+    private int currentWaveIndex = 0;
+    private int enemiesRemaining = 0;
+    private bool isWaveActive = false;
+    
+    void Start()
+    {
+        if (waves.Length > 0)
+        {
+            StartCoroutine(WaveSequenceRoutine());
+        }
+        else
+        {
+            Debug.LogError("No Wave Configurations found! Please assign WaveConfig Scriptable Objects.");
+        }
+    }
+
+    // Main routine controlling the flow of waves
+    IEnumerator WaveSequenceRoutine()
+    {
+        while (currentWaveIndex < waves.Length)
+        {
+            WaveConfig currentWave = waves[currentWaveIndex];
+            
+            // 1. Preparation Phase
+            Debug.Log("Starting Preparation for " + currentWave.waveName);
+            yield return new WaitForSeconds(currentWave.preparationTime);
+
+            // 2. Spawn Phase
+            yield return StartCoroutine(SpawnWave(currentWave));
+            
+            // 3. Cleanup/Waiting Phase
+            Debug.Log(currentWave.waveName + " spawning complete. Waiting for enemies to be destroyed.");
+            
+            // Wait until all enemies from the current wave are destroyed
+            yield return new WaitUntil(() => enemiesRemaining <= 0);
+
+            Debug.Log(currentWave.waveName + " is defeated!");
+            currentWaveIndex++;
+            isWaveActive = false;
+
+            // Optional: Give the player a small resource bonus or restore health here
+        }
+
+        Debug.Log("All waves defeated! Game Over (Win).");
+    }
+
+    IEnumerator SpawnWave(WaveConfig wave)
+    {
+        isWaveActive = true;
+        enemiesRemaining = 0;
+
+        foreach (var group in wave.enemyGroups)
+        {
+            // Update the total count of enemies we need to track
+            enemiesRemaining += group.count; 
+
+            for (int i = 0; i < group.count; i++)
+            {
+                // Instantiate the enemy prefab
+                GameObject enemyObj = Instantiate(
+                    group.enemyType.enemyPrefab, 
+                    GetRandomSpawnPoint(), 
+                    Quaternion.identity
+                );
+
+                // --- CRITICAL SETUP ---
+                // Assign the required data and target to the EnemyController script on the new enemy
+                EnemyController enemyScript = enemyObj.GetComponent<EnemyController>();
+                if (enemyScript != null)
+                {
+                    // 1. Set the target (the core)
+                    enemyScript.playerTarget = coreTarget;
+                    
+                    // 2. Set base stats from the Scriptable Object data
+                    enemyScript.health = group.enemyType.baseHealth;
+                    // Note: You would set the NavMeshAgent speed here too if you expose it in EnemyController
+                }
+
+                yield return new WaitForSeconds(group.spawnInterval);
+            }
+        }
+    }
+    
+    // Call this from EnemyController.Die() to decrement the count
+    public void EnemyDestroyed()
+    {
+        enemiesRemaining--;
+    }
+
+    // Helper method to get a random spawn point
+    Vector3 GetRandomSpawnPoint()
+    {
+        if (spawnPoints.Length == 0)
+        {
+            Debug.LogError("Spawn points are not assigned!");
+            return Vector3.zero;
+        }
+        Transform selectedPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        return selectedPoint.position;
+    }
+}

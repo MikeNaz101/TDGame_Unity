@@ -1,0 +1,19 @@
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "NewTowerData", menuName = "Aegis/Tower Data")]
+public class TowerData : ScriptableObject
+{
+    [Header("Tower Identity")]
+    public string towerName = "New Tower";
+    public string description = "A basic defensive unit.";
+    
+    [Header("Building")]
+    [Tooltip("The actual GameObject prefab to be instantiated.")]
+    public GameObject towerPrefab;
+    public int scrapCost = 100;
+
+    [Header("Combat Stats")]
+    public float damage = 10f;
+    public float fireRate = 0.5f;
+    public float range = 15f;
+}

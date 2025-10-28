@@ -1,73 +1,125 @@
 using UnityEngine;
 using System.Collections;
 using StarterAssets; // Required to access the public input booleans
+using UnityEngine.InputSystem; // Still needed for CallbackContext but not used for firing logic
+using System.Linq; 
 
 public class WeaponController : MonoBehaviour
 {
-    // --- SETUP REFERENCES ---
+    // --- SETUP REFERENCES (Assigned in Inspector) ---
     [Header("Setup")]
-    [Tooltip("The script that holds the current state of player inputs.")]
-    public StarterAssetsInputs inputScript; // Assigned in Inspector (The Player object)
-    [Tooltip("The point where projectiles spawn.")]
-    public Transform shootPoint; // Assigned in Inspector (The Muzzle)
-    [Tooltip("The player camera's shake script for recoil effects.")]
-    public CameraShake cameraShake; // Assigned in Inspector (The Main Camera)
-    [Tooltip("The target transform the gun moves to when Aiming Down Sights.")]
-    public Transform adsTarget; // Assigned in Inspector
+    [Tooltip("The script that holds the current state of player inputs (StarterAssetsInputs).")]
+    public StarterAssetsInputs inputScript; // MUST be assigned in Inspector
+    [Tooltip("The Transform where bullets spawn.")]
+    public Transform shootPoint;
+    [Tooltip("The CameraShake script on the camera.")]
+    public CameraShake cameraShake; 
+    [Tooltip("The object that marks the ADS position.")]
+    public Transform adsTarget;
 
-    // --- WEAPON DATA ---
-    [Header("Weapon Inventory & Data")]
-    public WeaponData[] inventory; // Drag your Scriptable Objects here
-    private WeaponData currentWeapon;
-    private int currentWeaponIndex = 0;
-
-    // --- AMMO & RELOAD STATE ---
-    [Header("Ammo & State")]
-    public int currentAmmo;
-    public int currentReserveAmmo;
-    private bool isReloading = false;
-    private float timeUntilNextShot = 0f;
-    private bool wasFiringLastFrame = false; // Tracks semi-auto clicks
-    private bool adsModeActive = false;
+    // --- TOWER BUILDING REFERENCES ---
+    [Header("Tower Building")]
+    [Tooltip("The UI panel that shows the list of buildable towers.")]
+    public GameObject buildMenuUI;
+    [Tooltip("The component used to draw the red aim ray.")]
+    public LineRenderer aimRay;
+    [Tooltip("Max distance the player can place a tower.")]
+    public float maxBuildDistance = 15f;
+    [Tooltip("The object that indicates the current valid build location.")]
+    public GameObject buildIndicatorPrefab; // Placeholder or ghost tower prefab
     
-    // --- ANIMATION & RECOIL ---
-    private Vector3 initialPosition; // For ADS and Recoil
-    private Vector3 hipPosition = Vector3.zero; // Local position in hip-fire mode
+    // --- WEAPON DATA ---
+    [Header("Weapon Data")]
+    [Tooltip("List of all weapons the player can switch between.")]
+    public WeaponData[] inventory;
 
-    // --- LIFE CYCLE METHODS ---
+    // --- PRIVATE STATE VARIABLES ---
+    private WeaponData currentWeapon;
+    private float nextFireTime;
+    private bool isReloading = false;
+    private int currentAmmo;
+    private int currentReserveAmmo;
+    private bool isAiming = false; // Tracks current ADS state
+    private bool wasFiringLastFrame = false; // Used for semi-auto/ammo check
+    private bool buildIndicatorAvailable = false; // Tracks if the indicator is over a valid spot
+    private float adsSpeed;
+    private Vector3 initialPosition;
+    private int currentWeaponIndex = 0; // Tracks equipped index
+
+    // --- BUILDING STATE MACHINE ---
+    private enum BuildState { Idle, Aiming, MenuOpen }
+    private BuildState buildState = BuildState.Idle;
+    private Transform buildIndicatorInstance; // The red/green ghost object
+    private int selectedTowerIndex = 0; // Index for tower selection
+
+    // --- UNITY LIFECYCLE ---
 
     void Start()
     {
-        // 1. Get initial resting position
-        initialPosition = transform.localPosition;
-        hipPosition = initialPosition;
+        // Find LineRenderer on the camera
+        if (aimRay == null)
+        {
+            aimRay = GetComponentInParent<LineRenderer>();
+            if (aimRay == null)
+            {
+                Debug.LogError("WeaponController requires a LineRenderer component in the parent hierarchy for the build ray.");
+            }
+        }
+        
+        // Find StarterAssetsInputs script if not assigned
+        if (inputScript == null)
+        {
+            inputScript = FindObjectOfType<StarterAssetsInputs>();
+            if (inputScript == null)
+            {
+                Debug.LogError("StarterAssetsInputs script not found in scene. Inputs will not work.");
+            }
+        }
 
-        // 2. Equip the first weapon on start
+        initialPosition = transform.localPosition;
+        
+        // Start with the first weapon
         if (inventory.Length > 0)
         {
-            EquipWeapon(currentWeaponIndex);
+            EquipWeapon(0);
         }
+
+        // Hide UI and LineRenderer on start
+        if (buildMenuUI != null) buildMenuUI.SetActive(false);
+        if (aimRay != null) aimRay.enabled = false;
     }
 
-    // This method now handles input polling, ADS, and firing checks every frame
     void Update()
     {
-        if (currentWeapon == null) return;
-
-        // 1. Update Cooldown
-        if (timeUntilNextShot > 0f)
+        if (currentWeapon == null || inputScript == null) return;
+        
+        // Update Cooldown
+        if (nextFireTime > Time.time)
         {
-            timeUntilNextShot -= Time.deltaTime;
+            return; // Can't shoot yet
         }
-
-        // 2. Handle Aim Down Sights (ADS)
+        
         HandleADS();
+        
+        // Input logic now starts here
+        HandleBuildingInput();
+        
+        // Only allow shooting if we are NOT building
+        if (buildState == BuildState.Idle)
+        {
+            HandleShootingInput();
+            HandleReloadInput();
+        }
+    }
+    
+    // --- INPUT HANDLERS (Polling) ---
 
-        // 3. Handle Firing Input Logic
-        // We only allow shooting if not reloading AND the shot is off cooldown.
-        bool shotReady = timeUntilNextShot <= 0f;
-
-        if (!isReloading && shotReady)
+    void HandleShootingInput()
+    {
+        // We only allow shooting if the weapon is off cooldown and not reloading.
+        bool shotReady = nextFireTime <= Time.time;
+        
+        if (shotReady)
         {
             if (currentWeapon.isAutomatic)
             {
@@ -77,7 +129,7 @@ public class WeaponController : MonoBehaviour
                     Shoot();
                 }
             }
-            else // Semi-Automatic (Current forced behavior)
+            else // Semi-Automatic
             {
                 // Semi-Auto: Fire only on the frame the button is pressed down (input is TRUE AND it was FALSE last frame)
                 if (inputScript.fire && !wasFiringLastFrame)
@@ -87,19 +139,175 @@ public class WeaponController : MonoBehaviour
             }
         }
         
-        // 4. Handle Manual Reload Input
+        // Update input state for the next frame's semi-auto check
+        wasFiringLastFrame = inputScript.fire;
+    }
+    
+    void HandleReloadInput()
+    {
+        // Handle Manual Reload Input
         if (inputScript.reload && !isReloading && currentAmmo < currentWeapon.maxAmmo)
         {
             StartCoroutine(Reload());
-            // Consume the reload input immediately to prevent continuous attempts
-            inputScript.reload = false; 
         }
-
-        // 5. Update Input State for next frame
-        wasFiringLastFrame = inputScript.fire;
+        // NOTE: We don't reset the boolean here; the StarterAssetsInputs script must handle its own state reset.
     }
 
-    // --- CORE GAMEPLAY METHODS ---
+    void HandleBuildingInput()
+    {
+        // --- 1. Handle Q (Build) input ---
+        if (inputScript.build) // Q is pressed
+        {
+            if (buildState == BuildState.Idle)
+            {
+                // Start Aiming Phase
+                buildState = BuildState.Aiming;
+                if (aimRay != null) aimRay.enabled = true;
+            }
+            // Keep AimingPhase running in Update()
+        }
+        else if (buildState != BuildState.Idle) // Q was released
+        {
+            // Cancel the build from any state if Q is released
+            CancelBuild();
+            return; // Exit function immediately after cancel
+        }
+
+        // --- 2. Handle Fire input when in Building States ---
+        if (inputScript.fire)
+        {
+            if (buildState == BuildState.Aiming)
+            {
+                // Check if the raycast is hitting a valid spot
+                if (!buildIndicatorAvailable)
+                {
+                    Debug.LogWarning("Cannot build: location is not valid or too far.");
+                    return;
+                }
+                
+                // Transition to MenuOpen
+                buildState = BuildState.MenuOpen;
+                if (aimRay != null) aimRay.enabled = false; // Deactivate ray
+                if (buildIndicatorInstance != null) buildIndicatorInstance.gameObject.SetActive(true); // Keep ghost visible
+                Cursor.lockState = CursorLockMode.None; // Show cursor
+                if (buildMenuUI != null) buildMenuUI.SetActive(true); // Show UI
+            } 
+            else if (buildState == BuildState.MenuOpen)
+            {
+                // Confirm the build (Fire button clicked while menu is open)
+                // **TODO: Call the resource check and build logic**
+                // PlayerStats.TryBuildTower(selectedTowerIndex, buildIndicatorInstance.position);
+                
+                Debug.Log("Tower Build Confirmed at location! (Call to PlayerStats missing)");
+                CancelBuild(); 
+            }
+        }
+        
+        // --- 3. Handle Scroll Wheel for Menu (assuming the scroll value is polled in StarterAssetsInputs) ---
+        // We will assume a dedicated method or property for scrolling here. For now, we will use a key check:
+        // if (inputScript.menuScroll != 0) { // Cycle Towers }
+        
+        // Run state logic
+        HandleBuildingState();
+    }
+
+
+    // --- STATE MACHINE HANDLERS ---
+    
+    void HandleBuildingState()
+    {
+        switch (buildState)
+        {
+            case BuildState.Aiming:
+                AimingPhase();
+                break;
+            case BuildState.MenuOpen:
+                // MenuPhase is active (UI is visible, cursor is unlocked)
+                break;
+            case BuildState.Idle:
+                // Clean up happens in CancelBuild, so nothing needed here.
+                break;
+        }
+    }
+
+    void AimingPhase()
+    {
+        // Ensure indicator and ray are visible
+        if (aimRay != null) aimRay.enabled = true;
+
+        RaycastHit hit;
+        // Raycast origin is camera, direction is camera forward
+        if (Physics.Raycast(transform.parent.position, transform.parent.forward, out hit, maxBuildDistance, LayerMask.GetMask("Default")))
+        {
+            // Assuming LayerMask "Default" covers all walkable ground
+            buildIndicatorAvailable = true;
+            
+            // Position the ray end and the indicator
+            aimRay.SetPosition(0, shootPoint.position);
+            aimRay.SetPosition(1, hit.point);
+            UpdateBuildIndicator(hit.point, true); // True = can build
+        }
+        else
+        {
+            buildIndicatorAvailable = false;
+            // Ray misses the ground within max distance
+            aimRay.SetPosition(0, shootPoint.position);
+            aimRay.SetPosition(1, shootPoint.position + transform.parent.forward * maxBuildDistance);
+            UpdateBuildIndicator(Vector3.zero, false); // False = invalid location
+        }
+    }
+
+    void CancelBuild()
+    {
+        buildState = BuildState.Idle;
+        if (aimRay != null) aimRay.enabled = false;
+        if (buildMenuUI != null) buildMenuUI.SetActive(false);
+        
+        // Only destroy the indicator if it exists
+        if (buildIndicatorInstance != null) Destroy(buildIndicatorInstance.gameObject);
+        
+        // Lock cursor for FPS view
+        Cursor.lockState = CursorLockMode.Locked; 
+    }
+    
+    void UpdateBuildIndicator(Vector3 position, bool isValid)
+    {
+        if (buildIndicatorPrefab == null) return;
+        
+        if (buildIndicatorInstance == null)
+        {
+            // Create the ghost indicator on first use
+            buildIndicatorInstance = Instantiate(buildIndicatorPrefab, position, Quaternion.identity).transform;
+            buildIndicatorInstance.SetParent(transform.root);
+        }
+
+        // Set position and color based on validity
+        buildIndicatorInstance.position = position;
+        
+        // Ensure renderer exists before trying to change color
+        Renderer indicatorRenderer = buildIndicatorInstance.GetComponent<Renderer>();
+        if(indicatorRenderer != null)
+        {
+            indicatorRenderer.material.color = isValid ? Color.green : Color.red;
+        }
+
+        buildIndicatorInstance.gameObject.SetActive(true);
+    }
+
+    // --- SHOOTING & ADS HANDLERS ---
+    
+    void HandleADS()
+    {
+        // Get target position (uses the isAiming state set by OnAim)
+        Vector3 targetPosition = inputScript.aim ? adsTarget.localPosition : initialPosition;
+        
+        // Smoothly move the gun
+        transform.localPosition = Vector3.Lerp(
+            transform.localPosition, 
+            targetPosition, 
+            Time.deltaTime * currentWeapon.adsSpeed
+        );
+    }
 
     void Shoot()
     {
@@ -107,120 +315,107 @@ public class WeaponController : MonoBehaviour
         if (currentAmmo <= 0)
         {
             Debug.Log("Out of Ammo! Reloading automatically...");
-            if (currentReserveAmmo > 0)
+            if (currentReserveAmmo > 0 && !isReloading)
             {
-                // Only start reload if we are not already reloading and have reserve ammo
-                if (!isReloading)
-                {
-                    StartCoroutine(Reload());
-                }
+                StartCoroutine(Reload()); 
             }
-            // Return regardless of whether reload started or not (stops shot attempt)
             return; 
         }
 
         // 2. Decrement Ammo & Set Cooldown
         currentAmmo--;
-        timeUntilNextShot = currentWeapon.fireRate;
+        nextFireTime = Time.time + currentWeapon.fireRate;
 
         // 3. CORE MECHANIC: Spawn Projectile
         if (currentWeapon.bulletPrefab != null)
         {
-            // Instantiating and passing damage/speed data to the Projectile script
+            // Instantiate and pass damage/speed data
             GameObject projectileObject = Instantiate(currentWeapon.bulletPrefab, shootPoint.position, shootPoint.rotation);
             Projectile projectileScript = projectileObject.GetComponent<Projectile>(); 
-
+            
             if (projectileScript != null)
             {
                 projectileScript.damageAmount = currentWeapon.damage;
             }
         }
+        else
+        {
+            Debug.LogError("Bullet Prefab is NULL in Weapon Data asset!");
+        }
 
-        // 4. Recoil and Visual Feedback
+        // 4. Apply recoil/camera shake
         if (cameraShake != null)
         {
             cameraShake.Shake(currentWeapon.recoilKickback);
         }
 
-        // Optional: Implement muzzle flash and sound effects here
-        
         Debug.Log("Fired! Ammo Remaining: " + currentAmmo);
     }
+    
+    // --- COROUTINE ---
 
     IEnumerator Reload()
     {
-        Debug.Log("Reloading...");
         isReloading = true;
-
+        Debug.Log("Reloading...");
+        
         // Wait for the specified reload time
         yield return new WaitForSeconds(currentWeapon.reloadTime);
+        
+        // Calculate amount to reload
+        int ammoNeeded = currentWeapon.maxAmmo - currentAmmo;
+        int ammoToUse = Mathf.Min(ammoNeeded, currentReserveAmmo);
 
-        // Calculate ammo to transfer from reserve to clip
-        int neededAmmo = currentWeapon.maxAmmo - currentAmmo;
-        int ammoToTransfer = Mathf.Min(neededAmmo, currentReserveAmmo);
+        // Update values
+        currentAmmo += ammoToUse;
+        currentReserveAmmo -= ammoToUse;
 
-        // Update counts
-        currentAmmo += ammoToTransfer;
-        currentReserveAmmo -= ammoToTransfer;
-
+        Debug.Log("Reload Complete! Ammo: " + currentAmmo + " Reserve: " + currentReserveAmmo);
         isReloading = false;
-        Debug.Log("Reload Complete. Ammo: " + currentAmmo + " / Reserve: " + currentReserveAmmo);
     }
+    
+    // --- PUBLIC METHODS ---
 
     public void EquipWeapon(int index)
     {
-        // Bounds check
-        if (index < 0 || index >= inventory.Length) return;
+        if (index < 0 || index >= inventory.Length)
+        {
+            Debug.LogError("Invalid weapon index.");
+            return;
+        }
 
-        // 1. DEACTIVATE the currently equipped weapon (if there is one)
+        // 1. Deactivate old weapon model
         if (currentWeapon != null && currentWeapon.weaponPrefab != null)
         {
             currentWeapon.weaponPrefab.SetActive(false);
         }
 
-        // 2. Set the new weapon data
-        currentWeaponIndex = index;
+        // 2. Set new weapon data
         currentWeapon = inventory[index];
+        
+        // 3. Initialize state for new weapon
+        currentAmmo = currentWeapon.maxAmmo;
+        currentReserveAmmo = currentWeapon.reserveAmmo;
+        adsSpeed = currentWeapon.adsSpeed;
 
-        // 3. ACTIVATE the new weapon model
+        // 4. Activate new weapon model and ensure it starts at the hip position
         if (currentWeapon.weaponPrefab != null)
         {
             currentWeapon.weaponPrefab.SetActive(true);
         }
         
-        // 4. Initialize ammo
-        currentAmmo = currentWeapon.maxAmmo;
-        currentReserveAmmo = currentWeapon.reserveAmmo;
-        isReloading = false;
-        
+        transform.localPosition = initialPosition;
+
         Debug.Log("Equipped: " + currentWeapon.weaponName);
     }
+    
+    // --- DUMMY CALLBACK METHODS (Required to consume Broadcast Messages) ---
+    // Even though we poll, we need these public methods to prevent InputSystem errors 
+    // when using Broadcast Messages on the player root.
 
-    // --- VISUAL & MOVEMENT ---
-
-    void HandleADS()
-    {
-        Vector3 targetLocalPosition = hipPosition;
-        
-        // Check if ADS input is active and we are not currently reloading
-        if (inputScript.aim && !isReloading)
-        {
-            // Set the target position to the ADS position from the data asset
-            if (adsTarget != null)
-            {
-                // We use the local position of the adsTarget marker as the target position
-                targetLocalPosition = adsTarget.localPosition;
-            }
-            adsModeActive = true;
-        }
-        else
-        {
-            // Otherwise, target the hip position
-            adsModeActive = false;
-        }
-
-        // Smoothly interpolate between the current position and the target position
-        float lerpSpeed = currentWeapon != null ? currentWeapon.adsSpeed : 10f;
-        transform.localPosition = Vector3.Lerp(transform.localPosition, targetLocalPosition, Time.deltaTime * lerpSpeed);
-    }
+    //public void OnFire(InputAction.CallbackContext context) { /* Handled in Update */ }
+    //public void OnAim(InputAction.CallbackContext context) { /* Handled in Update */ }
+    //public void OnReload(InputAction.CallbackContext context) { /* Handled in Update */ }
+    //public void OnBuild(InputAction.CallbackContext context) { /* Handled in Update */ }
+    //public void OnMenuScroll(InputAction.CallbackContext context) { /* Handled in Update */ }
 }
