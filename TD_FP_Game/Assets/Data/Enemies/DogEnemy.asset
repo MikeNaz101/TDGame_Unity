@@ -12,8 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69b09942343bc054496c775627921e02, type: 3}
   m_Name: DogEnemy
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyName: Dog
-  enemyPrefab: {fileID: 8284769568972452652, guid: d0a7854a30e40a8479daa31ed03d2e09, type: 3}
+  enemyName: New Grunt
+  enemyPrefab: {fileID: 6315366646354374642, guid: cc8401c0a7d659d43a0c5ca93157882b, type: 3}
   baseHealth: 50
-  speed: 3.5
-  scrapDropAmount: 10
+  attackDamage: 10
+  attackCooldown: 2
+  moveSpeed: 3.5
+  detectionRange: 15
+  patrolWaitTime: 2
+  scrapMetalPrefab: {fileID: 3609530775625676480, guid: 012bf2f65129f7c4db77522b829b50b2, type: 3}
+  deathEffect: {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}

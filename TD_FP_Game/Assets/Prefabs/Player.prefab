@@ -161,6 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6d86b5905b1b3e4f83472bd9e10ec63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponController
+  inputScript: {fileID: 7781065369506059698}
   shootPoint: {fileID: 7329137285754393691}
   cameraShake: {fileID: 2937927678609004415}
   adsTarget: {fileID: 1992113726465873071}
@@ -421,8 +422,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraShake
   returnSpeed: 10
-  shakeIntensity: 0.5
-  shakeSpeed: 50
+  shakeIntensity: 0.25
+  shakeSpeed: 25
 --- !u!120 &2388160892330337478
 LineRenderer:
   serializedVersion: 2

@@ -15,7 +15,7 @@ public class WaveManager : MonoBehaviour
 
     [Header("Core Reference")]
     [Tooltip("The central core/base the enemies are targeting.")]
-    public Transform coreTarget;
+    public Transform coreTarget; // Still needed for context, but EnemyController finds its own target
 
     private int currentWaveIndex = 0;
     private int enemiesRemaining = 0;
@@ -83,16 +83,17 @@ public class WaveManager : MonoBehaviour
                 );
 
                 // --- CRITICAL SETUP ---
-                // Assign the required data and target to the EnemyController script on the new enemy
+                // The enemy should find its target and manager in its own Start() method.
+                // We only need to assign the EnemyData Scriptable Object.
+                
                 EnemyController enemyScript = enemyObj.GetComponent<EnemyController>();
                 if (enemyScript != null)
                 {
-                    // 1. Set the target (the core)
-                    enemyScript.playerTarget = coreTarget;
+                    // 1. Assign the EnemyData asset! This provides all stats (health, speed, etc.)
+                    enemyScript.enemyData = group.enemyType;
                     
-                    // 2. Set base stats from the Scriptable Object data
-                    enemyScript.health = group.enemyType.baseHealth;
-                    // Note: You would set the NavMeshAgent speed here too if you expose it in EnemyController
+                    // NOTE: The EnemyController's Start() method will now correctly use this
+                    // data to set its _currentHealth and _agent.speed.
                 }
 
                 yield return new WaitForSeconds(group.spawnInterval);
