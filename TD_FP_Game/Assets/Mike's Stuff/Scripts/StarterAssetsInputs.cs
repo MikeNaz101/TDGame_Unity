@@ -36,6 +36,10 @@ namespace StarterAssets
        [Header("Mouse Cursor Settings")]
        public bool cursorLocked = true;
        public bool cursorInputForLook = true;
+       
+       [Header("Weapon Selection Input")]
+       public bool weapon2; 
+       public bool weapon3;
 
 #if ENABLE_INPUT_SYSTEM
        // --- MOVEMENT/LOOK CALLBACKS (Invoked by PlayerInput) ---
@@ -91,6 +95,16 @@ namespace StarterAssets
        {
           MenuScrollInput(value.Get<float>());
        }
+       
+       public void OnWeapon2(InputValue value)
+       {
+          Weapon2Input(value.isPressed);
+       }
+       
+       public void OnWeapon3(InputValue value)
+       {
+          Weapon3Input(value.isPressed);
+       }
 
 
 #endif
@@ -142,8 +156,16 @@ namespace StarterAssets
            // Scroll wheel returns a vector (usually Y-axis), but we only need the float value
            menuScroll = newScrollValue;
        }
-
-
+       
+       public void Weapon2Input(bool newWeapon2State)
+       {
+          weapon2 = newWeapon2State;
+       }
+       
+       public void Weapon3Input(bool newWeapon3State)
+       {
+          weapon3 = newWeapon3State;
+       }
        
        private void OnApplicationFocus(bool hasFocus)
        {

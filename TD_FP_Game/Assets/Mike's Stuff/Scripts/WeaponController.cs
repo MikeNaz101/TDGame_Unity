@@ -327,7 +327,7 @@ public class WeaponController : MonoBehaviour
         nextFireTime = Time.time + currentWeapon.fireRate;
 
         // 3. CORE MECHANIC: Spawn Projectile
-        if (currentWeapon.bulletPrefab != null)
+        /*if (currentWeapon.bulletPrefab != null)
         {
             // Instantiate and pass damage/speed data
             GameObject projectileObject = Instantiate(currentWeapon.bulletPrefab, shootPoint.position, shootPoint.rotation);
@@ -341,7 +341,7 @@ public class WeaponController : MonoBehaviour
         else
         {
             Debug.LogError("Bullet Prefab is NULL in Weapon Data asset!");
-        }
+        }*/
 
         // 4. Apply recoil/camera shake
         if (cameraShake != null)
@@ -393,12 +393,35 @@ public class WeaponController : MonoBehaviour
         // 2. Set new weapon data
         currentWeapon = inventory[index];
         
-        // 3. Initialize state for new weapon
+        // 3. ACTIVATE and SEARCH the new weapon model
+        if (currentWeapon.weaponPrefab != null)
+        {
+            // 3a. Instantiate the model if it's not already in the scene, OR...
+            // 3b. If using the setup where the models are already children of GunHolder:
+            currentWeapon.weaponPrefab.SetActive(true); 
+
+            // CRITICAL STEP: Search the newly activated weapon model for the Muzzle tag.
+            Transform newShootPoint = currentWeapon.weaponPrefab.GetComponentInChildren<Transform>()
+                .GetComponentsInChildren<Transform>()
+                .FirstOrDefault(t => t.CompareTag("Muzzle"));
+
+            if (newShootPoint != null)
+            {
+                // Assign the found Transform to the public shootPoint field
+                shootPoint = newShootPoint; 
+            }
+            else
+            {
+                Debug.LogError("ShootPoint/Muzzle Tag Not Found in new weapon prefab: " + currentWeapon.weaponName);
+            }
+        }
+        
+        // 4. Initialize state for new weapon
         currentAmmo = currentWeapon.maxAmmo;
         currentReserveAmmo = currentWeapon.reserveAmmo;
         adsSpeed = currentWeapon.adsSpeed;
 
-        // 4. Activate new weapon model and ensure it starts at the hip position
+        // 5. Activate new weapon model and ensure it starts at the hip position
         if (currentWeapon.weaponPrefab != null)
         {
             currentWeapon.weaponPrefab.SetActive(true);
