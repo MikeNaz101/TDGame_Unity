@@ -2023,9 +2023,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   enemyData: {fileID: 11400000, guid: 2455d0491877f1e40bb903079e05d214, type: 2}
-  _waveManager: {fileID: 0}
-  _playerTarget: {fileID: 0}
-  patrolRoute: {fileID: 0}
+  _waveManager: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+  _playerTarget: {fileID: 5676907677654854008, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+  patrolRoute: {fileID: 4141435576251544674, guid: 4b8eb8a9c58129640ae89ff4d579c5c9, type: 3}
   fov: {fileID: 6091228900648116733}
   _ragdollRigidbodies:
   - {fileID: 3677564129342027936}
