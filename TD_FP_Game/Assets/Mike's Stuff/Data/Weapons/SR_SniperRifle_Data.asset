@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Sniper Rifle
   weaponPrefab: {fileID: 124194, guid: f05a2b9d2a6e5dd4b8241a31203d8b13, type: 3}
+  adsReticlePrefab: {fileID: 6765210739813428312, guid: 169407042f5c9c644828ea08e163eeb2, type: 3}
   damage: 100
   range: 200
   fireRate: 0.25

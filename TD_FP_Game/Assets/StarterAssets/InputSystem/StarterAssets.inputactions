@@ -320,7 +320,7 @@
                     "name": "",
                     "id": "6851942a-f102-43c9-a727-d81e5818daef",
                     "path": "<Keyboard>/q",
-                    "interactions": "Press",
+                    "interactions": "Press(behavior=2)",
                     "processors": "",
                     "groups": "",
                     "action": "Build",

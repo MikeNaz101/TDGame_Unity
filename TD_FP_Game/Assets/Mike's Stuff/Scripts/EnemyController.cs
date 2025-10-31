@@ -59,7 +59,7 @@ public class EnemyController : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
     }
 
-    public void Init()
+    public void Start()
     {
         // This is called by WaveManager AFTER enemyData is assigned, preventing NullReferenceException.
 

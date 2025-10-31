@@ -93,7 +93,7 @@ namespace StarterAssets
 
        public void OnMenuScroll(InputValue value)
        {
-          MenuScrollInput(value.Get<float>());
+          MenuScrollInput(value.Get<Vector2>().y);
        }
        
        public void OnWeapon2(InputValue value)

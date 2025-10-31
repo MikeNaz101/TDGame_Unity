@@ -14,13 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Assault Rifle
   weaponPrefab: {fileID: 1396857973655360118, guid: ee9c6e6555bcf0a498f8e747fdf73ce8, type: 3}
-  bulletPrefab: {fileID: 8479983748241459406, guid: 167038338c6f0eb44b39bcfffcffe316, type: 3}
+  adsReticlePrefab: {fileID: 8305691199734996223, guid: ecaf8c39d8992c94f94f5b8e8f2f66d7, type: 3}
   damage: 10
+  range: 100
   fireRate: 0.25
   isAutomatic: 1
   maxAmmo: 30
-  reloadTime: 10
   reserveAmmo: 29
+  reloadTime: 10
   recoilKickback: 0.5
-  aimDownSightsPosition: {x: 0, y: 0, z: 0}
   adsSpeed: 8
+  aimDownSightsPosition: {x: 0, y: 0, z: 0}

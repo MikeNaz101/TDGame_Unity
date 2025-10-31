@@ -5,17 +5,18 @@ TagManager:
   serializedVersion: 3
   tags:
   - CinemachineTarget
+  - Muzzle
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Gun
   - Water
   - UI
   - Muzzle
-  - 
-  - 
-  - 
+  - Enemy
+  - Player
+  - Tower
   - 
   - 
   - 
