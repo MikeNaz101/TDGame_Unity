@@ -28,7 +28,10 @@ namespace StarterAssets
        public bool build;
        [Tooltip("Value from the Scroll Wheel for menu navigation.")]
        public float menuScroll;
-
+       
+       [Header("Interaction Input")]
+       [Tooltip("True when the Interact button (E) is pressed.")]
+       public bool interact;
 
        [Header("Movement Settings")]
        public bool analogMovement;
@@ -83,8 +86,6 @@ namespace StarterAssets
        {
           ReloadInput(value.isPressed);
        }
-       
-       // --- NEW BUILD CALLBACKS (Invoked by PlayerInput) ---
 
        public void OnBuild(InputValue value)
        {
@@ -104,6 +105,11 @@ namespace StarterAssets
        public void OnWeapon3(InputValue value)
        {
           Weapon3Input(value.isPressed);
+       }
+       
+       public void OnInteract(InputValue value)
+       {
+          InteractInput(value.isPressed);
        }
 
 
@@ -167,12 +173,18 @@ namespace StarterAssets
           weapon3 = newWeapon3State;
        }
        
+       public void InteractInput(bool newInteractState)
+       {
+          interact = newInteractState;
+       }
+       
+       
        private void OnApplicationFocus(bool hasFocus)
        {
           SetCursorState(cursorLocked);
        }
 
-       private void SetCursorState(bool newState)
+       public void SetCursorState(bool newState)
        {
           Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
        }

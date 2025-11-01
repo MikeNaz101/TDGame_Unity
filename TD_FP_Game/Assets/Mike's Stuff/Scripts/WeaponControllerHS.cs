@@ -210,46 +210,86 @@ public class WeaponControllerHS : MonoBehaviour
     // --- (Shoot, FlashMuzzle, and Reload are unchanged) ---
     void Shoot()
     {
+        // 1. Check for Ammunition and Auto-Reload
         if (currentAmmo <= 0)
         {
-            if (currentReserveAmmo > 0 && !isReloading) StartCoroutine(Reload()); 
+            if (currentReserveAmmo > 0 && !isReloading)
+            {
+                StartCoroutine(Reload()); 
+            }
             return; 
         }
+
+        // 2. Decrement Ammo & Set Cooldown
         currentAmmo--;
         nextFireTime = currentWeapon.fireRate;
 
+        // --- THIS IS THE FIX ---
+        // 3. CORE MECHANIC: Define the ray from the CAMERA (where the reticle is)
+        Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
         RaycastHit hit;
-        if (Physics.Raycast(shootPoint.position, shootPoint.forward, out hit, currentWeapon.range, hitScanLayer))
+
+        // 4. Perform Hit Scan from the CAMERA
+        if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
         {
-            EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
-            if (enemy != null) enemy.TakeDamage(currentWeapon.damage);
+            // Damage Enemy
+            EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>(); // Use GetComponentInParent for robustness
+            if (enemy != null)
+            {
+                enemy.TakeDamage(currentWeapon.damage);
+            }
         }
-        if (cameraShake != null) cameraShake.Shake(currentWeapon.recoilKickback);
+        // --- END OF FIX ---
+
+        // 5. Recoil and Visual Feedback
+        if (cameraShake != null)
+        {
+            cameraShake.Shake(currentWeapon.recoilKickback);
+        }
+        
+        // 6. Flash Muzzle
         StartCoroutine(FlashMuzzle());
+        
+        // 7. Consume Input to avoid conflicts
         inputScript.fire = false; 
+        
+        // Debug.Log("Fired! Ammo Remaining: " + currentAmmo); // Optional: uncomment for debugging
     }
 
     IEnumerator FlashMuzzle()
     {
-        if (currentGunTracer == null || shootPoint == null) yield break; 
-
-        RaycastHit hit;
-        Vector3 startPoint = shootPoint.position;
-        Vector3 endPoint;
-        float range = currentWeapon.range;
-
-        if (Physics.Raycast(startPoint, shootPoint.forward, out hit, range, hitScanLayer))
+        if (currentGunTracer == null || shootPoint == null)
         {
-            endPoint = hit.point;
+            yield break; 
+        }
+        
+        // 1. Define Ray from CAMERA center (same as in Shoot())
+        Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
+        RaycastHit hit;
+
+        // 2. Find the target point (from CAMERA)
+        Vector3 targetPoint;
+        if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
+        {
+            // We hit something, so our target is the hit point
+            targetPoint = hit.point;
         }
         else
         {
-            endPoint = startPoint + shootPoint.forward * range;
+            // We hit nothing, so our target is max range in that direction
+            targetPoint = ray.GetPoint(currentWeapon.range);
         }
-        currentGunTracer.SetPosition(0, startPoint);
-        currentGunTracer.SetPosition(1, endPoint);
+
+
+        // 3. Set LineRenderer's positions
+        // Start at the gun's muzzle
+        currentGunTracer.SetPosition(0, shootPoint.position);
+        // End at the reticle's target
+        currentGunTracer.SetPosition(1, targetPoint);
+
+        // 4. Flash the line
         currentGunTracer.enabled = true;
-        yield return new WaitForSeconds(0.05f); 
+        yield return new WaitForSeconds(0.05f); // Flash for 50 milliseconds
         currentGunTracer.enabled = false;
     }
 
