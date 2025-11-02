@@ -6,6 +6,9 @@ TagManager:
   tags:
   - CinemachineTarget
   - Muzzle
+  - FxTemporaire
+  - Tower
+  - NoBuildZone
   layers:
   - Default
   - TransparentFX
@@ -19,10 +22,10 @@ TagManager:
   - Tower
   - Cursor
   - 
+  - CanBuildOn
   - 
-  - 
-  - 
-  - 
+  - TowerPreview
+  - NoBuildZone
   - 
   - 
   - 

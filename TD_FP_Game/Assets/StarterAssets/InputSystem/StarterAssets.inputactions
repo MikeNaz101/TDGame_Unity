@@ -113,6 +113,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "PreviewBuild",
+                    "type": "Button",
+                    "id": "f9f9cff8-92aa-46ac-98af-a0e22f7b3169",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -329,7 +338,7 @@
                     "name": "",
                     "id": "6851942a-f102-43c9-a727-d81e5818daef",
                     "path": "<Keyboard>/q",
-                    "interactions": "Press(behavior=2)",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Build",
@@ -377,6 +386,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c867277c-1fc6-4bfc-a6ff-a7e9a8ea9aae",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";KeyboardMouse",
+                    "action": "PreviewBuild",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
