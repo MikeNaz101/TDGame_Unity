@@ -5,7 +5,7 @@ using UnityEngine.InputSystem; // Still needed for CallbackContext but not used 
 using System.Linq; 
 
 public class WeaponController : MonoBehaviour
-{
+{/*
     // --- SETUP REFERENCES (Assigned in Inspector) ---
     [Header("Setup")]
     [Tooltip("The script that holds the current state of player inputs (StarterAssetsInputs).")]
@@ -341,7 +341,7 @@ public class WeaponController : MonoBehaviour
         else
         {
             Debug.LogError("Bullet Prefab is NULL in Weapon Data asset!");
-        }*/
+        }
 
         // 4. Apply recoil/camera shake
         if (cameraShake != null)
@@ -431,14 +431,4 @@ public class WeaponController : MonoBehaviour
 
         Debug.Log("Equipped: " + currentWeapon.weaponName);
     }
-    
-    // --- DUMMY CALLBACK METHODS (Required to consume Broadcast Messages) ---
-    // Even though we poll, we need these public methods to prevent InputSystem errors 
-    // when using Broadcast Messages on the player root.
-
-    //public void OnFire(InputAction.CallbackContext context) { /* Handled in Update */ }
-    //public void OnAim(InputAction.CallbackContext context) { /* Handled in Update */ }
-    //public void OnReload(InputAction.CallbackContext context) { /* Handled in Update */ }
-    //public void OnBuild(InputAction.CallbackContext context) { /* Handled in Update */ }
-    //public void OnMenuScroll(InputAction.CallbackContext context) { /* Handled in Update */ }
-}
+*/}

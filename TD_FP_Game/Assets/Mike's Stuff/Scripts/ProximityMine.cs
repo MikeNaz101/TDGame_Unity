@@ -100,7 +100,7 @@ public class ProximityMine : MonoBehaviour
 
             if (enemy != null)
             {
-                enemy.TakeExplosion(transform.position, _explosionForce, _explosionRadius, _upwardModifier);
+                //enemy.TakeExplosion(transform.position, _explosionForce, _explosionRadius, _upwardModifier);
             }
             else
             {

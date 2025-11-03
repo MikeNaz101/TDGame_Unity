@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine.UI; // Required for Button and GraphicRaycaster
-using UnityEngine.EventSystems; // Required for EventSystem and PointerEventData
-using System.Collections.Generic; // Required for List
-using StarterAssets; // Required for StarterAssetsInputs
-using Unity.Cinemachine; // Required for virtual cameras
-using TMPro; // Required for TextMeshPro text
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using StarterAssets;
+using Unity.Cinemachine;
+using TMPro;
 
 /// <summary>
 /// This script manages the player's state (e.g., "Playing" vs. "Interacting with PC").
@@ -33,7 +33,6 @@ public class PlayerInteractionManager : MonoBehaviour
     public GraphicRaycaster pcGraphicRaycaster;
     public EventSystem eventSystem;
 
-    // --- NEW TYPEWRITER FIELDS ---
     [Header("PC Typewriter")]
     [Tooltip("The TypeWriterEffect script. (Can be on the PC Canvas or another manager object)")]
     public TypeWriterEffect pcTypewriter;
@@ -42,7 +41,6 @@ public class PlayerInteractionManager : MonoBehaviour
     [Tooltip("The message to display when the player first uses the PC.")]
     [TextArea(3, 10)]
     public string pcWelcomeMessage = "Welcome, user. System booting...\nAll systems nominal.\nReady for input.";
-    // --- END NEW FIELDS ---
 
     private bool isInteracting = false;
     private CinemachineCamera activePCVCam;
@@ -64,18 +62,8 @@ public class PlayerInteractionManager : MonoBehaviour
         {
             pcGraphicRaycaster = pcScreenCanvas.GetComponent<GraphicRaycaster>();
         }
-
-        // --- NEW ---
-        // Auto-find typewriter script if not assigned
-        if (pcTypewriter == null)
-        {
-            pcTypewriter = FindObjectOfType<TypeWriterEffect>();
-        }
-        // --- END NEW ---
-
         pointerEventData = new PointerEventData(eventSystem);
         raycastResults = new List<RaycastResult>();
-        
         EndPCInteraction(); 
     }
 
@@ -83,7 +71,6 @@ public class PlayerInteractionManager : MonoBehaviour
     {
         if (isInteracting)
         {
-            // --- 1. CURSOR MOVEMENT LOGIC ---
             if (customCursor != null)
             {
                 Vector2 mouseDelta = inputScript.look * cursorSpeed;
@@ -99,7 +86,6 @@ public class PlayerInteractionManager : MonoBehaviour
                 customCursor.anchoredPosition = cursorPosition;
             }
 
-            // --- 2. CLICK LOGIC (NEW) ---
             if (inputScript.fire)
             {
                 inputScript.fire = false;
@@ -118,9 +104,6 @@ public class PlayerInteractionManager : MonoBehaviour
                     }
                 }
             }
-            // --- END CLICK LOGIC ---
-
-            // --- 3. EXIT LOGIC (FIXED) ---
             if (inputScript.interact)
             {
                 inputScript.interact = false; 
@@ -162,14 +145,10 @@ public class PlayerInteractionManager : MonoBehaviour
         {
             activePCVCam.Priority = 20; // Give this camera priority
         }
-
-        // --- NEW ---
-        // Start the typewriter effect
         if (pcTypewriter != null && pcDisplay != null)
         {
             pcTypewriter.DisplayText(pcDisplay, pcWelcomeMessage);
         }
-        // --- END NEW ---
     }
 
     /// <summary>
@@ -178,14 +157,10 @@ public class PlayerInteractionManager : MonoBehaviour
     public void EndPCInteraction()
     {
         isInteracting = false;
-
-        // --- NEW ---
-        // Stop the typewriter effect
         if (pcTypewriter != null)
         {
             pcTypewriter.StopTyping();
         }
-        // --- END NEW ---
 
         // Enable player controls
         doomMovement.enabled = true;

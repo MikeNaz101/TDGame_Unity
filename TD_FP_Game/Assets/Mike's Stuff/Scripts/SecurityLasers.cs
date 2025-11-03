@@ -61,7 +61,7 @@ public class SecurityLasers : MonoBehaviour
 
         if (enemyController)
         {
-            enemyController.GoToAlarm(alarmPosition, this);
+            //enemyController.GoToAlarm(alarmPosition, this);
         }
     }
 

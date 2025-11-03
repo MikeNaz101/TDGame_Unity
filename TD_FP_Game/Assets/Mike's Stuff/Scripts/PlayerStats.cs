@@ -1,12 +1,14 @@
 using UnityEngine;
 
-public class PlayerStats : MonoBehaviour
+public class PlayerStats : MonoBehaviour, IDamageable
 {
     [Header("Health & Energy")]
     public float maxHealth = 100f;
     public float currentHealth;
     public float maxEnergy = 100f;
     public float currentEnergy;
+    
+    public Transform transform => base.transform;
 
     [Header("Resources")]
     public int scrapMetal = 0; // Public field for the collected resource
@@ -50,17 +52,10 @@ public class PlayerStats : MonoBehaviour
     {
         scrapMetal += amount;
         Debug.Log("Scrap Metal: " + scrapMetal);
-        // Note: HUD update logic would typically be called here if not using continuous binding
     }
 
     // --- TOWER BUILDING LOGIC (Called by WeaponController) ---
-
-    /// <summary>
-    /// Attempts to build a tower at the specified location if the player has enough resources.
-    /// </summary>
-    /// <param name="towerIndex">The index of the tower type to build (from TowerManager list).</param>
-    /// <param name="position">The world position where the tower should be placed.</param>
-    /// <returns>True if the tower was successfully built, False otherwise.</returns>
+    // Attempts to build a tower at the specified location if the player has enough resources.
     public bool TryBuildTower(int towerIndex, Vector3 position)
     {
         if (towerManager == null)

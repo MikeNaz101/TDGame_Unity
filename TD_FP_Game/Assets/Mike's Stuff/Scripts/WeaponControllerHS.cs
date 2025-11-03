@@ -2,34 +2,46 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq; 
-using StarterAssets; // Required to access the public input booleans
+using StarterAssets; // Required for StarterAssetsInputs
 
+// This line automatically adds an AudioSource component when you add this script.
+[RequireComponent(typeof(AudioSource))]
 public class WeaponControllerHS : MonoBehaviour
 {
     // --- EXTERNAL REFERENCES ---
     [Header("Setup")]
+    [Tooltip("The player camera's shake script for recoil effects.")]
     public CameraShake cameraShake;
+    [Tooltip("The main player camera that will be zoomed.")]
     public Camera mainCamera;
+    [Tooltip("How much 'range' affects zoom. Higher number = LESS zoom.")]
     public float rangeToZoomRatio = 20f;
+    [Tooltip("The object that marks the ADS position.")]
     public Transform adsTarget;
+    [Tooltip("The layer mask used for hit scanning (Enemies & Environment).")]
     public LayerMask hitScanLayer;
+    [Tooltip("The script that holds the current state of player inputs.")]
     public StarterAssetsInputs inputScript; 
+    [Tooltip("The dedicated script that handles all building FSM logic.")]
     public BuildManager buildManager;
 
-    // --- NEW UI FIELDS ---
     [Header("UI")]
     [Tooltip("The simple, static crosshair for hip fire.")]
     public GameObject hipCrosshairUI;
     [Tooltip("The parent RectTransform on your Canvas where ADS reticles will be spawned.")]
     public Transform adsReticleParent;
-    // --- END NEW UI FIELDS ---
+    
+    [Header("Audio")]
+    [Tooltip("The sound to play when the player tries to fire an empty clip.")]
+    public AudioClip emptyClipSound;
     
     [Header("Weapon Data")]
+    [Tooltip("List of all weapons the player can switch between.")]
     public WeaponData[] inventory;
 
     // --- PRIVATE STATE VARIABLES ---
     private GameObject currentGunInstance;
-    private GameObject currentAdsReticleInstance; // To hold the spawned ADS reticle
+    private GameObject currentAdsReticleInstance;
     private WeaponData currentWeapon;
     private float nextFireTime;
     private int currentAmmo;
@@ -41,15 +53,16 @@ public class WeaponControllerHS : MonoBehaviour
     private bool isShootingEnabled = true;
     private float originalFOV; 
 
-    // --- (Properties are unchanged) ---
+    // --- PUBLIC PROPERTIES (For BuildManager to Read) ---
     public bool IsReloading => isReloading;
     public Transform ShootPoint => shootPoint;
     
-    // --- (Private references are unchanged) ---
+    // --- PRIVATE REFERENCES ---
     private Transform gunHolder; 
     private Transform shootPoint; 
     private LineRenderer currentGunTracer;
     private PlayerStats playerStats; 
+    private AudioSource _audioSource; // For playing sounds
 
     // --- UNITY LIFECYCLE ---
 
@@ -57,12 +70,14 @@ public class WeaponControllerHS : MonoBehaviour
     {
         playerStats = GetComponentInParent<PlayerStats>();
         gunHolder = this.transform; 
+        _audioSource = GetComponent<AudioSource>(); // Get the AudioSource
         
         if (transform.parent != null)
         {
             hipPosition = transform.localPosition;
         }
         
+        // Find camera from CameraShake script if not assigned
         if (mainCamera == null && cameraShake != null)
         {
             mainCamera = cameraShake.GetComponentInParent<Camera>();
@@ -82,7 +97,6 @@ public class WeaponControllerHS : MonoBehaviour
             EquipWeapon(currentWeaponIndex); 
         }
 
-        // Ensure hip crosshair is visible at start
         if(hipCrosshairUI != null) hipCrosshairUI.SetActive(true);
     }
 
@@ -90,6 +104,7 @@ public class WeaponControllerHS : MonoBehaviour
     {
         if (currentWeapon == null || playerStats == null) return;
 
+        // Update Cooldown
         if (nextFireTime > 0f)
         {
             nextFireTime -= Time.deltaTime;
@@ -98,9 +113,10 @@ public class WeaponControllerHS : MonoBehaviour
         if (isShootingEnabled)
         {
             HandleDirectSwitching();
-            HandleADS(); // This is now updated
+            HandleADS(); 
             HandleFiringInput();
 
+            // Handle Manual Reload
             if (inputScript.reload && !isReloading && currentAmmo < currentWeapon.maxAmmo)
             {
                 inputScript.reload = false; 
@@ -111,7 +127,8 @@ public class WeaponControllerHS : MonoBehaviour
         wasFiringLastFrame = inputScript.fire;
     }
 
-    // --- (HandleFiringInput and HandleDirectSwitching are unchanged) ---
+    // --- INPUT HANDLERS (Combat) ---
+
     void HandleFiringInput()
     {
         bool shotReady = nextFireTime <= 0f;
@@ -122,10 +139,15 @@ public class WeaponControllerHS : MonoBehaviour
             {
                 if (inputScript.fire) Shoot();
             }
-            else 
+            else // Semi-Automatic
             {
                 if (inputScript.fire && !wasFiringLastFrame) Shoot();
             }
+        }
+        // Play empty clip sound
+        else if (inputScript.fire && !wasFiringLastFrame && currentAmmo <= 0 && !isReloading)
+        {
+            if (emptyClipSound != null) _audioSource.PlayOneShot(emptyClipSound);
         }
     }
     
@@ -136,6 +158,7 @@ public class WeaponControllerHS : MonoBehaviour
 
         if (inventory.Length <= 1) return;
 
+        // Consume input and determine direction
         if (inputScript.weapon3) 
         {
             direction = 1;
@@ -162,7 +185,6 @@ public class WeaponControllerHS : MonoBehaviour
     
     // --- COMBAT & MOVEMENT HANDLERS ---
     
-    // --- UPDATED METHOD ---
     void HandleADS()
     {
         Vector3 targetLocalPosition = hipPosition;
@@ -182,19 +204,17 @@ public class WeaponControllerHS : MonoBehaviour
             targetFOV = Mathf.Clamp(originalFOV - zoomAmount, 10f, originalFOV);
         }
         
-        // --- ADDED UI LOGIC ---
-        // Toggle the Hip Crosshair
+        // Toggle Hip Crosshair
         if (hipCrosshairUI != null)
         {
             hipCrosshairUI.SetActive(!isAiming);
         }
         
-        // Toggle the weapon-specific ADS Reticle
+        // Toggle weapon-specific ADS Reticle
         if (currentAdsReticleInstance != null)
         {
             currentAdsReticleInstance.SetActive(isAiming);
         }
-        // --- END ADDED UI LOGIC ---
 
         // Lerp gun position
         float lerpSpeed = currentWeapon != null ? currentWeapon.adsSpeed : 10f;
@@ -207,96 +227,101 @@ public class WeaponControllerHS : MonoBehaviour
         }
     }
 
-    // --- (Shoot, FlashMuzzle, and Reload are unchanged) ---
     void Shoot()
     {
-        // 1. Check for Ammunition and Auto-Reload
+        // Check for Ammunition
         if (currentAmmo <= 0)
         {
-            if (currentReserveAmmo > 0 && !isReloading)
-            {
-                StartCoroutine(Reload()); 
-            }
             return; 
         }
 
-        // 2. Decrement Ammo & Set Cooldown
+        // Decrement Ammo & Set Cooldown
         currentAmmo--;
         nextFireTime = currentWeapon.fireRate;
 
-        // --- THIS IS THE FIX ---
-        // 3. CORE MECHANIC: Define the ray from the CAMERA (where the reticle is)
+        // Play shoot sound
+        if (currentWeapon.shootSound != null)
+        {
+            _audioSource.PlayOneShot(currentWeapon.shootSound);
+        }
+
+        // Report gunshot to AI
+        if(shootPoint != null)
+        {
+            // This is the static event call for the Roamer AI
+            EnemyAIAudioEvents.ReportGunshot(shootPoint.position); 
+        }
+
+        // Parallax-Fixed Raycast from Camera
         Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
         RaycastHit hit;
 
-        // 4. Perform Hit Scan from the CAMERA
         if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
         {
             // Damage Enemy
-            EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>(); // Use GetComponentInParent for robustness
+            EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
             if (enemy != null)
             {
-                enemy.TakeDamage(currentWeapon.damage);
+                // Pass attacker transform (the Player) to the enemy
+                enemy.TakeDamage(currentWeapon.damage, transform.root); 
             }
         }
-        // --- END OF FIX ---
 
-        // 5. Recoil and Visual Feedback
+        // Recoil
         if (cameraShake != null)
         {
             cameraShake.Shake(currentWeapon.recoilKickback);
         }
         
-        // 6. Flash Muzzle
+        // Muzzle Flash
         StartCoroutine(FlashMuzzle());
         
-        // 7. Consume Input to avoid conflicts
+        // Consume Input
         inputScript.fire = false; 
-        
-        // Debug.Log("Fired! Ammo Remaining: " + currentAmmo); // Optional: uncomment for debugging
     }
+
+    // --- COROUTINES ---
 
     IEnumerator FlashMuzzle()
     {
-        if (currentGunTracer == null || shootPoint == null)
-        {
-            yield break; 
-        }
-        
-        // 1. Define Ray from CAMERA center (same as in Shoot())
+        if (currentGunTracer == null || shootPoint == null) yield break; 
+
+        // Find target for laser (Parallax-Fixed)
         Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
         RaycastHit hit;
-
-        // 2. Find the target point (from CAMERA)
         Vector3 targetPoint;
+
         if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
         {
-            // We hit something, so our target is the hit point
-            targetPoint = hit.point;
+            targetPoint = hit.point; // Hit a wall/enemy
         }
         else
         {
-            // We hit nothing, so our target is max range in that direction
-            targetPoint = ray.GetPoint(currentWeapon.range);
+            targetPoint = ray.GetPoint(currentWeapon.range); // Hit nothing
         }
 
-
-        // 3. Set LineRenderer's positions
-        // Start at the gun's muzzle
+        // Draw line from gun muzzle to reticle target
         currentGunTracer.SetPosition(0, shootPoint.position);
-        // End at the reticle's target
         currentGunTracer.SetPosition(1, targetPoint);
-
-        // 4. Flash the line
+        
         currentGunTracer.enabled = true;
-        yield return new WaitForSeconds(0.05f); // Flash for 50 milliseconds
+        yield return new WaitForSeconds(0.05f); // Flash duration
         currentGunTracer.enabled = false;
     }
 
     IEnumerator Reload()
     {
+        if (isReloading) yield break; // Prevent multiple reloads
         isReloading = true;
+        
+        // Play reload sound
+        if (currentWeapon.reloadSound != null)
+        {
+            _audioSource.PlayOneShot(currentWeapon.reloadSound);
+        }
+        
         yield return new WaitForSeconds(currentWeapon.reloadTime);
+        
         int ammoNeeded = currentWeapon.maxAmmo - currentAmmo;
         int ammoToUse = Mathf.Min(ammoNeeded, currentReserveAmmo);
         currentAmmo += ammoToUse;
@@ -304,55 +329,61 @@ public class WeaponControllerHS : MonoBehaviour
         isReloading = false;
     }
     
-    // --- (ToggleShootingEnabled is unchanged) ---
+    // --- PUBLIC METHODS ---
+    
+    // Allows BuildManager to temporarily halt weapon operation
     public void ToggleShootingEnabled(bool state)
     {
         isShootingEnabled = state;
     }
 
-    // --- UPDATED METHOD ---
+    // --- WEAPON EQUIP METHOD ---
     void EquipWeapon(int weaponIndex)
     {
         if (weaponIndex < 0 || weaponIndex >= inventory.Length) return;
 
-        // 1. Destroy old gun
+        // Destroy old gun and reticle
         if (currentGunInstance != null) Destroy(currentGunInstance);
-        
-        // --- ADDED: Destroy old reticle ---
         if (currentAdsReticleInstance != null) Destroy(currentAdsReticleInstance);
 
-        // 2. Set new WeaponData
+        // Set new WeaponData
         currentWeaponIndex = weaponIndex;
         currentWeapon = inventory[currentWeaponIndex]; 
 
-        // 3. Instantiate new gun model
+        // Play equip sound
+        if (currentWeapon.equipSound != null)
+        {
+            _audioSource.PlayOneShot(currentWeapon.equipSound);
+        }
+
+        // Instantiate new gun model
         currentGunInstance = Instantiate(currentWeapon.weaponPrefab, gunHolder);
         
-        // --- ADDED: Instantiate new reticle ---
+        // Instantiate new reticle
         if (currentWeapon.adsReticlePrefab != null && adsReticleParent != null)
         {
             currentAdsReticleInstance = Instantiate(currentWeapon.adsReticlePrefab, adsReticleParent);
-            currentAdsReticleInstance.SetActive(false); // Hide it immediately
+            currentAdsReticleInstance.SetActive(false); // Hide it
         }
         else
         {
-            currentAdsReticleInstance = null; // Ensure it's null if one doesn't exist
+            currentAdsReticleInstance = null; 
             if(adsReticleParent == null) Debug.LogWarning("AdsReticleParent is not assigned on WeaponControllerHS!");
         }
-        // --- END ADDED BLOCK ---
 
-        // 4. Find components on the new gun
+        // Find components on new gun
         currentGunTracer = currentGunInstance.GetComponentInChildren<LineRenderer>();
         shootPoint = currentGunInstance.transform.Find("ShootPoint");
 
-        // 5. Set new weapon stats
+        // Set new weapon stats
         currentAmmo = currentWeapon.maxAmmo;
         currentReserveAmmo = currentWeapon.reserveAmmo;
         isReloading = false;
         nextFireTime = 0f;
 
-        // 6. Safety Checks
+        // Safety Checks
         if (currentGunTracer == null) Debug.LogError($"Weapon '{currentWeapon.weaponName}' prefab is missing a LineRenderer!");
         if (shootPoint == null) Debug.LogError($"Weapon '{currentWeapon.weaponName}' prefab is missing a 'ShootPoint' object!");
     }
 }
+

@@ -19,9 +19,12 @@ MonoBehaviour:
   range: 200
   fireRate: 0.25
   isAutomatic: 0
-  maxAmmo: 5
+  maxAmmo: 20
   reserveAmmo: 100
-  reloadTime: 10
+  reloadTime: 2
   recoilKickback: 0.99
   adsSpeed: 8
   aimDownSightsPosition: {x: 0, y: 0, z: 0}
+  shootSound: {fileID: 8300000, guid: 614cd7dc9daa6b84286af1e08ac67172, type: 3}
+  reloadSound: {fileID: 8300000, guid: ca22f850fb7e36d429a85576bebd0015, type: 3}
+  equipSound: {fileID: 8300000, guid: edade11325ed6b64c8c8e17293a4861f, type: 3}

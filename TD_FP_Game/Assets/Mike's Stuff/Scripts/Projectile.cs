@@ -45,7 +45,7 @@ public class Projectile : MonoBehaviour
         if (enemy != null)
         {
             // If it hits an enemy, deal damage using the TakeDamage method
-            enemy.TakeDamage(damageAmount);
+            //enemy.TakeDamage(damageAmount);
         }
 
         // Destroy the projectile after it hits anything (or a specific target)

@@ -7,11 +7,7 @@ public class TowerManager : MonoBehaviour
     [Tooltip("List of all available TowerData Scriptable Objects.")]
     public TowerData[] availableTowers;
     
-    // --- Public methods called by PlayerStats.cs ---
-
-    /// <summary>
-    /// Returns the scrap cost for a tower based on its index in the availableTowers list.
-    /// </summary>
+    // Returns the scrap cost for a tower based on its index in the availableTowers list.
     public int GetTowerCost(int index)
     {
         if (availableTowers == null || index < 0 || index >= availableTowers.Length)
@@ -22,10 +18,8 @@ public class TowerManager : MonoBehaviour
         
         return availableTowers[index].scrapCost;
     }
-
-    /// <summary>
-    /// Instantiates the selected tower prefab at the specified world position.
-    /// </summary>
+    
+    // Instantiates the selected tower prefab at the specified world position.
     public void BuildTower(int index, Vector3 position)
     {
         if (availableTowers == null || index < 0 || index >= availableTowers.Length)
@@ -40,12 +34,11 @@ public class TowerManager : MonoBehaviour
         GameObject newTower = Instantiate(
             towerData.towerPrefab, 
             position, 
-            Quaternion.identity // Towers usually don't need initial rotation
+            Quaternion.identity
         );
         
-        // NOTE: You would assign the towerData to a TowerController script here
+        // Assign the towerData to a TowerController script here (when they actually do stuff!)
         // Example: newTower.GetComponent<TowerController>().Initialize(towerData);
-        
         Debug.Log($"Successfully instantiated {towerData.towerName} at {position}");
     }
 }

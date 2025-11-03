@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69b09942343bc054496c775627921e02, type: 3}
+  m_Name: QueenEnemy
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  movementType: 1
+  canBeDistracted: 1
+  baseScale: 1
+  enemyName: Queen
+  enemyPrefab: {fileID: 5358199103257218831, guid: 51e166b55556a5f4ab98a9be1fe825c6, type: 3}
+  baseHealth: 1000
+  attackDamage: 20
+  attackCooldown: 5
+  moveSpeed: 0.7
+  hearingRange: 30
+  visionRange: 15
+  patrolWaitTime: 2
+  scrapMetalPrefab: {fileID: 3609530775625676480, guid: 012bf2f65129f7c4db77522b829b50b2, type: 3}
+  isSpawner: 1
+  spawnerTimeLimit: 30
+  spawnPrefabs:
+  - {fileID: 5358199103257218831, guid: 51e166b55556a5f4ab98a9be1fe825c6, type: 3}
+  - {fileID: 5358199103257218831, guid: 76dddc366d3e67647a6d4a096c58a85c, type: 3}
+  - {fileID: 5358199103257218831, guid: 76dddc366d3e67647a6d4a096c58a85c, type: 3}
+  - {fileID: 5358199103257218831, guid: 76dddc366d3e67647a6d4a096c58a85c, type: 3}
+  - {fileID: 5358199103257218831, guid: 1a6ce89e787adff46b0fcf10cddbd7ff, type: 3}
+  - {fileID: 5358199103257218831, guid: 1a6ce89e787adff46b0fcf10cddbd7ff, type: 3}
+  - {fileID: 5358199103257218831, guid: 1a6ce89e787adff46b0fcf10cddbd7ff, type: 3}
+  - {fileID: 5358199103257218831, guid: 7eb944fe9efcee747b66d532dc794cc1, type: 3}
+  - {fileID: 5358199103257218831, guid: 7eb944fe9efcee747b66d532dc794cc1, type: 3}
+  - {fileID: 5358199103257218831, guid: 7eb944fe9efcee747b66d532dc794cc1, type: 3}
+  spawnInterval: 5
+  canGrow: 1
+  growthInterval: 0.25
+  growthRate: 1.005
+  maxGrowthSize: 6

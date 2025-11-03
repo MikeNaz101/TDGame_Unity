@@ -6,12 +6,10 @@ public class TowerData : ScriptableObject
     [Header("Tower Identity")]
     public string towerName = "New Tower";
     public string description = "A basic defensive unit.";
-
-    // --- NEW FIELD ADDED ---
+    
     [Header("UI")]
     [Tooltip("The 2D icon to display in the build menu.")]
-    public Sprite towerIcon; 
-    // --- END NEW FIELD ---
+    public Sprite towerIcon;
     
     [Header("Building")]
     [Tooltip("The actual GameObject prefab to be instantiated.")]

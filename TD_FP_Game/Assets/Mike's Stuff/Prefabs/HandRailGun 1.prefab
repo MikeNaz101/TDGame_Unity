@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 440568}
   - component: {fileID: 3371936}
   - component: {fileID: 2383444}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 425004}
   - component: {fileID: 3352100}
   - component: {fileID: 2319920}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_emitter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 400366}
   - component: {fileID: 3326936}
   - component: {fileID: 2316366}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -289,7 +289,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 498068}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -326,7 +326,7 @@ GameObject:
   - component: {fileID: 440662}
   - component: {fileID: 3331720}
   - component: {fileID: 2352384}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_pillars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -415,7 +415,7 @@ GameObject:
   - component: {fileID: 413990}
   - component: {fileID: 3398910}
   - component: {fileID: 2392126}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -504,7 +504,7 @@ GameObject:
   - component: {fileID: 472398}
   - component: {fileID: 3348976}
   - component: {fileID: 2352046}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_tube2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -593,7 +593,7 @@ GameObject:
   - component: {fileID: 440404}
   - component: {fileID: 3305242}
   - component: {fileID: 2372234}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_tube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -681,7 +681,7 @@ GameObject:
   m_Component:
   - component: {fileID: 400158}
   - component: {fileID: 21576236}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: Reflection Probe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -747,7 +747,7 @@ GameObject:
   - component: {fileID: 448974}
   - component: {fileID: 3302664}
   - component: {fileID: 2336040}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_button1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -836,7 +836,7 @@ GameObject:
   - component: {fileID: 494320}
   - component: {fileID: 3376746}
   - component: {fileID: 2377608}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_rails
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -925,7 +925,7 @@ GameObject:
   - component: {fileID: 453156}
   - component: {fileID: 3384038}
   - component: {fileID: 2380180}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1014,7 +1014,7 @@ GameObject:
   - component: {fileID: 411998}
   - component: {fileID: 3332422}
   - component: {fileID: 2327518}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_button2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1103,7 +1103,7 @@ GameObject:
   - component: {fileID: 453926}
   - component: {fileID: 3373726}
   - component: {fileID: 2307246}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1192,7 +1192,7 @@ GameObject:
   - component: {fileID: 472786}
   - component: {fileID: 3345144}
   - component: {fileID: 2389828}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: HandRailGun_tube3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1280,7 +1280,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8040071486385017977}
   - component: {fileID: 2825678326797157569}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: TracerRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1430,7 +1430,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7702092838982181205}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: Scope
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -1,15 +1,14 @@
 using UnityEngine;
+using UnityEngine.AI;
 using System.Collections;
 using System.Linq; 
 using StarterAssets;
-using TMPro; // Required for input polling
-using UnityEngine.InputSystem; // Required for PlayerInput access
+using TMPro;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.UI; // Required for InputSystemUIInputModule (kept for reference, but logic removed)
-
+using UnityEngine.UI;
 public class BuildManager : MonoBehaviour
 {
-    // --- EXTERNAL REFERENCES (Assigned in Inspector) ---
     [Header("Core Components")]
     [Tooltip("The script that handles all weapon fire and reloading state.")]
     public WeaponControllerHS weaponController;
@@ -33,10 +32,19 @@ public class BuildManager : MonoBehaviour
     [Header("Tuning")]
     [Tooltip("Max distance the player can place a tower.")]
     public float maxBuildDistance = 15f;
+    [Tooltip("The name of the NavMesh Area that blocks building (e.g., 'EnemyPath').")]
+    [SerializeField] private string _unbuildableAreaName = "EnemyPath";
+    [Tooltip("How close to the ground the raycast hit must be to a valid NavMesh point.")]
+    [SerializeField] private float _navMeshSampleDistance = 1.0f;
+    [Tooltip("The minimum distance allowed between towers.")]
+    [SerializeField] private float _minBuildProximity = 3.0f;
+    [Tooltip("The LayerMask containing only the 'Tower' layer.")]
+    [SerializeField] private LayerMask _towerLayer;
 
-    // --- NEW UI REFERENCE ---
-    // Kept for reference, but no longer toggled as input remains enabled
-    private InputSystemUIInputModule uiInputModule; 
+    // This will store the bitmask for the unbuildable area
+    private int _unbuildableAreaMask;
+    
+    
     
     [Header("Build Menu UI")]
     [Tooltip("The UI Image component that will display the tower's icon.")]
@@ -47,42 +55,42 @@ public class BuildManager : MonoBehaviour
     public TextMeshProUGUI towerCostText;
     [Tooltip("The UI Text component for the tower's description.")]
     public TextMeshProUGUI towerDescriptionText;
-
-    // --- PRIVATE STATE VARIABLES ---
+    
+    private InputSystemUIInputModule uiInputModule; 
     private enum BuildState { Idle, Aiming, MenuOpen }
     private BuildState buildState = BuildState.Idle;
     private Transform buildIndicatorInstance; // The ghost object instance
     private int selectedTowerIndex = 0;
     
-    // --- RUNTIME REFERENCES ---
-    private Vector3 currentBuildLocation = Vector3.zero; // Stores the confirmed placement spot
-
-    // --- UNITY LIFECYCLE ---
+    private Vector3 currentBuildLocation = Vector3.zero;
 
     void Start()
     {
-        // Initial safety checks and setup
-        if (buildMenuUI != null) buildMenuUI.SetActive(false);
-        if (aimRay != null) aimRay.enabled = false;
-
         // Auto-find managers if they weren't assigned in the inspector
         if (playerStats == null) playerStats = GetComponentInParent<PlayerStats>();
         if (towerManager == null) towerManager = FindObjectOfType<TowerManager>();
-        
-        // Find PlayerInput component (needed for initial setup, but not toggling)
         if (playerInput == null) playerInput = GetComponentInParent<PlayerInput>();
         
-        // Find the global UI Input Module (still needed to be in scene for UI events)
+        // Find the global UI Input Module
         uiInputModule = FindObjectOfType<InputSystemUIInputModule>();
+        
+        // Get the area index from the name (e.g., "EnemyPath" might be index 3)
+        int unbuildableAreaIndex = NavMesh.GetAreaFromName(_unbuildableAreaName);
+        
+        if (unbuildableAreaIndex == -1) // -1 means it wasn't found
+        {
+            Debug.LogWarning($"NavMesh Area '{_unbuildableAreaName}' not found. Building checks may not work.", this);
+            _unbuildableAreaMask = 0; // Set to an empty mask
+        }
+        else
+        {
+            // Convert the index (e.g., 3) to a bitmask (e.g., 1 << 3, which is 8)
+            _unbuildableAreaMask = 1 << unbuildableAreaIndex;
+        }
     }
 
     void Update()
     {
-        // Safety check to ensure core components are linked
-        if (weaponController == null || inputScript == null || playerStats == null || towerManager == null) return;
-        
-        // --- Input Conflict Check (Revised) ---
-        
         // 1. Check for non-fire combat inputs. These ALWAYS cancel building.
         if (weaponController.IsReloading || inputScript.aim || inputScript.reload)
         {
@@ -97,14 +105,9 @@ public class BuildManager : MonoBehaviour
         // If we are Aiming or MenuOpen, 'fire' is a build system input, not a conflict.
         if (buildState == BuildState.Idle && inputScript.fire)
         {
-            // We are idle and the player is shooting, do nothing related to building.
             return; 
         }
-
-        // --- State Transitions ---
         HandleBuildingStateTransitions();
-        
-        // --- State Workload ---
         switch (buildState)
         {
             case BuildState.Aiming:
@@ -114,13 +117,10 @@ public class BuildManager : MonoBehaviour
                 MenuSelectionPhase();
                 break;
             case BuildState.Idle:
-                // Nothing needed, but ensures UI is hidden if state was manually set
                 if (buildMenuUI != null) buildMenuUI.SetActive(false);
                 break;
         }
     }
-
-    // --- STATE MACHINE LOGIC ---
 
     void HandleBuildingStateTransitions()
     {
@@ -144,14 +144,7 @@ public class BuildManager : MonoBehaviour
                 
                 // Hide ray
                 if (aimRay != null) aimRay.enabled = false;
-
-                // --- THIS IS THE FIX ---
-                // Update the UI *before* showing the menu.
-                // It uses selectedTowerIndex, which defaults to 0.
-                UpdateBuildMenuUI(selectedTowerIndex); 
-                // --- END OF FIX ---
-
-                // Now show the menu UI, which is already populated
+                UpdateBuildMenuUI(selectedTowerIndex);
                 if (buildMenuUI != null) buildMenuUI.SetActive(true);
             }
             // Consume the fire input but return immediately to prevent cancellation/weapon update THIS FRAME
@@ -185,32 +178,57 @@ public class BuildManager : MonoBehaviour
 
     void AimingPhase()
     {
-        // Raycast origin is camera, direction is camera forward (assuming WeaponController exposes these)
         Ray ray = new Ray(weaponController.transform.parent.position, weaponController.transform.parent.forward);
         RaycastHit hit;
-        
-        // LayerMask.GetMask("Default") ensures we hit the floor/walls
+
+        bool isLocationValid = false; // Assuming the location is invalid
+
         if (Physics.Raycast(ray, out hit, maxBuildDistance, LayerMask.GetMask("Default")))
         {
-            currentBuildLocation = hit.point;
+            // Sample the NavMesh at the hit point, checking all areas
+            if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit, _navMeshSampleDistance, NavMesh.AllAreas))
+            {
+                // Found a NavMesh point. 
+                // Now check if it's on the *unbuildable* area.
+                if ((navHit.mask & _unbuildableAreaMask) == 0)
+                {
+                    // We check a sphere at the hit point, with our proximity radius, against the tower layer.
+                    int towersFound = Physics.OverlapSphere(navHit.position, _minBuildProximity, _towerLayer).Length;
+
+                    if (towersFound == 0)
+                    {
+                        // PASSED ALL CHECKS: Not on enemy path AND not too close to another tower.
+                        isLocationValid = true;
+                        currentBuildLocation = navHit.position; // Use navHit.position for perfect placement
+                    }
+                }
+            }
             
-            // Visualize ray hit
+            // Update ray visualization (always show, even if invalid)
             if (aimRay != null)
             {
                 aimRay.SetPosition(0, weaponController.ShootPoint.position);
                 aimRay.SetPosition(1, hit.point);
             }
-            UpdateBuildIndicator(hit.point, true);
         }
         else
         {
-            currentBuildLocation = Vector3.zero; // Mark location as invalid
-            // Visualize ray miss
+            // Raycast hit nothing. Visualize ray miss.
             if (aimRay != null)
             {
                 aimRay.SetPosition(0, weaponController.ShootPoint.position);
                 aimRay.SetPosition(1, weaponController.ShootPoint.position + ray.direction * maxBuildDistance);
             }
+        }
+        
+        // Update the ghost indicator and location variable based on the final result
+        if (isLocationValid)
+        {
+            UpdateBuildIndicator(currentBuildLocation, true); // Show green indicator
+        }
+        else
+        {
+            currentBuildLocation = Vector3.zero; // Mark location as invalid
             UpdateBuildIndicator(Vector3.zero, false);
         }
     }
@@ -228,8 +246,6 @@ public class BuildManager : MonoBehaviour
             selectedTowerIndex = (selectedTowerIndex + maxTowers) % maxTowers;
 
             Debug.Log($"Selected Tower Index: {selectedTowerIndex}");
-
-            // --- THIS IS THE NEW CODE ---
             UpdateBuildMenuUI(selectedTowerIndex);
         }
     }
@@ -239,42 +255,21 @@ public class BuildManager : MonoBehaviour
         if (towerManager == null || towerManager.availableTowers.Length == 0) return;
 
         // 1. Get the TowerData for the selected tower
-        //TowerData selectedTower = towerManager.GetTowerData(towerIndex); // (Assuming TowerManager has a GetTowerData(int index) method)
-        // If not, you might get it like this:
         TowerData selectedTower = towerManager.availableTowers[towerIndex];
 
         if (selectedTower == null) return;
 
         // 2. Apply the data to the UI elements
-        if (towerIconImage != null)
-        {
-            towerIconImage.sprite = selectedTower.towerIcon;
-            towerIconImage.enabled = (selectedTower.towerIcon != null);
-        }
-
-        if (towerNameText != null)
-        {
-            towerNameText.text = selectedTower.towerName;
-        }
-
-        if (towerCostText != null)
-        {
-            towerCostText.text = selectedTower.scrapCost.ToString() + " SCRAP";
-        }
-
-        if (towerDescriptionText != null)
-        {
-            towerDescriptionText.text = selectedTower.description;
-        }
+        towerIconImage.sprite = selectedTower.towerIcon;
+        towerIconImage.enabled = (selectedTower.towerIcon != null);
+        towerNameText.text = selectedTower.towerName;
+        towerCostText.text = selectedTower.scrapCost.ToString() + " SCRAP";
+        towerDescriptionText.text = selectedTower.description;
     }
 
     public void CancelBuild()
     {
         buildState = BuildState.Idle;
-        
-        // --- REACTIVATE COMBAT INPUT (NO CURSOR LOCK/UNLOCK) ---
-        // PlayerInput remains enabled, Cursor remains locked.
-        
         weaponController.ToggleShootingEnabled(true); 
 
         // Hide visuals

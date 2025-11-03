@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4437933807027830271}
   - component: {fileID: 6121804768108498988}
   - component: {fileID: 8345899075037246909}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Tower_Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,7 +86,7 @@ GameObject:
   - component: {fileID: 6387348884421738079}
   - component: {fileID: 4332820551867620048}
   - component: {fileID: 1591062805498822826}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -205,7 +205,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -407.7758, y: -202.24493, z: -402.6416, w: -76.00043}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -223,7 +223,9 @@ GameObject:
   - component: {fileID: 5703964481374843982}
   - component: {fileID: 2113654713275857388}
   - component: {fileID: 5866840681485943395}
-  m_Layer: 0
+  - component: {fileID: 7824735896027928434}
+  - component: {fileID: 2516222351934604663}
+  m_Layer: 9
   m_Name: PC_Screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315,7 +317,33 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1023
+--- !u!114 &7824735896027928434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1270947558781271564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af15a5f2550c88b4db0552a639fc356a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TypeWriterEffect
+  typingSpeed: 0.05
+--- !u!114 &2516222351934604663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1270947558781271564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af15a5f2550c88b4db0552a639fc356a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TypeWriterEffect
+  typingSpeed: 0.05
 --- !u!1 &2115805533643223870
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,7 +355,7 @@ GameObject:
   - component: {fileID: 6715824595134407170}
   - component: {fileID: 6717484489869853143}
   - component: {fileID: 4909463552446517474}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Tower_Title_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -467,7 +495,7 @@ GameObject:
   - component: {fileID: 7170994607310426319}
   - component: {fileID: 7340868589745532452}
   - component: {fileID: 8841195264629208945}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -482,8 +510,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2162002029521248823}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.39425844, y: 0.6038765, z: -0.51941526, w: 0.45836815}
+  m_LocalPosition: {x: -1.3875537, y: 0.089897156, z: -0.4124127}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -520,9 +548,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
+  near clip plane: 0.01
   far clip plane: 5000
-  field of view: 40
+  field of view: 83.6
   orthographic: 0
   orthographic size: 10
   m_Depth: -1
@@ -760,7 +788,7 @@ GameObject:
   - component: {fileID: 2095724757770407673}
   - component: {fileID: 8306872588893666561}
   - component: {fileID: 3341580208559123466}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Tower_Description_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -896,7 +924,7 @@ GameObject:
   - component: {fileID: 8818296588013290877}
   - component: {fileID: 5888544527647601714}
   - component: {fileID: 8290220050529639815}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -944,7 +972,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1035,7 +1063,7 @@ GameObject:
   - component: {fileID: 2823917912206355459}
   - component: {fileID: 8214036706990343392}
   - component: {fileID: 7108228605193414455}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1167,8 +1195,8 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 39b3215957da8e0439a27de8b38fac4f, type: 3}
-  m_PlayOnAwake: 1
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1265,7 +1293,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e78187677269bb49bfa1d7a55b5ae8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButtonSound
-  clickSound: {fileID: 0}
+  clickSound: {fileID: 8300000, guid: 39b3215957da8e0439a27de8b38fac4f, type: 3}
 --- !u!1 &3516486206578613378
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,7 +1305,7 @@ GameObject:
   - component: {fileID: 3478172775523662315}
   - component: {fileID: 5196164307630155685}
   - component: {fileID: 5842705333262406819}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1353,7 +1381,7 @@ GameObject:
   - component: {fileID: 2910852161218803324}
   - component: {fileID: 6281275373223329988}
   - component: {fileID: 2224882025934157788}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1466,7 +1494,7 @@ GameObject:
   - component: {fileID: 1915135992225540117}
   - component: {fileID: 890133321744519364}
   - component: {fileID: 1083335414041249677}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: GunHolder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1603,11 +1631,12 @@ MonoBehaviour:
   adsTarget: {fileID: 1992113726465873071}
   hitScanLayer:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 645
   inputScript: {fileID: 7781065369506059698}
   buildManager: {fileID: 1083335414041249677}
   hipCrosshairUI: {fileID: 3568824839718432519}
   adsReticleParent: {fileID: 1364029959750275992}
+  emptyClipSound: {fileID: 8300000, guid: 796efa3942c5b3e4da593ca8478aecfb, type: 3}
   inventory:
   - {fileID: 11400000, guid: d79667dd91425f84db1865f1867ecc0d, type: 2}
   - {fileID: 11400000, guid: c47cfe81f5ca04c4e80b27364dc6d624, type: 2}
@@ -1632,6 +1661,12 @@ MonoBehaviour:
   aimRay: {fileID: 7340868589745532452}
   buildIndicatorPrefab: {fileID: 4376194662093663467, guid: 5ef1845950141e343b709bd75be0bdde, type: 3}
   maxBuildDistance: 15
+  _unbuildableAreaName: EnemyPath
+  _navMeshSampleDistance: 1
+  _minBuildProximity: 1
+  _towerLayer:
+    serializedVersion: 2
+    m_Bits: 8192
   towerIconImage: {fileID: 8345899075037246909}
   towerNameText: {fileID: 134193561989476401}
   towerCostText: {fileID: 975376440546114108}
@@ -1647,7 +1682,7 @@ GameObject:
   - component: {fileID: 5013197544898915021}
   - component: {fileID: 3337030309357443220}
   - component: {fileID: 546862577218491296}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1722,7 +1757,7 @@ GameObject:
   - component: {fileID: 4005135032059488861}
   - component: {fileID: 7513189821869604656}
   - component: {fileID: 134193561989476401}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Text_Tower_Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1858,7 +1893,7 @@ GameObject:
   - component: {fileID: 9049907321141761679}
   - component: {fileID: 7283623207307441769}
   - component: {fileID: 8137021046510602150}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: PlayerCam
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -1873,8 +1908,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4886359443836128710}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.00000047683716, z: -0.000000044703484}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.000000044703484}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1910,9 +1945,9 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 40
+    FieldOfView: 83.6
     OrthographicSize: 10
-    NearClipPlane: 0.1
+    NearClipPlane: 0.01
     FarClipPlane: 5000
     Dutch: 0
     ModeOverride: 0
@@ -2007,7 +2042,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -2031,7 +2066,7 @@ GameObject:
   - component: {fileID: 7443445121153953985}
   - component: {fileID: 7057146317812683818}
   - component: {fileID: 975376440546114108}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Text_Tower_Cost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2172,7 +2207,7 @@ GameObject:
   - component: {fileID: 6688483990265849444}
   - component: {fileID: 3194229437561688140}
   - component: {fileID: 4804962782072750936}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2429,6 +2464,20 @@ MonoBehaviour:
   cursorSpeed: 1
   pcGraphicRaycaster: {fileID: 5866840681485943395}
   eventSystem: {fileID: 0}
+  pcTypewriter: {fileID: 2516222351934604663}
+  pcDisplay: {fileID: 1591062805498822826}
+  pcWelcomeMessage: 'Welcome, user. System booting...
+
+    All systems... nominal?
+
+    Ready
+    for input!
+
+
+
+
+
+    Press E to Quit'
 --- !u!114 &3194229437561688140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2482,7 +2531,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7329137285754393691}
   - component: {fileID: 1812244455724259425}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2623,7 +2672,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1992113726465873071}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ADSTarget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2654,7 +2703,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6980152911514526588}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: PlayerCameraRoot
   m_TagString: CinemachineTarget
   m_Icon: {fileID: 0}
@@ -2690,7 +2739,7 @@ GameObject:
   - component: {fileID: 8724390129960971783}
   - component: {fileID: 5681943334262927084}
   - component: {fileID: 6577354336995731154}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BuildUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2793,17 +2842,157 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 9049907321141761679}
     m_Modifications:
+    - target: {fileID: 104613504691839945, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 393793238569478678, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 393793238569478678, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 683617072807625948, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 683617072807625948, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Color.g
+      value: 0.091103174
+      objectReference: {fileID: 0}
+    - target: {fileID: 852989337232585825, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1472657535701468636, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 1549793075805143815, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2579261722200697184, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 2616519043565457096, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3079489347404886324, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3092796023448639796, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_ScreenMatchMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3092796023448639796, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_MatchWidthOrHeight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3092796023448639796, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_ReferenceResolution.x
+      value: 1906.25
       objectReference: {fileID: 0}
     - target: {fileID: 3668067593634384731, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
       propertyPath: playerStats
       value: 
       objectReference: {fileID: 3194229437561688140}
+    - target: {fileID: 4322354070348112836, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.3444914
+      objectReference: {fileID: 0}
+    - target: {fileID: 4322354070348112836, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.3444914
+      objectReference: {fileID: 0}
+    - target: {fileID: 4322354070348112836, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.3444914
+      objectReference: {fileID: 0}
+    - target: {fileID: 4322354070348112836, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -592.19995
+      objectReference: {fileID: 0}
+    - target: {fileID: 4322354070348112836, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 151
+      objectReference: {fileID: 0}
+    - target: {fileID: 4634394771480705595, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.48733
+      objectReference: {fileID: 0}
+    - target: {fileID: 4634394771480705595, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.48733
+      objectReference: {fileID: 0}
+    - target: {fileID: 4634394771480705595, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.48733
+      objectReference: {fileID: 0}
+    - target: {fileID: 4874717680998140927, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 6908724278379209201}
+    - target: {fileID: 4874717680998140927, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_RenderMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4874717680998140927, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_SortingOrder
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4874717680998140927, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_PlaneDistance
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196050829043245904, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196050829043245904, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Color.r
+      value: 0.07381892
+      objectReference: {fileID: 0}
     - target: {fileID: 5719574732889552458, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
       propertyPath: m_Name
       value: HUD
+      objectReference: {fileID: 0}
+    - target: {fileID: 5719574732889552458, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6034322055365101033, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6628189574627855098, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 7266653644301492462, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.56727207
+      objectReference: {fileID: 0}
+    - target: {fileID: 7266653644301492462, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.56727207
+      objectReference: {fileID: 0}
+    - target: {fileID: 7266653644301492462, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.56727207
+      objectReference: {fileID: 0}
+    - target: {fileID: 7266653644301492462, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -560
+      objectReference: {fileID: 0}
+    - target: {fileID: 7266653644301492462, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 207
       objectReference: {fileID: 0}
     - target: {fileID: 8170368969461358028, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
       propertyPath: m_Pivot.x
@@ -2888,6 +3077,10 @@ PrefabInstance:
     - target: {fileID: 9057172359741441567, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9194139847642192049, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

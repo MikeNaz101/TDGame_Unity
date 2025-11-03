@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.AI; // Required for NavMeshAgent
+using UnityEngine.AI;
 using System.Collections;
 using System.Linq;
 
@@ -27,7 +27,6 @@ public class ScrapCollectorBot : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        // Its starting position in the scene is its "home"
         homePosition = transform.position;
 
         // Auto-find PlayerStats if it wasn't assigned in the Inspector
@@ -123,7 +122,7 @@ public class ScrapCollectorBot : MonoBehaviour
         }
 
         // Destroy the scrap object
-        Destroy(scrapObject); // This triggers OnDestroy() and removes it from the static list
+        Destroy(scrapObject); // This triggers OnDestroy()
 
         // Go home
         currentScrapTarget = null;

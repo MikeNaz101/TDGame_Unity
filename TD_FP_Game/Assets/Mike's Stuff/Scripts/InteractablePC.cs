@@ -1,19 +1,19 @@
 using UnityEngine;
-using UnityEngine.Events; // Required for UnityEvent
-using StarterAssets; // Required for StarterAssetsInputs
-//using Cinemachine;
-using Unity.Cinemachine; // Required for virtual cameras
+using StarterAssets;
+using Unity.Cinemachine;
+using TMPro; 
 
-/// <summary>
-/// This script goes on any interactable object (like a PC).
-/// It detects the player, shows a prompt, and triggers an event on interaction.
-/// </summary>
 [RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(TypeWriterEffect))]
 public class InteractablePC : MonoBehaviour
 {
     [Header("Interaction")]
-    [Tooltip("The UI element that says 'Press E to use PC'.")]
-    public GameObject interactPromptUI;
+    [Tooltip("The Text (TMP) UI element that says 'Press E to use PC'.")]
+    public TMP_Text interactPromptText; 
+    
+    [Tooltip("The message to type out.")]
+    [TextArea(2, 5)]
+    public string interactMessage = "Press E to use PC";
     
     [Header("Camera")]
     [Tooltip("The Cinemachine Virtual Camera that is focused on this PC screen.")]
@@ -22,31 +22,32 @@ public class InteractablePC : MonoBehaviour
     private bool canInteract = false;
     private StarterAssetsInputs playerInput;
     private PlayerInteractionManager playerInteractionManager;
+    private TypeWriterEffect typewriter;
 
     void Start()
     {
-        // Make sure the prompt is hidden at start
-        if (interactPromptUI != null)
+        typewriter = GetComponent<TypeWriterEffect>();
+        if (interactPromptText != null)
         {
-            interactPromptUI.SetActive(false);
+            interactPromptText.gameObject.SetActive(false);
         }
-        // Make sure the collider is a trigger
         GetComponent<Collider>().isTrigger = true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the object entering is the player
         if (other.CompareTag("Player"))
         {
-            // Get the player's input and interaction scripts
             playerInput = other.GetComponent<StarterAssetsInputs>();
             playerInteractionManager = other.GetComponent<PlayerInteractionManager>();
 
             if (playerInput != null && playerInteractionManager != null)
             {
-                // Show prompt and allow interaction
-                if (interactPromptUI != null) interactPromptUI.SetActive(true);
+                if (interactPromptText != null)
+                {
+                    interactPromptText.gameObject.SetActive(true);
+                    typewriter.DisplayText(interactPromptText, interactMessage);
+                }
                 canInteract = true;
             }
         }
@@ -54,11 +55,11 @@ public class InteractablePC : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        // Player left the trigger
         if (other.CompareTag("Player"))
         {
-            // Hide prompt and disable interaction
-            if (interactPromptUI != null) interactPromptUI.SetActive(false);
+            typewriter.StopTyping();
+            if (interactPromptText != null) interactPromptText.gameObject.SetActive(false);
+
             canInteract = false;
             playerInput = null;
             playerInteractionManager = null;
@@ -67,21 +68,17 @@ public class InteractablePC : MonoBehaviour
 
     void Update()
     {
-        // While the player is in range and presses the interact button
         if (canInteract && playerInput != null && playerInput.interact)
         {
-            // Consume the input
             playerInput.interact = false;
-            
-            // Tell the PlayerInteractionManager to take over
             if (playerInteractionManager != null)
             {
                 playerInteractionManager.BeginPCInteraction(pcVCam);
             }
-
-            // We are now interacting, so hide the prompt
-            if (interactPromptUI != null) interactPromptUI.SetActive(false);
+            typewriter.StopTyping();
+            if (interactPromptText != null) interactPromptText.gameObject.SetActive(false);
             canInteract = false;
         }
     }
 }
+

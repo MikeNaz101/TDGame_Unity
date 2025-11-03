@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8313651626165266044}
   - component: {fileID: 3184205678226419419}
   - component: {fileID: 232590886631340900}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AssaultRifle_Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -1,41 +1,58 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[CreateAssetMenu(fileName = "EnemyData", menuName = "Aegis/Enemy Data", order = 1)]
+[CreateAssetMenu(fileName = "NewEnemyData", menuName = "Aegis/Enemy Data", order = 1)]
 public class EnemyData : ScriptableObject
 {
-    // --- IDENTITY ---
+    // --- NEW: Simplified AI Behavior ---
+    public enum AIMovementType
+    {
+        Direct, // Moves directly to the target (CoreAttacker, Patroller, Spawner)
+        Wander  // Moves in a randomized "wavy" path towards the target (new Roamer)
+    }
+
+    [Header("AI Behavior")]
+    [Tooltip("How this enemy moves towards its goal.")]
+    public AIMovementType movementType = AIMovementType.Direct;
+
+    [Tooltip("Can this enemy be distracted by player sounds or attacks?")]
+    public bool canBeDistracted = true;
+
+    [Tooltip("The base scale of the enemy. '1' is normal.")]
+    public float baseScale = 1f;
+
     [Header("Identification")]
     public string enemyName = "New Grunt";
-    public GameObject enemyPrefab; // The main model with EnemyController script attached
+    public GameObject enemyPrefab; 
 
-    // --- CORE COMBAT STATS ---
     [Header("Combat Stats")]
-    [Tooltip("Starting health of the enemy.")]
     public float baseHealth = 50f;
-    [Tooltip("Damage dealt to player/core per attack.")]
     public float attackDamage = 10f;
-    [Tooltip("Time delay between each attack.")]
     public float attackCooldown = 1.5f;
 
-    // --- MOVEMENT & AI ---
     [Header("Movement & AI")]
-    [Tooltip("Speed the NavMeshAgent moves at.")]
     public float moveSpeed = 3.5f;
-    [Tooltip("Distance at which the enemy detects the player/switches from Patrol.")]
-    public float detectionRange = 15f;
-    [Tooltip("Time enemy waits at a patrol point or after investigating a sound.")]
+    [Tooltip("The max distance the enemy will 'hear' a gunshot from.")]
+    public float hearingRange = 30f;
+    [Tooltip("The range the enemy will 'see' the player from.")]
+    public float visionRange = 15f;
+    [Tooltip("How long enemy waits at a patrol point or after investigating a sound.")]
     public float patrolWaitTime = 2f; 
 
-    // --- ECONOMY ---
     [Header("Economy")]
-    [Tooltip("Prefab for the resource dropped when this enemy is destroyed.")]
     public GameObject scrapMetalPrefab;
 
-    // --- RAGDOLL / VISUALS ---
-    [Header("Visuals")]
-    [Tooltip("Optional: Particle effect played upon death/destruction.")]
-    public GameObject deathEffect;
+    [Header("Spawner (Queen) Settings")]
+    [Tooltip("Is this enemy a spawner?")]
+    public bool isSpawner = false;
+    public float spawnerTimeLimit = 30f;
+    public List<GameObject> spawnPrefabs = new List<GameObject>();
+    public float spawnInterval = 5f;
 
-    // NOTE: Ragdoll rigidbodies are assigned on the prefab/model itself, not in the data asset.
+    [Header("Growth (Queen) Settings")]
+    public bool canGrow = false;
+    public float growthInterval = 2f;
+    [Tooltip("e.g., 1.1 = 10% larger")]
+    public float growthRate = 1.1f;
+    public float maxGrowthSize = 3f;
 }
