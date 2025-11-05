@@ -13,6 +13,8 @@ public class WaveConfig : ScriptableObject
         public int count = 5;
         [Tooltip("The time delay between spawning each enemy of this type.")]
         public float spawnInterval = 0.5f;
+        [Tooltip("The time delay between spawning enemy groups of this type.")]
+        public float spawnPauseInterval = 0.5f;
     }
 
     [Header("Wave Properties")]

@@ -52,6 +52,10 @@ public class WeaponControllerHS : MonoBehaviour
     private Vector3 hipPosition;
     private bool isShootingEnabled = true;
     private float originalFOV; 
+    
+    // --- PUBLIC STATE (for Adaptive AI) ---
+    [HideInInspector] public int shotsFired = 0;
+    [HideInInspector] public int shotsHit = 0;
 
     // --- PUBLIC PROPERTIES (For BuildManager to Read) ---
     public bool IsReloading => isReloading;
@@ -238,6 +242,7 @@ public class WeaponControllerHS : MonoBehaviour
         // Decrement Ammo & Set Cooldown
         currentAmmo--;
         nextFireTime = currentWeapon.fireRate;
+        shotsFired++; // Track the shot
 
         // Play shoot sound
         if (currentWeapon.shootSound != null)
@@ -264,6 +269,7 @@ public class WeaponControllerHS : MonoBehaviour
             {
                 // Pass attacker transform (the Player) to the enemy
                 enemy.TakeDamage(currentWeapon.damage, transform.root); 
+                shotsHit++; // Track the successful hit
             }
         }
 
@@ -330,6 +336,15 @@ public class WeaponControllerHS : MonoBehaviour
     }
     
     // --- PUBLIC METHODS ---
+    
+    public float GetAccuracy()
+    {
+        if (shotsFired == 0)
+        {
+            return 0f; // Prevent divide-by-zero
+        }
+        return (float)shotsHit / (float)shotsFired;
+    }
     
     // Allows BuildManager to temporarily halt weapon operation
     public void ToggleShootingEnabled(bool state)

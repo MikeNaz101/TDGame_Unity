@@ -16,5 +16,18 @@ MonoBehaviour:
   preparationTime: 10
   enemyGroups:
   - enemyType: {fileID: 11400000, guid: 2455d0491877f1e40bb903079e05d214, type: 2}
+    count: 3
+    spawnInterval: 0.1
+    spawnPauseInterval: 0.5
+  - enemyType: {fileID: 11400000, guid: 2455d0491877f1e40bb903079e05d214, type: 2}
+    count: 3
+    spawnInterval: 0.1
+    spawnPauseInterval: 0.5
+  - enemyType: {fileID: 11400000, guid: 2455d0491877f1e40bb903079e05d214, type: 2}
     count: 10
     spawnInterval: 5
+    spawnPauseInterval: 0.5
+  - enemyType: {fileID: 11400000, guid: 2455d0491877f1e40bb903079e05d214, type: 2}
+    count: 10
+    spawnInterval: 5
+    spawnPauseInterval: 0.5

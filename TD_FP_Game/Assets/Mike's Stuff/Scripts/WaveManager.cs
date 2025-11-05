@@ -98,6 +98,7 @@ public class WaveManager : MonoBehaviour
 
                 yield return new WaitForSeconds(group.spawnInterval);
             }
+            yield return new WaitForSeconds(group.spawnPauseInterval);
         }
     }
     

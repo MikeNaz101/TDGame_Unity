@@ -15,15 +15,27 @@ MonoBehaviour:
   waveName: Wave 2
   preparationTime: 20
   enemyGroups:
-  - enemyType: {fileID: 11400000, guid: 92a5b4ae7a978cb48a6874a5c512954d, type: 2}
-    count: 2
-    spawnInterval: 10
   - enemyType: {fileID: 11400000, guid: 79eecfbccec43f049b3bf876339482eb, type: 2}
     count: 10
-    spawnInterval: 1
+    spawnInterval: 0.5
+    spawnPauseInterval: 3
   - enemyType: {fileID: 11400000, guid: fce8e708c977454449ed06ef0ca80cb1, type: 2}
-    count: 50
-    spawnInterval: 0.75
+    count: 20
+    spawnInterval: 0.15
+    spawnPauseInterval: 4
+  - enemyType: {fileID: 11400000, guid: 0408420f359b1c44f8e41d58917dc45d, type: 2}
+    count: 10
+    spawnInterval: 0.25
+    spawnPauseInterval: 3
+  - enemyType: {fileID: 11400000, guid: 0408420f359b1c44f8e41d58917dc45d, type: 2}
+    count: 10
+    spawnInterval: 0.1
+    spawnPauseInterval: 5
+  - enemyType: {fileID: 11400000, guid: 92a5b4ae7a978cb48a6874a5c512954d, type: 2}
+    count: 2
+    spawnInterval: 5
+    spawnPauseInterval: 2
   - enemyType: {fileID: 11400000, guid: 0408420f359b1c44f8e41d58917dc45d, type: 2}
     count: 5
     spawnInterval: 2
+    spawnPauseInterval: 0.5

@@ -33,7 +33,10 @@ public class EnemyController : MonoBehaviour
     private float _currentHealth;
     private bool _isDead = false;
     private float _timeSinceLastAttack = 0f;
-
+    
+    // --- Static list for AI Manager ---
+    public static List<EnemyController> ActiveEnemies = new List<EnemyController>();
+    
     // --- AI-Specific State Variables ---
     private IDamageable _currentTarget;    // Our *current* target (Player, Core, or Door)
     private Transform _coreTarget;          // The ultimate goal
@@ -41,11 +44,15 @@ public class EnemyController : MonoBehaviour
     private Transform _soundInvestigationPos; // For distractions
     private Transform _attackSource;        // For distractions
     private float _sensorCooldown = 0f;     // Timer for how often to check for player/doors
+    // --- AI Stance ---
+    public enum AIStance { Standard, Aggressive, Evasive }
+    private AIStance _currentStance = AIStance.Standard;
+    private float _originalMoveSpeed;
+    private float _originalStoppingDistance;
     
     private float _spawnerTimeAlive = 0f;   // For Spawner
     private float _timeSinceLastGrowth = 0f; // For Spawner Growth
     private float _timeSinceLastSpawn;      // For Spawner
-
     private float _wanderTimer; // Timer for how often to pick a new wander point
 
     // --- Constants ---
@@ -94,6 +101,15 @@ public class EnemyController : MonoBehaviour
         transform.localScale = Vector3.one * enemyData.baseScale; // Apply base scale
         _agent.enabled = true;
         SetRagdollActive(false);
+        
+        _originalMoveSpeed = enemyData.moveSpeed;
+        _originalStoppingDistance = _agent.stoppingDistance;
+
+        // Add to static list
+        if (!ActiveEnemies.Contains(this))
+        {
+            ActiveEnemies.Add(this);
+        }
 
         // --- Initialize AI Behavior ---
         // All enemies start by targeting the Core
@@ -124,9 +140,9 @@ public class EnemyController : MonoBehaviour
         // Unsubscribe from events to prevent errors
         if (enemyData != null && enemyData.canBeDistracted)
         {
-            // This line needs the new script
             EnemyAIAudioEvents.OnGunshotReported -= HandleGunshot;
         }
+        ActiveEnemies.Remove(this);
     }
 
     void Update()
@@ -252,22 +268,37 @@ public class EnemyController : MonoBehaviour
             _state = EnemyState.Attacking;
             return;
         }
-        
-        switch (enemyData.movementType)
-        {
-            case EnemyData.AIMovementType.Direct:
-                _agent.SetDestination(_currentTarget.transform.position);
-                break;
 
-            case EnemyData.AIMovementType.Wander:
-                _wanderTimer -= Time.deltaTime;
-                if (_wanderTimer <= 0f || _agent.remainingDistance < 1f)
-                {
-                    Vector3 randomPoint = GetWanderPointTowardsTarget(_currentTarget.transform.position);
-                    _agent.SetDestination(randomPoint);
-                    _wanderTimer = WANDER_UPDATE_RATE;
-                }
-                break;
+        // --- NEW ADAPTIVE MOVEMENT LOGIC ---
+
+        // 1. EVASIVE STANCE: Always use the "dodge" logic on a timer.
+        if (_currentStance == AIStance.Evasive && !enemyData.isSpawner)
+        {
+            _wanderTimer -= Time.deltaTime;
+            // Check if our "dodge" timer is up OR we've reached our last dodge point
+            if (_wanderTimer <= 0f || _agent.remainingDistance < _agent.stoppingDistance + 1f)
+            {
+                Vector3 dodgePoint = GetEvasiveManeuverPoint(_currentTarget.transform.position);
+                _agent.SetDestination(dodgePoint);
+                _wanderTimer = WANDER_UPDATE_RATE; // WANDER_UPDATE_RATE acts as our "dodge interval"
+            }
+        }
+        // 2. AGGRESSIVE STANCE or STANDARD-DIRECT: Always move directly to target.
+        else if (_currentStance == AIStance.Aggressive || enemyData.movementType == EnemyData.AIMovementType.Direct)
+        {
+            _agent.SetDestination(_currentTarget.transform.position);
+        }
+        // 3. STANDARD-WANDER: Use the original wander logic.
+        else if (enemyData.movementType == EnemyData.AIMovementType.Wander)
+        {
+            _wanderTimer -= Time.deltaTime;
+            if (_wanderTimer <= 0f || _agent.remainingDistance < 1f)
+            {
+                // Call our renamed function
+                Vector3 randomPoint = GetStandardWanderPoint(_currentTarget.transform.position);
+                _agent.SetDestination(randomPoint);
+                _wanderTimer = WANDER_UPDATE_RATE;
+            }
         }
     }
     
@@ -319,6 +350,36 @@ public class EnemyController : MonoBehaviour
     #endregion
 
     #region --- AI Helper & State Methods ---
+    
+    public void SetAIStance(AIStance newStance)
+    {
+        if (_currentStance == newStance) return; // No change
+
+        _currentStance = newStance;
+
+        switch (newStance)
+        {
+            case AIStance.Aggressive:
+                // --- This is your "AggressiveApproach" ---
+                _agent.speed = _originalMoveSpeed * 1.5f; // 50% faster
+                _agent.stoppingDistance = _originalStoppingDistance * 0.75f; // Get a bit closer
+                break;
+                
+            case AIStance.Evasive:
+                // --- This is your "EvasiveManeuvers" ---
+                // We no longer slow them down. We just use their normal stats,
+                // but the UpdatePursueState logic will use a new "dodge" behavior.
+                _agent.speed = _originalMoveSpeed;
+                _agent.stoppingDistance = _originalStoppingDistance;
+                break;
+
+            case AIStance.Standard:
+            default:
+                _agent.speed = _originalMoveSpeed;
+                _agent.stoppingDistance = _originalStoppingDistance;
+                break;
+        }
+    }
 
     void TryAttack()
     {
@@ -355,7 +416,7 @@ public class EnemyController : MonoBehaviour
         return false;
     }
 
-    private Vector3 GetWanderPointTowardsTarget(Vector3 targetPosition)
+    private Vector3 GetStandardWanderPoint(Vector3 targetPosition)
     {
         Vector3 dirToTarget = (targetPosition - transform.position).normalized;
         Vector3 randomDir = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
@@ -367,6 +428,32 @@ public class EnemyController : MonoBehaviour
             return hit.position;
         }
         
+        return targetPosition;
+    }
+    
+    private Vector3 GetEvasiveManeuverPoint(Vector3 targetPosition)
+    {
+        // 1. Get direction to target
+        Vector3 dirToTarget = (targetPosition - transform.position).normalized;
+        
+        // 2. Get a perpendicular side direction (left or right)
+        Vector3 sideDir = Vector3.Cross(dirToTarget, Vector3.up).normalized;
+        sideDir *= (Random.Range(0, 2) * 2 - 1); // Randomly -1 or 1
+
+        // 3. Define the dodge "jerk"
+        float dodgeSideDistance = 5f;  // How far to the side
+        float dodgeForwardDistance = 4f; // How far forward
+        
+        // 4. Calculate the target point
+        Vector3 targetPoint = transform.position + (sideDir * dodgeSideDistance) + (dirToTarget * dodgeForwardDistance);
+
+        // 5. Find the closest valid point on the NavMesh
+        if (NavMesh.SamplePosition(targetPoint, out NavMeshHit hit, 5f, _agent.areaMask))
+        {
+            return hit.position;
+        }
+        
+        // Failsafe: just move towards the target if no valid dodge point is found
         return targetPosition;
     }
     
