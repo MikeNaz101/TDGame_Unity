@@ -19,7 +19,7 @@ MonoBehaviour:
   scrapCost: 10
   attackType: 0
   projectilePrefab: {fileID: 0}
-  damage: 10
+  damage: 100
   fireRate: 0.5
   range: 15
   isExplosive: 0

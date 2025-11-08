@@ -8,7 +8,10 @@ public class TypeWriterEffect : MonoBehaviour
     private Coroutine typingCoroutine;
     private TMP_Text activeTextComponent; // Track current text component
 
-    public void DisplayText(TMP_Text textComponent, string text)
+    /// <summary>
+    /// Starts the typewriter effect and returns the Coroutine.
+    /// </summary>
+    public Coroutine DisplayText(TMP_Text textComponent, string text)
     {
         if (typingCoroutine != null)
         {
@@ -17,8 +20,14 @@ public class TypeWriterEffect : MonoBehaviour
 
         activeTextComponent = textComponent;
         typingCoroutine = StartCoroutine(TypeText(textComponent, text));
+        
+        // This is the critical change:
+        return typingCoroutine;
     }
 
+    /// <summary>
+    /// Stops any active typing coroutine and clears the text.
+    /// </summary>
     public void StopTyping()
     {
         if (typingCoroutine != null)
@@ -34,6 +43,9 @@ public class TypeWriterEffect : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// The private coroutine that actually types out the text.
+    /// </summary>
     private IEnumerator TypeText(TMP_Text textComponent, string text)
     {
         textComponent.text = "";

@@ -34,6 +34,7 @@ public class EnemyController : MonoBehaviour
     private float _currentHealth;
     private bool _isDead = false;
     private float _timeSinceLastAttack = 0f;
+    public float CurrentHealth => _currentHealth;
     
     // --- Static list for AI Manager ---
     public static List<EnemyController> ActiveEnemies = new List<EnemyController>();

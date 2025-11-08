@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2878557954726989769}
   m_Layer: 13
-  m_Name: SwivvelPoint
+  m_Name: Barrel_Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,7 +26,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.2744689, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4362569586468078863}
@@ -59,14 +59,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1669738086307544372}
   serializedVersion: 2
-  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
-  m_LocalPosition: {x: -0.002, y: 0, z: 0.524}
-  m_LocalScale: {x: 0.21004899, y: 0.46906042, z: 0.210049}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -0, z: 0.871}
+  m_LocalScale: {x: 0.210049, y: 0.46906042, z: 0.210049}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1241574902802280289}
   m_Father: {fileID: 2878557954726989769}
-  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!33 &4201346921964310564
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -215,7 +215,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ab5173d347dc4104097e6fe29282b03d, type: 2}
+  - {fileID: 2100000, guid: 12eb1b030cdc0c54490510093102d7f6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -314,8 +314,8 @@ Transform:
   m_GameObject: {fileID: 3982819893665439607}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.01, y: 0.8110001, z: 0}
-  m_LocalScale: {x: 1, y: 0.64292, z: 1}
+  m_LocalPosition: {x: -0.009999692, y: 0.8110002, z: 0}
+  m_LocalScale: {x: 3.6434, y: 0.64291996, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2878557954726989769}
@@ -354,7 +354,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6d9dc13b5f72b83478030dc3ef382d6d, type: 2}
+  - {fileID: 2100000, guid: ace0e4a93565da449b1e8066dd151b11, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -415,8 +415,8 @@ GameObject:
   - component: {fileID: 4838221078671498395}
   - component: {fileID: 4749254821780869390}
   m_Layer: 13
-  m_Name: Tower 3
-  m_TagString: Tower
+  m_Name: Tower 1
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -470,7 +470,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ab5173d347dc4104097e6fe29282b03d, type: 2}
+  - {fileID: 2100000, guid: 12eb1b030cdc0c54490510093102d7f6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -672,10 +672,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerController
   _turretBase: {fileID: 1091952749038565001}
-  _barrel: {fileID: 4362569586468078863}
+  _barrel: {fileID: 2878557954726989769}
   _shootPoint: {fileID: 1241574902802280289}
+  _targetingPriority: 0
   _aimSpeed: 10
-  _aimTolerance: 3
+  _aimTolerance: 10
 --- !u!1 &5279589003770124245
 GameObject:
   m_ObjectHideFlags: 0
@@ -701,13 +702,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5279589003770124245}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: -0, y: 1.17, z: -0}
-  m_LocalScale: {x: 1, y: 2.2330995, z: 0.44780788}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.0300003, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4362569586468078863}
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!120 &1878863632809348117
 LineRenderer:
   serializedVersion: 2

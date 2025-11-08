@@ -23,6 +23,9 @@ public class PlayerInteractionManager : MonoBehaviour
 
     [Header("PC Interaction")]
     public GameObject pcScreenCanvas;
+    
+    [Tooltip("The PC_UI_Manager script on the pcScreenCanvas.")]
+    public PC_UI_Manager pcUIManager;
 
     [Header("PC Custom Cursor")]
     public RectTransform customCursor;
@@ -32,15 +35,6 @@ public class PlayerInteractionManager : MonoBehaviour
     [Header("PC Event System")]
     public GraphicRaycaster pcGraphicRaycaster;
     public EventSystem eventSystem;
-
-    [Header("PC Typewriter")]
-    [Tooltip("The TypeWriterEffect script. (Can be on the PC Canvas or another manager object)")]
-    public TypeWriterEffect pcTypewriter;
-    [Tooltip("The Text (TMP) component on the PC screen where the text will be displayed.")]
-    public TMP_Text pcDisplay;
-    [Tooltip("The message to display when the player first uses the PC.")]
-    [TextArea(3, 10)]
-    public string pcWelcomeMessage = "Welcome, user. System booting...\nAll systems nominal.\nReady for input.";
 
     private bool isInteracting = false;
     private CinemachineCamera activePCVCam;
@@ -62,6 +56,13 @@ public class PlayerInteractionManager : MonoBehaviour
         {
             pcGraphicRaycaster = pcScreenCanvas.GetComponent<GraphicRaycaster>();
         }
+        
+        // Find the UI Manager
+        if (pcUIManager == null && pcScreenCanvas != null)
+        {
+            pcUIManager = pcScreenCanvas.GetComponent<PC_UI_Manager>();
+        }
+
         pointerEventData = new PointerEventData(eventSystem);
         raycastResults = new List<RaycastResult>();
         EndPCInteraction(); 
@@ -145,9 +146,11 @@ public class PlayerInteractionManager : MonoBehaviour
         {
             activePCVCam.Priority = 20; // Give this camera priority
         }
-        if (pcTypewriter != null && pcDisplay != null)
+        
+        // Tell the PC UI Manager to start
+        if (pcUIManager != null)
         {
-            pcTypewriter.DisplayText(pcDisplay, pcWelcomeMessage);
+            pcUIManager.StartPCInterface();
         }
     }
 
@@ -157,9 +160,11 @@ public class PlayerInteractionManager : MonoBehaviour
     public void EndPCInteraction()
     {
         isInteracting = false;
-        if (pcTypewriter != null)
+        
+        // Tell the PC to stop all coroutines and typewriter effects
+        if (pcUIManager != null)
         {
-            pcTypewriter.StopTyping();
+            pcUIManager.StopInterface();
         }
 
         // Enable player controls
@@ -187,4 +192,3 @@ public class PlayerInteractionManager : MonoBehaviour
         }
     }
 }
-

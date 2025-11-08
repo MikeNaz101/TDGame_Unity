@@ -19,8 +19,8 @@ MonoBehaviour:
   scrapCost: 10
   attackType: 1
   projectilePrefab: {fileID: 8479983748241459406, guid: 167038338c6f0eb44b39bcfffcffe316, type: 3}
-  damage: 10
-  fireRate: 0.5
+  damage: 500
+  fireRate: 1
   range: 15
   isExplosive: 1
   explosionRadius: 3
