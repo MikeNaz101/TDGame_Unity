@@ -12,11 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b6dcc75fa6bc694bb16d405aefadc6e, type: 3}
   m_Name: BaseTower 1
   m_EditorClassIdentifier: Assembly-CSharp::TowerData
-  towerName: Tower 2
-  description: A basic defensive unit.
+  towerName: Bomb Tower
+  description: Shoots Explosive Ammo.
   towerIcon: {fileID: 21300000, guid: 32700198561e47044863cf80370fe63a, type: 3}
-  towerPrefab: {fileID: 4376194662093663467, guid: 18d7916610a3e1644a890ffc928887c4, type: 3}
+  towerPrefab: {fileID: 4376194662093663467, guid: c030f7a7fa6bd9942a4b6ddcc3852864, type: 3}
   scrapCost: 10
+  attackType: 1
+  projectilePrefab: {fileID: 8479983748241459406, guid: 167038338c6f0eb44b39bcfffcffe316, type: 3}
   damage: 10
   fireRate: 0.5
   range: 15
+  isExplosive: 1
+  explosionRadius: 3
+  explosionForce: 500
+  impactParticlePrefab: {fileID: 8194992990867289339, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
+  shootSound: {fileID: 8300000, guid: 5390c5db551430b4e90da4dbcd63f1b1, type: 3}

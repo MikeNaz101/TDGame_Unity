@@ -2467,7 +2467,7 @@ GameObject:
   - component: {fileID: 164532537473050640}
   m_Layer: 0
   m_Name: Sci-Fi Dog
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2526,13 +2526,13 @@ MonoBehaviour:
   enemyData: {fileID: 11400000, guid: 2455d0491877f1e40bb903079e05d214, type: 2}
   _waveManager: {fileID: 0}
   _playerTarget: {fileID: 0}
-  patrolRoute: {fileID: 0}
   fov: {fileID: 0}
   _ragdollRigidbodies: []
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
   _agent: {fileID: 5520392024916807195}
-  _state: 0
   _attackThreshold: 2.5
-  _attackCooldown: 1.5
 --- !u!54 &6855262704910263696
 Rigidbody:
   m_ObjectHideFlags: 0
