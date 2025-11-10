@@ -4,12 +4,11 @@ using Unity.Cinemachine;
 using TMPro; 
 
 [RequireComponent(typeof(Collider))]
-[RequireComponent(typeof(TypeWriterEffect))]
 public class InteractablePC : MonoBehaviour
 {
     [Header("Interaction")]
-    [Tooltip("The Text (TMP) UI element that says 'Press E to use PC'.")]
-    public TMP_Text interactPromptText; 
+    [Tooltip("The PC_UI_Manager script, which is on your PC_Screen_Canvas object.")]
+    public PC_UI_Manager pcUIManager; // <-- NEW
     
     [Tooltip("The message to type out.")]
     [TextArea(2, 5)]
@@ -22,16 +21,16 @@ public class InteractablePC : MonoBehaviour
     private bool canInteract = false;
     private StarterAssetsInputs playerInput;
     private PlayerInteractionManager playerInteractionManager;
-    private TypeWriterEffect typewriter;
+    // We no longer need the 'typewriter' or 'interactPromptText' here.
 
     void Start()
     {
-        typewriter = GetComponent<TypeWriterEffect>();
-        if (interactPromptText != null)
-        {
-            interactPromptText.gameObject.SetActive(false);
-        }
         GetComponent<Collider>().isTrigger = true;
+        // Start with the UI hidden
+        if (pcUIManager != null)
+        {
+            pcUIManager.gameObject.SetActive(false);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -41,13 +40,11 @@ public class InteractablePC : MonoBehaviour
             playerInput = other.GetComponent<StarterAssetsInputs>();
             playerInteractionManager = other.GetComponent<PlayerInteractionManager>();
 
-            if (playerInput != null && playerInteractionManager != null)
+            if (playerInput != null && playerInteractionManager != null && pcUIManager != null)
             {
-                if (interactPromptText != null)
-                {
-                    interactPromptText.gameObject.SetActive(true);
-                    typewriter.DisplayText(interactPromptText, interactMessage);
-                }
+                // Turn on the canvas and show the prompt
+                pcUIManager.gameObject.SetActive(true);
+                pcUIManager.ShowInteractPrompt(true, interactMessage);
                 canInteract = true;
             }
         }
@@ -57,8 +54,12 @@ public class InteractablePC : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            typewriter.StopTyping();
-            if (interactPromptText != null) interactPromptText.gameObject.SetActive(false);
+            if (pcUIManager != null)
+            {
+                // Turn off the whole canvas
+                pcUIManager.ShowInteractPrompt(false, null); // Stop typewriter
+                pcUIManager.gameObject.SetActive(false);
+            }
 
             canInteract = false;
             playerInput = null;
@@ -73,12 +74,15 @@ public class InteractablePC : MonoBehaviour
             playerInput.interact = false;
             if (playerInteractionManager != null)
             {
+                // Tell the UI to hide the prompt *before* starting the main interface
+                if (pcUIManager != null)
+                {
+                    pcUIManager.ShowInteractPrompt(false, null);
+                }
+                
                 playerInteractionManager.BeginPCInteraction(pcVCam);
             }
-            typewriter.StopTyping();
-            if (interactPromptText != null) interactPromptText.gameObject.SetActive(false);
-            canInteract = false;
+            // We no longer set canInteract to false here, because we're *still* interacting
         }
     }
 }
-

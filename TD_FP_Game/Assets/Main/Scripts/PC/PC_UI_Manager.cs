@@ -4,37 +4,27 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// Manages the entire UI state machine for the interactive PC.
-/// Lives on the PC_Screen_Canvas.
-/// </summary>
 public class PC_UI_Manager : MonoBehaviour
 {
     [Header("Screen Containers")]
-    [Tooltip("The parent object for the main menu buttons (Player, Towers, etc.)")]
     public GameObject MainMenu_Container;
-    [Tooltip("The parent object for the generated tower list buttons.")]
     public GameObject TowerList_Container;
-    [Tooltip("The parent object for the 'Settings', 'Upgrades', 'Salvage' buttons.")]
     public GameObject TowerOptions_Container;
-    [Tooltip("The parent object for the 4 targeting priority buttons.")]
     public GameObject TowerSettings_Container;
+    // No "InteractPrompt_Container" needed, we will reuse the 'pcDisplay' text.
 
     [Header("List Prefab")]
-    [Tooltip("The Button prefab to be spawned for each tower in the list.")]
     public GameObject TowerListButton_Prefab;
-    [Tooltip("The parent object (with a Vertical Layout Group) to spawn buttons into.")]
     public Transform TowerList_ContentParent;
 
     [Header("Animation")]
-    [Tooltip("The RectTransform of the selected button (for moving it).")]
     public RectTransform SelectedButton_Transform;
-    [Tooltip("An empty object on the canvas marking the 'selected' position.")]
     public Transform SelectedButton_TargetPosition;
     public float buttonAnimSpeed = 10f;
 
     [Header("Typewriter")]
     public TypeWriterEffect typewriter;
+    [Tooltip("The MAIN text display for both the prompt and the welcome message.")]
     public TMP_Text pcDisplay;
     [TextArea(3, 10)]
     public string pcWelcomeMessage = "Welcome. System ready.\nSelect an option.";
@@ -52,14 +42,11 @@ public class PC_UI_Manager : MonoBehaviour
     {
         // Start with ALL screens hidden.
         ShowScreen(null); 
+        pcDisplay.gameObject.SetActive(false);
     }
     
-    /// <summary>
-    /// This is the main entry point called by PlayerInteractionManager.
-    /// </summary>
     public void StartPCInterface()
     {
-        // Stop any previous startup routine, just in case
         if (_startupCoroutine != null)
         {
             StopCoroutine(_startupCoroutine);
@@ -67,9 +54,6 @@ public class PC_UI_Manager : MonoBehaviour
         _startupCoroutine = StartCoroutine(StartupRoutine());
     }
 
-    /// <summary>
-    /// This stops all UI processes when exiting the PC.
-    /// </summary>
     public void StopInterface()
     {
         if (typewriter != null)
@@ -81,43 +65,31 @@ public class PC_UI_Manager : MonoBehaviour
             StopCoroutine(_startupCoroutine);
             _startupCoroutine = null;
         }
-        // Hide everything
         ShowScreen(null);
-        ClearSelectedTower(); // Make sure to clear selection on exit
+        pcDisplay.gameObject.SetActive(false); // Hide text
+        ClearSelectedTower();
     }
 
-    /// <summary>
-    /// This coroutine handles the "first time" welcome message logic.
-    /// </summary>
     private IEnumerator StartupRoutine()
     {
-        // Ensure the text display area is visible
-        if (pcDisplay != null) pcDisplay.gameObject.SetActive(true);
+        // This is called AFTER the 'E' key is pressed
+        pcDisplay.gameObject.SetActive(true);
         
         if (!hasShownWelcomeMessage)
         {
-            // 1. First time: Hide all button containers
             ShowScreen(null); 
-            
-            // 2. Set the flag so this never runs again
             hasShownWelcomeMessage = true;
             
-            // 3. Run the typewriter and WAIT for it to finish
             if (typewriter != null && pcDisplay != null)
             {
-                // We use 'yield return' on the coroutine from the modified TypeWriterEffect
                 yield return typewriter.DisplayText(pcDisplay, pcWelcomeMessage);
-                
-                // Optional: Wait an extra second after typing finishes
                 yield return new WaitForSeconds(1f); 
             }
             
-            // 4. Now that the message is done, show the main menu
             ShowMainMenu();
         }
         else
         {
-            // Not the first time: Just show the main menu immediately
             ShowMainMenu();
         }
         
@@ -127,11 +99,39 @@ public class PC_UI_Manager : MonoBehaviour
     // --- STATE 1: MAIN MENU ---
     public void ShowMainMenu()
     {
-        // Hide the typewriter text display
-        if (pcDisplay != null) pcDisplay.gameObject.SetActive(false);
-        
+        pcDisplay.gameObject.SetActive(false); // Hide welcome text
         ShowScreen(MainMenu_Container);
         ClearSelectedTower();
+    }
+
+    // --- NEW METHOD ---
+    /// <summary>
+    /// Shows JUST the interact prompt (called by InteractablePC)
+    /// </summary>
+    public void ShowInteractPrompt(bool show, string message)
+    {
+        if (show)
+        {
+            // Hide all button menus
+            ShowScreen(null);
+            
+            // Show and run the prompt text
+            pcDisplay.gameObject.SetActive(true);
+            if (typewriter != null)
+            {
+                typewriter.DisplayText(pcDisplay, message);
+            }
+        }
+        else
+        {
+            // Hide everything
+            ShowScreen(null);
+            pcDisplay.gameObject.SetActive(false);
+            if (typewriter != null)
+            {
+                typewriter.StopTyping();
+            }
+        }
     }
 
     // --- STATE 2: TOWER LIST ---

@@ -65,7 +65,7 @@ public class PlayerInteractionManager : MonoBehaviour
 
         pointerEventData = new PointerEventData(eventSystem);
         raycastResults = new List<RaycastResult>();
-        EndPCInteraction(); 
+        //EndPCInteraction(); 
     }
 
     void Update()
@@ -75,8 +75,8 @@ public class PlayerInteractionManager : MonoBehaviour
             if (customCursor != null)
             {
                 Vector2 mouseDelta = inputScript.look * cursorSpeed;
-                cursorPosition.x += mouseDelta.x;
-                cursorPosition.y -= mouseDelta.y; 
+                cursorPosition.x -= mouseDelta.y;
+                cursorPosition.y -= mouseDelta.x; 
 
                 if (pcCanvasRect != null)
                 {
@@ -93,7 +93,13 @@ public class PlayerInteractionManager : MonoBehaviour
                 
                 if (pcGraphicRaycaster != null && eventSystem != null)
                 {
-                    pointerEventData.position = customCursor.position;
+                    //pointerEventData.position = customCursor.position;
+                    // 1. Convert the 3D world position of our cursor into a 2D screen position
+                    // We can get the camera reference from the weaponController.
+                    Vector2 screenPos = weaponController.mainCamera.WorldToScreenPoint(customCursor.position);
+
+                    // 2. Use that new 'screenPos' for the raycast
+                    pointerEventData.position = screenPos;
                     raycastResults.Clear();
                     pcGraphicRaycaster.Raycast(pointerEventData, raycastResults);
 
@@ -105,9 +111,10 @@ public class PlayerInteractionManager : MonoBehaviour
                     }
                 }
             }
-            if (inputScript.interact)
+            if (inputScript.interact || inputScript.build) 
             {
-                inputScript.interact = false; 
+                inputScript.interact = false;
+                inputScript.build = false; 
                 EndPCInteraction();
             }
         }
@@ -139,7 +146,7 @@ public class PlayerInteractionManager : MonoBehaviour
         
         // Swap UI
         if (playerHudCanvas != null) playerHudCanvas.SetActive(false);
-        if (pcScreenCanvas != null) pcScreenCanvas.SetActive(true);
+        //if (pcScreenCanvas != null) pcScreenCanvas.SetActive(true);
 
         // Switch cameras
         if (activePCVCam != null)
@@ -182,13 +189,27 @@ public class PlayerInteractionManager : MonoBehaviour
 
         // Swap UI
         if (playerHudCanvas != null) playerHudCanvas.SetActive(true);
-        if (pcScreenCanvas != null) pcScreenCanvas.SetActive(false);
+        //if (pcScreenCanvas != null) pcScreenCanvas.SetActive(false);
 
         // Give control back to player camera
         if (activePCVCam != null)
         {
             activePCVCam.Priority = 5; // Return to low priority
             activePCVCam = null;
+        }
+        
+        if (pcUIManager != null)
+        {
+            // This is a bit of a hack, but it's the cleanest way.
+            // We assume the pcUIManager's parent is the InteractablePC, or nearby.
+            // A better way is to find the InteractablePC that is currently active.
+            
+            // Let's just find the script. It's simple.
+            InteractablePC activePC = FindObjectOfType<InteractablePC>(); 
+            if(activePC != null)
+            {
+                pcUIManager.ShowInteractPrompt(true, activePC.interactMessage);
+            }
         }
     }
 }
