@@ -18,7 +18,7 @@ public class TowerManager : MonoBehaviour
         
         return availableTowers[index].scrapCost;
     }
-    
+
     // Instantiates the selected tower prefab at the specified world position.
     public void BuildTower(int index, Vector3 position)
     {
@@ -29,16 +29,18 @@ public class TowerManager : MonoBehaviour
         }
 
         TowerData towerData = availableTowers[index];
-        
-        // Instantiate the tower prefab at the location determined by the raycast
+
         GameObject newTower = Instantiate(
-            towerData.towerPrefab, 
-            position, 
+            towerData.towerPrefab,
+            position,
             Quaternion.identity
         );
-        
-        // Assign the towerData to a TowerController script here (when they actually do stuff!)
-        // Example: newTower.GetComponent<TowerController>().Initialize(towerData);
+
+        // --- THIS IS THE NEW, CRITICAL LINE ---
+        // Get the controller and give it its stats
+        newTower.GetComponent<TowerController>()?.Initialize(towerData);
+        // ----------------------------------------
+
         Debug.Log($"Successfully instantiated {towerData.towerName} at {position}");
     }
 }

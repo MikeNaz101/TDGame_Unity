@@ -1,0 +1,215 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+using StarterAssets;
+using Unity.Cinemachine;
+using TMPro;
+
+/// <summary>
+/// This script manages the player's state (e.g., "Playing" vs. "Interacting with PC").
+/// It lives on the Player object and is responsible for enabling/disabling
+/// all other player-control scripts.
+/// </summary>
+public class PlayerInteractionManager : MonoBehaviour
+{
+    [Header("Player Components")]
+    public StarterAssetsInputs inputScript;
+    public DoomMovement doomMovement;
+    public WeaponControllerHS weaponController;
+
+    [Header("Player UI")]
+    public GameObject playerHudCanvas;
+
+    [Header("PC Interaction")]
+    public GameObject pcScreenCanvas;
+    
+    [Tooltip("The PC_UI_Manager script on the pcScreenCanvas.")]
+    public PC_UI_Manager pcUIManager;
+
+    [Header("PC Custom Cursor")]
+    public RectTransform customCursor;
+    public RectTransform pcCanvasRect;
+    public float cursorSpeed = 1f;
+    
+    [Header("PC Event System")]
+    public GraphicRaycaster pcGraphicRaycaster;
+    public EventSystem eventSystem;
+
+    private bool isInteracting = false;
+    private CinemachineCamera activePCVCam;
+    private Vector2 cursorPosition;
+    
+    private PointerEventData pointerEventData;
+    private List<RaycastResult> raycastResults;
+    
+    void Start()
+    {
+        // Auto-find components
+        if (inputScript == null) inputScript = GetComponent<StarterAssetsInputs>();
+        if (doomMovement == null) doomMovement = GetComponent<DoomMovement>();
+        if (weaponController == null) weaponController = GetComponentInChildren<WeaponControllerHS>();
+        if (eventSystem == null) eventSystem = FindObjectOfType<EventSystem>();
+        
+        // Auto-find raycaster from the canvas
+        if (pcGraphicRaycaster == null && pcScreenCanvas != null)
+        {
+            pcGraphicRaycaster = pcScreenCanvas.GetComponent<GraphicRaycaster>();
+        }
+        
+        // Find the UI Manager
+        if (pcUIManager == null && pcScreenCanvas != null)
+        {
+            pcUIManager = pcScreenCanvas.GetComponent<PC_UI_Manager>();
+        }
+
+        pointerEventData = new PointerEventData(eventSystem);
+        raycastResults = new List<RaycastResult>();
+        //EndPCInteraction(); 
+    }
+
+    void Update()
+    {
+        if (isInteracting)
+        {
+            if (customCursor != null)
+            {
+                Vector2 mouseDelta = inputScript.look * cursorSpeed;
+                cursorPosition.x -= mouseDelta.y;
+                cursorPosition.y -= mouseDelta.x; 
+
+                if (pcCanvasRect != null)
+                {
+                    Rect canvasRect = pcCanvasRect.rect;
+                    cursorPosition.x = Mathf.Clamp(cursorPosition.x, canvasRect.xMin, canvasRect.xMax);
+                    cursorPosition.y = Mathf.Clamp(cursorPosition.y, canvasRect.yMin, canvasRect.yMax);
+                }
+                customCursor.anchoredPosition = cursorPosition;
+            }
+
+            if (inputScript.fire)
+            {
+                inputScript.fire = false;
+                
+                if (pcGraphicRaycaster != null && eventSystem != null)
+                {
+                    //pointerEventData.position = customCursor.position;
+                    // 1. Convert the 3D world position of our cursor into a 2D screen position
+                    // We can get the camera reference from the weaponController.
+                    Vector2 screenPos = weaponController.mainCamera.WorldToScreenPoint(customCursor.position);
+
+                    // 2. Use that new 'screenPos' for the raycast
+                    pointerEventData.position = screenPos;
+                    raycastResults.Clear();
+                    pcGraphicRaycaster.Raycast(pointerEventData, raycastResults);
+
+                    if (raycastResults.Count > 0)
+                    {
+                        GameObject hitObject = raycastResults[0].gameObject;
+                        ExecuteEvents.Execute(hitObject, pointerEventData, ExecuteEvents.pointerClickHandler);
+                        Debug.Log("Clicked on: " + hitObject.name);
+                    }
+                }
+            }
+            if (inputScript.interact || inputScript.build) 
+            {
+                inputScript.interact = false;
+                inputScript.build = false; 
+                EndPCInteraction();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Called by an interactable object (like a PC) to start an interaction.
+    /// </summary>
+    public void BeginPCInteraction(CinemachineCamera targetPCVCam)
+    {
+        isInteracting = true;
+        activePCVCam = targetPCVCam;
+
+        // Disable player controls
+        doomMovement.enabled = false;
+        weaponController.ToggleShootingEnabled(false);
+        inputScript.cursorInputForLook = true;
+        inputScript.fire = false; 
+
+        // Keep OS cursor locked, show custom cursor
+        inputScript.SetCursorState(true);
+        inputScript.cursorLocked = true;
+        if (customCursor != null)
+        {
+            cursorPosition = Vector2.zero;
+            customCursor.anchoredPosition = cursorPosition;
+            customCursor.gameObject.SetActive(true);
+        }
+        
+        // Swap UI
+        if (playerHudCanvas != null) playerHudCanvas.SetActive(false);
+        //if (pcScreenCanvas != null) pcScreenCanvas.SetActive(true);
+
+        // Switch cameras
+        if (activePCVCam != null)
+        {
+            activePCVCam.Priority = 20; // Give this camera priority
+        }
+        
+        // Tell the PC UI Manager to start
+        if (pcUIManager != null)
+        {
+            pcUIManager.StartPCInterface();
+        }
+    }
+
+    /// <summary>
+    // Called to return control to the player.
+    /// </summary>
+    public void EndPCInteraction()
+    {
+        isInteracting = false;
+        
+        // Tell the PC to stop all coroutines and typewriter effects
+        if (pcUIManager != null)
+        {
+            pcUIManager.StopInterface();
+        }
+
+        // Enable player controls
+        doomMovement.enabled = true;
+        weaponController.ToggleShootingEnabled(true);
+        inputScript.cursorInputForLook = true;
+
+        // Keep OS cursor locked, hide custom cursor
+        inputScript.SetCursorState(true);
+        inputScript.cursorLocked = true;
+        if (customCursor != null)
+        {
+            customCursor.gameObject.SetActive(false);
+        }
+
+        // Swap UI
+        if (playerHudCanvas != null) playerHudCanvas.SetActive(true);
+        //if (pcScreenCanvas != null) pcScreenCanvas.SetActive(false);
+
+        // Give control back to player camera
+        if (activePCVCam != null)
+        {
+            activePCVCam.Priority = 5; // Return to low priority
+            activePCVCam = null;
+        }
+        
+        if (pcUIManager != null)
+        {
+            // This is a bit of a hack, but it's the cleanest way.
+            // We assume the pcUIManager's parent is the InteractablePC, or nearby.
+            // A better way is to find the InteractablePC that is currently active.
+            
+            // Let's just find the script. It's simple.
+            InteractablePC activePC = FindObjectOfType<InteractablePC>(); 
+            if(activePC != null)
+            {
+                pcUIManager.ShowInteractPrompt(true, activePC.interactMessage);
+            }
+        }
+    }
+}

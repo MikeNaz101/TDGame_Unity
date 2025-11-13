@@ -1,6 +1,7 @@
+using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections.Generic;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour
@@ -33,6 +34,7 @@ public class EnemyController : MonoBehaviour
     private float _currentHealth;
     private bool _isDead = false;
     private float _timeSinceLastAttack = 0f;
+    public float CurrentHealth => _currentHealth;
     
     // --- Static list for AI Manager ---
     public static List<EnemyController> ActiveEnemies = new List<EnemyController>();
@@ -520,20 +522,40 @@ public class EnemyController : MonoBehaviour
             Die(true);
         }
     }
-    
-    public void TakeExplosion(Vector3 explosionPosition, float explosionForce, float explosionRadius, float upwardModifier = 0.1f)
+
+    /// <summary>
+    /// Takes damage AND physics force from an explosion.
+    /// </summary>
+    public void TakeExplosion(float damage, Transform attacker, Vector3 explosionPosition, float explosionForce, float explosionRadius, float upwardModifier = 0.1f)
     {
         if (_isDead) return;
 
-        _currentHealth = 0;
-        
-        Die(true);
-        
-        foreach (Rigidbody rb in _ragdollRigidbodies)
+        // 1. Apply Damage
+        _currentHealth -= damage;
+
+        // 2. Check for Death
+        if (_currentHealth <= 0f)
         {
-            if (rb != null)
+            // We are dead. Call Die() which will handle the ragdoll.
+            Die(true);
+
+            // Apply force *after* Die() has enabled the rigidbodies
+            foreach (Rigidbody rb in _ragdollRigidbodies)
             {
-                rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardModifier, ForceMode.Impulse);
+                if (rb != null)
+                {
+                    rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardModifier, ForceMode.Impulse);
+                }
+            }
+        }
+        else
+        {
+            // Enemy survived.
+
+            // This line will now work correctly
+            if (enemyData.canBeDistracted && attacker != null)
+            {
+                _attackSource = attacker;
             }
         }
     }
@@ -583,7 +605,6 @@ public class EnemyController : MonoBehaviour
 
     private void ActivateRagdoll()
     {
-        _isDead = true;
         SetRagdollActive(true);
         Collider mainCollider = GetComponent<Collider>();
         if (mainCollider != null) { mainCollider.enabled = false; }

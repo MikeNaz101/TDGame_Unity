@@ -12,11 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b6dcc75fa6bc694bb16d405aefadc6e, type: 3}
   m_Name: BaseTower
   m_EditorClassIdentifier: Assembly-CSharp::TowerData
-  towerName: Tower 1
+  towerName: Basic Shooter Tower
   description: A basic defensive unit.
   towerIcon: {fileID: 21300000, guid: cc22d7577cb43a843a562490334918cc, type: 3}
   towerPrefab: {fileID: 4376194662093663467, guid: 7b4ffdaf26f98184ebd7a8450df3fc4d, type: 3}
   scrapCost: 10
-  damage: 10
+  attackType: 0
+  projectilePrefab: {fileID: 0}
+  damage: 100
   fireRate: 0.5
   range: 15
+  isExplosive: 0
+  explosionRadius: 3
+  explosionForce: 500
+  impactParticlePrefab: {fileID: 0}
+  shootSound: {fileID: 8300000, guid: 614cd7dc9daa6b84286af1e08ac67172, type: 3}
