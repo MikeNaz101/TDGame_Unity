@@ -41,6 +41,12 @@ public class EnemyData : ScriptableObject
 
     [Header("Economy")]
     public GameObject scrapMetalPrefab;
+    
+    // --- THIS IS THE MISSING SECTION ---
+    [Header("VFX")]
+    [Tooltip("The particle effect to play when the enemy dies (if not ragdolling).")]
+    public GameObject deathParticlePrefab;
+    // ------------------------------------
 
     [Header("Spawner (Queen) Settings")]
     [Tooltip("Is this enemy a spawner?")]

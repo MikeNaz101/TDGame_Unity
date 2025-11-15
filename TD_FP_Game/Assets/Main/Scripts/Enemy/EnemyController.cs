@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour
@@ -28,12 +27,14 @@ public class EnemyController : MonoBehaviour
 
     [Header("AI & Navigation")]
     [SerializeField] private NavMeshAgent _agent;
-    [SerializeField] private float _attackThreshold = 2.5f; // <<<--- IT'S DECLARED HERE
+    [SerializeField] private float _attackThreshold = 2.5f;
 
     // --- RUNTIME STATE ---
     private float _currentHealth;
     private bool _isDead = false;
     private float _timeSinceLastAttack = 0f;
+    
+    // --- NEW: Public property for Tower Targeting ---
     public float CurrentHealth => _currentHealth;
     
     // --- Static list for AI Manager ---
@@ -125,7 +126,6 @@ public class EnemyController : MonoBehaviour
         // 5. Subscribe to Audio Events (if distractible)
         if (enemyData.canBeDistracted)
         {
-            // This is the line that needs the new script
             EnemyAIAudioEvents.OnGunshotReported += HandleGunshot;
         }
 
@@ -522,10 +522,8 @@ public class EnemyController : MonoBehaviour
             Die(true);
         }
     }
-
-    /// <summary>
-    /// Takes damage AND physics force from an explosion.
-    /// </summary>
+    
+    // --- UPDATED TakeExplosion ---
     public void TakeExplosion(float damage, Transform attacker, Vector3 explosionPosition, float explosionForce, float explosionRadius, float upwardModifier = 0.1f)
     {
         if (_isDead) return;
@@ -537,8 +535,8 @@ public class EnemyController : MonoBehaviour
         if (_currentHealth <= 0f)
         {
             // We are dead. Call Die() which will handle the ragdoll.
-            Die(true);
-
+            Die(true); 
+            
             // Apply force *after* Die() has enabled the rigidbodies
             foreach (Rigidbody rb in _ragdollRigidbodies)
             {
@@ -551,8 +549,7 @@ public class EnemyController : MonoBehaviour
         else
         {
             // Enemy survived.
-
-            // This line will now work correctly
+            // Set the attacker so it turns to fight
             if (enemyData.canBeDistracted && attacker != null)
             {
                 _attackSource = attacker;
@@ -560,6 +557,7 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    // --- UPDATED Die Method ---
     void Die(bool useRagdoll)
     {
         if (_isDead) return;
@@ -570,6 +568,7 @@ public class EnemyController : MonoBehaviour
             _waveManager.EnemyDestroyed();
         }
 
+        // --- Scrap Metal (Unchanged) ---
         if (enemyData != null && enemyData.scrapMetalPrefab != null)
         {
             Instantiate(enemyData.scrapMetalPrefab, transform.position, Quaternion.identity);
@@ -580,13 +579,34 @@ public class EnemyController : MonoBehaviour
             _agent.enabled = false;
         }
         
-        if (useRagdoll && _ragdollRigidbodies != null && _ragdollRigidbodies.Length > 0)
+        // --- UPDATED LOGIC: Ragdoll vs Particle ---
+        
+        // Check if we *can* and *should* ragdoll
+        bool canRagdoll = useRagdoll && _ragdollRigidbodies != null && _ragdollRigidbodies.Length > 0;
+
+        if (canRagdoll)
         {
+            // --- Ragdoll Death ---
             ActivateRagdoll();
-            Destroy(gameObject, 5f);
+            Destroy(gameObject, 5f); // Destroy ragdoll after 5 seconds
         }
         else
         {
+            // --- Particle Death ---
+            if (enemyData != null && enemyData.deathParticlePrefab != null)
+            {
+                // Spawn the particle effect
+                GameObject particles = Instantiate(
+                    enemyData.deathParticlePrefab, 
+                    transform.position, 
+                    Quaternion.identity
+                );
+                
+                // Destroy the particle system after 3 seconds (adjust as needed)
+                Destroy(particles, 3f);
+            }
+            
+            // Destroy the enemy object immediately
             Destroy(gameObject, 0.1f);
         }
     }
@@ -603,6 +623,7 @@ public class EnemyController : MonoBehaviour
         _state = EnemyState.Pursuing;
     }
 
+    // --- UPDATED ActivateRagdoll (removed _isDead = true) ---
     private void ActivateRagdoll()
     {
         SetRagdollActive(true);
@@ -635,4 +656,3 @@ public class EnemyController : MonoBehaviour
     
     #endregion
 }
-
