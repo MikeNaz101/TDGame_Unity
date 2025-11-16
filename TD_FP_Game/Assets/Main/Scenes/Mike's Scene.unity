@@ -1307,10 +1307,11 @@ MonoBehaviour:
   _waveManager: {fileID: 0}
   _playerTarget: {fileID: 0}
   fov: {fileID: 0}
-  _ragdollRigidbodies: []
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 0
+  pelvisRigidbody: {fileID: 0}
+  _ragdollRigidbodies: []
   _agent: {fileID: 0}
   _attackThreshold: 2.5
 --- !u!195 &1047237946
@@ -5846,12 +5847,32 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: availableTowers.Array.size
-      value: 2
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: 'availableTowers.Array.data[1]'
       value: 
       objectReference: {fileID: 11400000, guid: 9754af089926bb741bbdebc289e6405d, type: 2}
+    - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'availableTowers.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8c76fe4a22f11304cb89d83dd6e9fca0, type: 2}
+    - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'availableTowers.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 878d12515190a62459dfbe66f6f09339, type: 2}
+    - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'availableTowers.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8b968fab69158574a9da592334e24033, type: 2}
+    - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'availableTowers.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 71acc1186f8c6aa4e8241b2daab1ba3d, type: 2}
+    - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'availableTowers.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9273d48c596c0d04c85e895a44b78ed8, type: 2}
     - target: {fileID: 8837309847464674071, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: m_LocalPosition.x
       value: -99.4

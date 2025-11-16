@@ -129,8 +129,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   towerData: {fileID: 0}
   attacker: {fileID: 0}
+  damageMultiplier: 1
   projectileSpeed: 20
-  lifetime: 6
+  lifetime: 2
 --- !u!54 &1316696442381547299
 Rigidbody:
   m_ObjectHideFlags: 0

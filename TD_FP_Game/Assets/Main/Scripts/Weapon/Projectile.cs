@@ -6,6 +6,7 @@ public class Projectile : MonoBehaviour
     // These are set by the TowerController that fires this projectile.
     [HideInInspector] public TowerData towerData;
     [HideInInspector] public Transform attacker;
+    [HideInInspector] public float damageMultiplier = 1f;
 
     [Header("Tuning")]
     public float projectileSpeed = 20f;
@@ -86,7 +87,7 @@ public class Projectile : MonoBehaviour
     {
         if (enemy != null)
         {
-            enemy.TakeDamage(towerData.damage, attacker);
+            enemy.TakeDamage(towerData.damage * damageMultiplier, attacker);
         }
     }
 
@@ -106,7 +107,7 @@ public class Projectile : MonoBehaviour
                 {
                     // We now pass the 'attacker' transform
                     enemy.TakeExplosion(
-                        towerData.damage,
+                        towerData.damage * damageMultiplier,
                         attacker, // <-- This is the added parameter
                         explosionCenter,
                         towerData.explosionForce,

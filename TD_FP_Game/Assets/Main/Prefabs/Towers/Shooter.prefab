@@ -26,7 +26,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.2744689, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4362569586468078863}
@@ -60,8 +60,8 @@ Transform:
   m_GameObject: {fileID: 1669738086307544372}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.002, y: 0, z: 0.894}
-  m_LocalScale: {x: 0.21004899, y: 0.46906042, z: 0.210049}
+  m_LocalPosition: {x: 0, y: -0, z: 0.871}
+  m_LocalScale: {x: 0.210049, y: 0.46906042, z: 0.210049}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1241574902802280289}
@@ -215,7 +215,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ab5173d347dc4104097e6fe29282b03d, type: 2}
+  - {fileID: 2100000, guid: 12eb1b030cdc0c54490510093102d7f6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -314,8 +314,8 @@ Transform:
   m_GameObject: {fileID: 3982819893665439607}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.01, y: 0.8110001, z: 0}
-  m_LocalScale: {x: 1, y: 0.64292, z: 1}
+  m_LocalPosition: {x: -0.009999692, y: 0.8110002, z: 0}
+  m_LocalScale: {x: 3.6434, y: 0.64291996, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2878557954726989769}
@@ -354,7 +354,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6d9dc13b5f72b83478030dc3ef382d6d, type: 2}
+  - {fileID: 2100000, guid: ace0e4a93565da449b1e8066dd151b11, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -413,10 +413,10 @@ GameObject:
   - component: {fileID: 6834769421830708016}
   - component: {fileID: 4396614480476590435}
   - component: {fileID: 4838221078671498395}
-  - component: {fileID: 4749254821780869390}
+  - component: {fileID: 5608031521910061763}
   m_Layer: 13
-  m_Name: Tower 3
-  m_TagString: Tower
+  m_Name: Shooter
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -470,7 +470,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ab5173d347dc4104097e6fe29282b03d, type: 2}
+  - {fileID: 2100000, guid: 12eb1b030cdc0c54490510093102d7f6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -659,7 +659,7 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &4749254821780869390
+--- !u!114 &5608031521910061763
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -668,9 +668,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4376194662093663467}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3dc458011521f9458b69d88418e7670, type: 3}
+  m_Script: {fileID: 11500000, guid: 09b25cfc9d31f5c4ead8bad901337f2b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TowerController
+  m_EditorClassIdentifier: Assembly-CSharp::Tower_Attacker
   _turretBase: {fileID: 1091952749038565001}
   _barrel: {fileID: 2878557954726989769}
   _shootPoint: {fileID: 1241574902802280289}
@@ -702,13 +702,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5279589003770124245}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0, y: 1.17, z: -0}
-  m_LocalScale: {x: 1, y: 2.2330995, z: 0.44780788}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.0300003, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4362569586468078863}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
 --- !u!120 &1878863632809348117
 LineRenderer:
   serializedVersion: 2
@@ -768,7 +768,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.036727905
+        value: 0.041915894
         inSlope: 0
         outSlope: 0
         tangentMode: 0

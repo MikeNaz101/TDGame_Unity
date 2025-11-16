@@ -1,29 +1,28 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour
 {
     // --- AI States ---
-    // This is the new, unified state machine
-    private enum EnemyState { Pursuing, Attacking }
+    private enum EnemyState { Pursuing, Attacking, Ragdolled }
     private EnemyState _state;
 
     // --- SETUP & DATA ---
     [Header("Data & Manager References")]
-    [Tooltip("The Scriptable Object containing all stats for this enemy type.")]
     public EnemyData enemyData;
-    [Tooltip("The central manager for wave progression and enemy count.")]
     public WaveManager _waveManager;
-    [Tooltip("The player, which will be found by tag.")]
     public Transform _playerTarget;
-    [Tooltip("The Field of View component for visual detection.")]
     public FieldOfView fov;
+    public LayerMask obstacleLayer;
+
+    [Header("Ragdoll")]
+    [Tooltip("The central, main rigidbody of the ragdoll (e.g., the Hips or Pelvis).")]
+    public Rigidbody pelvisRigidbody;
     [Tooltip("All rigidbodies for the ragdoll.")]
     public Rigidbody[] _ragdollRigidbodies;
-    [Tooltip("The LayerMask that only contains 'Door' objects.")]
-    public LayerMask obstacleLayer; // Used to detect doors
 
     [Header("AI & Navigation")]
     [SerializeField] private NavMeshAgent _agent;
@@ -33,43 +32,39 @@ public class EnemyController : MonoBehaviour
     private float _currentHealth;
     private bool _isDead = false;
     private float _timeSinceLastAttack = 0f;
+    private Collider _mainCollider;
     
-    // --- NEW: Public property for Tower Targeting ---
     public float CurrentHealth => _currentHealth;
-    
-    // --- Static list for AI Manager ---
     public static List<EnemyController> ActiveEnemies = new List<EnemyController>();
     
     // --- AI-Specific State Variables ---
-    private IDamageable _currentTarget;    // Our *current* target (Player, Core, or Door)
-    private Transform _coreTarget;          // The ultimate goal
-    private Transform _lastKnownPlayerPos;  // For distractions
-    private Transform _soundInvestigationPos; // For distractions
-    private Transform _attackSource;        // For distractions
-    private float _sensorCooldown = 0f;     // Timer for how often to check for player/doors
-    // --- AI Stance ---
+    private IDamageable _currentTarget;
+    private Transform _coreTarget;
+    private Transform _lastKnownPlayerPos;
+    private Transform _soundInvestigationPos;
+    private Transform _attackSource;
+    private float _sensorCooldown = 0f;
     public enum AIStance { Standard, Aggressive, Evasive }
     private AIStance _currentStance = AIStance.Standard;
     private float _originalMoveSpeed;
     private float _originalStoppingDistance;
-    
-    private float _spawnerTimeAlive = 0f;   // For Spawner
-    private float _timeSinceLastGrowth = 0f; // For Spawner Growth
-    private float _timeSinceLastSpawn;      // For Spawner
-    private float _wanderTimer; // Timer for how often to pick a new wander point
+    private float _spawnerTimeAlive = 0f;
+    private float _timeSinceLastGrowth = 0f;
+    private float _timeSinceLastSpawn;
+    private float _wanderTimer;
 
     // --- Constants ---
-    private const float SENSOR_UPDATE_RATE = 0.5f; // How often to scan for player/doors
-    private const float WANDER_UPDATE_RATE = 3.0f; // How often Wander AI picks a new point
-    private const float WANDER_DISTANCE = 10f; // How far Wander AI looks for a new point
-    private const float ATTACK_RANGE_BUFFER = 1f; // Buffer to stop enemies from shuffling at attack range
+    private const float SENSOR_UPDATE_RATE = 0.5f;
+    private const float WANDER_UPDATE_RATE = 3.0f;
+    private const float WANDER_DISTANCE = 10f;
+    private const float ATTACK_RANGE_BUFFER = 1f;
 
     #region --- Unity Lifecycle & Initialization ---
 
     void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
-        // Ragdoll RBs are now assigned in the Inspector
+        _mainCollider = GetComponent<Collider>();
     }
 
     void Start()
@@ -80,7 +75,6 @@ public class EnemyController : MonoBehaviour
             return;
         }
 
-        // --- Find Global References ---
         if (_waveManager == null) _waveManager = FindObjectOfType<WaveManager>();
         if (_playerTarget == null)
         {
@@ -97,49 +91,42 @@ public class EnemyController : MonoBehaviour
             Debug.LogError("AI created, but no 'Core' tag found in scene!", this);
         }
 
-        // --- Initialize Stats ---
         _currentHealth = enemyData.baseHealth;
         _agent.speed = enemyData.moveSpeed;
-        _agent.stoppingDistance = _attackThreshold - 0.5f; // Set stopping distance
-        transform.localScale = Vector3.one * enemyData.baseScale; // Apply base scale
+        _agent.stoppingDistance = _attackThreshold - 0.5f;
+        transform.localScale = Vector3.one * enemyData.baseScale;
         _agent.enabled = true;
         SetRagdollActive(false);
         
         _originalMoveSpeed = enemyData.moveSpeed;
         _originalStoppingDistance = _agent.stoppingDistance;
 
-        // Add to static list
         if (!ActiveEnemies.Contains(this))
         {
             ActiveEnemies.Add(this);
         }
 
-        // --- Initialize AI Behavior ---
-        // All enemies start by targeting the Core
         if (_coreTarget != null)
         {
             _currentTarget = _coreTarget.GetComponent<IDamageable>();
         }
         _state = EnemyState.Pursuing;
-        _timeSinceLastAttack = enemyData.attackCooldown; // Ready to attack
+        _timeSinceLastAttack = enemyData.attackCooldown;
 
-        // 5. Subscribe to Audio Events (if distractible)
         if (enemyData.canBeDistracted)
         {
             EnemyAIAudioEvents.OnGunshotReported += HandleGunshot;
         }
 
-        // 6. Initialize Spawner (if applicable)
         if (enemyData.isSpawner)
         {
-            _spawnerTimeAlive = enemyData.spawnerTimeLimit; // This is now a countdown
+            _spawnerTimeAlive = enemyData.spawnerTimeLimit;
             _timeSinceLastSpawn = enemyData.spawnInterval;
         }
     }
 
     void OnDestroy()
     {
-        // Unsubscribe from events to prevent errors
         if (enemyData != null && enemyData.canBeDistracted)
         {
             EnemyAIAudioEvents.OnGunshotReported -= HandleGunshot;
@@ -149,19 +136,16 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        if (_isDead || !_agent.enabled || !_agent.isOnNavMesh) return;
+        if (_isDead) return;
 
-        // Update attack cooldown
         _timeSinceLastAttack += Time.deltaTime;
         _sensorCooldown -= Time.deltaTime;
 
-        // --- Spawner (Queen) Logic ---
         if (enemyData.isSpawner)
         {
             UpdateSpawnerLogic();
         }
 
-        // --- MASTER AI SWITCH ---
         RunAILogic();
     }
 
@@ -171,96 +155,89 @@ public class EnemyController : MonoBehaviour
 
     private void RunAILogic()
     {
-        // High-priority check: Is our current target gone?
+        if (_state == EnemyState.Ragdolled) return;
+        
+        if (!_agent.enabled || !_agent.isOnNavMesh) return;
+
         if ((_currentTarget as UnityEngine.Object) == null || _currentTarget.transform == null || !_currentTarget.transform.gameObject.activeInHierarchy)
         {
-            // Target is gone. Reset to go back to the Core.
             _currentTarget = _coreTarget.GetComponent<IDamageable>();
             _state = EnemyState.Pursuing;
-            if (_currentTarget == null) return; // Failsafe if Core is also gone
+            if (_currentTarget == null) return;
         }
 
-        // Run sensor checks (vision, sound, doors) on a timer
         if (_sensorCooldown <= 0f)
         {
             UpdateSensors();
             _sensorCooldown = SENSOR_UPDATE_RATE;
         }
 
-        // Execute logic based on current state
-        if (_state == EnemyState.Pursuing)
+        switch (_state)
         {
-            UpdatePursueState();
-        }
-        else if (_state == EnemyState.Attacking)
-        {
-            UpdateAttackState();
+            case EnemyState.Pursuing:
+                UpdatePursueState();
+                break;
+            case EnemyState.Attacking:
+                UpdateAttackState();
+                break;
+            case EnemyState.Ragdolled:
+                // Do nothing - coroutine is handling it
+                break;
         }
     }
     
-    // Handles all target-finding (vision, sound, doors).
-    // This sets the _currentTarget, which the Pursue state will follow.
     private void UpdateSensors()
     {
-        // 1. Distraction Check (Player/Attacker)
         if (enemyData.canBeDistracted)
         {
-            // A. Did we get shot? (Highest priority)
             if (_attackSource != null)
             {
                 SetNewTarget(_attackSource.GetComponent<IDamageable>());
-                _attackSource = null; // Clear trigger
-                return; // Found a target
+                _attackSource = null;
+                return;
             }
 
-            // B. Can we see the player?
             if (fov != null && _playerTarget != null && fov.IsTargetVisible(_playerTarget))
             {
-                _lastKnownPlayerPos = _playerTarget; // Remember where we saw them
+                _lastKnownPlayerPos = _playerTarget;
                 SetNewTarget(_playerTarget.GetComponent<IDamageable>());
-                return; // Found a target
+                return;
             }
             
-            // C. Did we hear a sound?
             if (_soundInvestigationPos != null)
             {
-                // Note: We don't set a target, just a destination.
                 if (_agent.destination != _soundInvestigationPos.position)
                 {
                     _agent.SetDestination(_soundInvestigationPos.position);
                 }
-                _soundInvestigationPos = null; // Clear trigger
-                return; // Found a target
+                _soundInvestigationPos = null;
+                return;
             }
 
-            // D. Are we investigating a sound or last known position?
             if (_lastKnownPlayerPos != null)
             {
                 if (Vector3.Distance(transform.position, _lastKnownPlayerPos.position) < _agent.stoppingDistance + 1f)
                 {
-                    _lastKnownPlayerPos = null; // We "lost" them, go back to Core
+                    _lastKnownPlayerPos = null;
                 }
             }
         }
 
-        // 2. Obstacle Check (Doors)
         if (_currentTarget.transform == _coreTarget)
         {
             if (CheckForDoorObstacle(out DoorHealth door))
             {
-                SetNewTarget(door); // Found a new target (the Door)
+                SetNewTarget(door);
                 return;
             }
         }
 
-        // 3. Default: Target the Core
         if (_currentTarget.transform != _playerTarget)
         {
              SetNewTarget(_coreTarget.GetComponent<IDamageable>());
         }
     }
     
-    // Movement logic (Direct or Wander)
     private void UpdatePursueState()
     {
         _agent.isStopped = false;
@@ -271,32 +248,25 @@ public class EnemyController : MonoBehaviour
             return;
         }
 
-        // --- NEW ADAPTIVE MOVEMENT LOGIC ---
-
-        // 1. EVASIVE STANCE: Always use the "dodge" logic on a timer.
         if (_currentStance == AIStance.Evasive && !enemyData.isSpawner)
         {
             _wanderTimer -= Time.deltaTime;
-            // Check if our "dodge" timer is up OR we've reached our last dodge point
             if (_wanderTimer <= 0f || _agent.remainingDistance < _agent.stoppingDistance + 1f)
             {
                 Vector3 dodgePoint = GetEvasiveManeuverPoint(_currentTarget.transform.position);
                 _agent.SetDestination(dodgePoint);
-                _wanderTimer = WANDER_UPDATE_RATE; // WANDER_UPDATE_RATE acts as our "dodge interval"
+                _wanderTimer = WANDER_UPDATE_RATE;
             }
         }
-        // 2. AGGRESSIVE STANCE or STANDARD-DIRECT: Always move directly to target.
         else if (_currentStance == AIStance.Aggressive || enemyData.movementType == EnemyData.AIMovementType.Direct)
         {
             _agent.SetDestination(_currentTarget.transform.position);
         }
-        // 3. STANDARD-WANDER: Use the original wander logic.
         else if (enemyData.movementType == EnemyData.AIMovementType.Wander)
         {
             _wanderTimer -= Time.deltaTime;
             if (_wanderTimer <= 0f || _agent.remainingDistance < 1f)
             {
-                // Call our renamed function
                 Vector3 randomPoint = GetStandardWanderPoint(_currentTarget.transform.position);
                 _agent.SetDestination(randomPoint);
                 _wanderTimer = WANDER_UPDATE_RATE;
@@ -304,7 +274,6 @@ public class EnemyController : MonoBehaviour
         }
     }
     
-    // Attack logic (for Player, Core, or Door)
     private void UpdateAttackState()
     {
         if (Vector3.Distance(transform.position, _currentTarget.transform.position) > _agent.stoppingDistance + ATTACK_RANGE_BUFFER)
@@ -322,7 +291,6 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    // Queen-specific logic (Spawning & Growth)
     private void UpdateSpawnerLogic()
     {
         if (enemyData.canGrow)
@@ -355,22 +323,18 @@ public class EnemyController : MonoBehaviour
     
     public void SetAIStance(AIStance newStance)
     {
-        if (_currentStance == newStance) return; // No change
+        if (_currentStance == newStance) return;
 
         _currentStance = newStance;
 
         switch (newStance)
         {
             case AIStance.Aggressive:
-                // --- This is your "AggressiveApproach" ---
-                _agent.speed = _originalMoveSpeed * 1.5f; // 50% faster
-                _agent.stoppingDistance = _originalStoppingDistance * 0.75f; // Get a bit closer
+                _agent.speed = _originalMoveSpeed * 1.5f;
+                _agent.stoppingDistance = _originalStoppingDistance * 0.75f;
                 break;
                 
             case AIStance.Evasive:
-                // --- This is your "EvasiveManeuvers" ---
-                // We no longer slow them down. We just use their normal stats,
-                // but the UpdatePursueState logic will use a new "dodge" behavior.
                 _agent.speed = _originalMoveSpeed;
                 _agent.stoppingDistance = _originalStoppingDistance;
                 break;
@@ -382,6 +346,20 @@ public class EnemyController : MonoBehaviour
                 break;
         }
     }
+
+    // --- THIS IS THE MISSING METHOD ---
+    /// <summary>
+    /// Applies a temporary speed modification to the enemy.
+    /// </summary>
+    /// <param name="speedMultiplier">e.g., 0.5 = 50% speed, 1.0 = normal speed</param>
+    public void ApplySpeedModification(float speedMultiplier)
+    {
+        if (_agent != null)
+        {
+            _agent.speed = _originalMoveSpeed * speedMultiplier;
+        }
+    }
+    // ---------------------------------
 
     void TryAttack()
     {
@@ -435,27 +413,18 @@ public class EnemyController : MonoBehaviour
     
     private Vector3 GetEvasiveManeuverPoint(Vector3 targetPosition)
     {
-        // 1. Get direction to target
         Vector3 dirToTarget = (targetPosition - transform.position).normalized;
-        
-        // 2. Get a perpendicular side direction (left or right)
         Vector3 sideDir = Vector3.Cross(dirToTarget, Vector3.up).normalized;
-        sideDir *= (Random.Range(0, 2) * 2 - 1); // Randomly -1 or 1
-
-        // 3. Define the dodge "jerk"
-        float dodgeSideDistance = 5f;  // How far to the side
-        float dodgeForwardDistance = 4f; // How far forward
-        
-        // 4. Calculate the target point
+        sideDir *= (Random.Range(0, 2) * 2 - 1);
+        float dodgeSideDistance = 5f;
+        float dodgeForwardDistance = 4f;
         Vector3 targetPoint = transform.position + (sideDir * dodgeSideDistance) + (dirToTarget * dodgeForwardDistance);
 
-        // 5. Find the closest valid point on the NavMesh
         if (NavMesh.SamplePosition(targetPoint, out NavMeshHit hit, 5f, _agent.areaMask))
         {
             return hit.position;
         }
         
-        // Failsafe: just move towards the target if no valid dodge point is found
         return targetPosition;
     }
     
@@ -523,33 +492,44 @@ public class EnemyController : MonoBehaviour
         }
     }
     
-    // --- UPDATED TakeExplosion ---
     public void TakeExplosion(float damage, Transform attacker, Vector3 explosionPosition, float explosionForce, float explosionRadius, float upwardModifier = 0.1f)
     {
         if (_isDead) return;
 
         // 1. Apply Damage
         _currentHealth -= damage;
+        
+        // 2. Check if this enemy even has a ragdoll
+        bool canRagdoll = _ragdollRigidbodies != null && _ragdollRigidbodies.Length > 0;
 
-        // 2. Check for Death
+        // 3. Check for Death
         if (_currentHealth <= 0f)
         {
-            // We are dead. Call Die() which will handle the ragdoll.
-            Die(true); 
+            // --- We died ---
+            Die(true); // This will correctly call the particle or ragdoll logic
             
-            // Apply force *after* Die() has enabled the rigidbodies
-            foreach (Rigidbody rb in _ragdollRigidbodies)
+            // Apply force *if* we have a ragdoll to apply it to
+            if (canRagdoll)
             {
-                if (rb != null)
+                foreach (Rigidbody rb in _ragdollRigidbodies)
                 {
-                    rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardModifier, ForceMode.Impulse);
+                    if (rb != null)
+                    {
+                        rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardModifier, ForceMode.Impulse);
+                    }
                 }
             }
         }
+        // 4. Check if we should be knocked down
+        else if (_state != EnemyState.Ragdolled && canRagdoll)
+        {
+            // --- We survived, get knocked down ---
+            StartCoroutine(GetUpRoutine(explosionPosition, explosionForce, explosionRadius, upwardModifier));
+        }
+        // 5. We survived but have no ragdoll
         else
         {
-            // Enemy survived.
-            // Set the attacker so it turns to fight
+            // Just take damage (already done) and get angry.
             if (enemyData.canBeDistracted && attacker != null)
             {
                 _attackSource = attacker;
@@ -557,64 +537,96 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    // --- UPDATED Die Method ---
     void Die(bool useRagdoll)
     {
         if (_isDead) return;
         _isDead = true;
+        _state = EnemyState.Ragdolled;
         
         if (_waveManager != null)
         {
             _waveManager.EnemyDestroyed();
         }
 
-        // --- Scrap Metal (Unchanged) ---
         if (enemyData != null && enemyData.scrapMetalPrefab != null)
         {
             Instantiate(enemyData.scrapMetalPrefab, transform.position, Quaternion.identity);
         }
         
-        if (_agent != null && _agent.enabled) 
+        if (_agent.enabled)
         {
             _agent.enabled = false;
         }
         
-        // --- UPDATED LOGIC: Ragdoll vs Particle ---
-        
-        // Check if we *can* and *should* ragdoll
         bool canRagdoll = useRagdoll && _ragdollRigidbodies != null && _ragdollRigidbodies.Length > 0;
 
         if (canRagdoll)
         {
-            // --- Ragdoll Death ---
             ActivateRagdoll();
-            Destroy(gameObject, 5f); // Destroy ragdoll after 5 seconds
+            Destroy(gameObject, 5f);
         }
         else
         {
-            // --- Particle Death ---
             if (enemyData != null && enemyData.deathParticlePrefab != null)
             {
-                // Spawn the particle effect
                 GameObject particles = Instantiate(
                     enemyData.deathParticlePrefab, 
                     transform.position, 
                     Quaternion.identity
                 );
                 
-                // Destroy the particle system after 3 seconds (adjust as needed)
                 Destroy(particles, 3f);
             }
             
-            // Destroy the enemy object immediately
             Destroy(gameObject, 0.1f);
         }
     }
 
     #endregion
 
-    #region --- Utility Methods ---
-    
+    #region --- Utility & Ragdoll Methods ---
+
+    private IEnumerator GetUpRoutine(Vector3 explosionPosition, float explosionForce, float explosionRadius, float upwardModifier)
+    {
+        _state = EnemyState.Ragdolled;
+        
+        if (_agent.enabled)
+        {
+            _agent.enabled = false;
+        }
+        ActivateRagdoll();
+
+        foreach (Rigidbody rb in _ragdollRigidbodies)
+        {
+            if (rb != null)
+            {
+                rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardModifier, ForceMode.Impulse);
+            }
+        }
+
+        yield return new WaitForSeconds(3.0f);
+
+        Vector3 getUpPosition = transform.position;
+        if (pelvisRigidbody != null)
+        {
+            getUpPosition = pelvisRigidbody.transform.position;
+        }
+        
+        DeactivateRagdoll();
+        
+        if (NavMesh.SamplePosition(getUpPosition, out NavMeshHit hit, 2.0f, _agent.areaMask))
+        {
+            _agent.Warp(hit.position);
+        }
+        else
+        {
+            _agent.Warp(transform.position);
+        }
+        
+        _agent.enabled = true;
+        _state = EnemyState.Pursuing;
+    }
+
     private void SetNewTarget(IDamageable newTarget)
     {
         if (newTarget == null || newTarget == _currentTarget) return; 
@@ -623,12 +635,22 @@ public class EnemyController : MonoBehaviour
         _state = EnemyState.Pursuing;
     }
 
-    // --- UPDATED ActivateRagdoll (removed _isDead = true) ---
     private void ActivateRagdoll()
     {
         SetRagdollActive(true);
-        Collider mainCollider = GetComponent<Collider>();
-        if (mainCollider != null) { mainCollider.enabled = false; }
+        if (_mainCollider != null)
+        {
+            _mainCollider.enabled = false;
+        }
+    }
+
+    private void DeactivateRagdoll()
+    {
+        SetRagdollActive(false);
+        if (_mainCollider != null)
+        {
+            _mainCollider.enabled = true;
+        }
     }
 
     private void SetRagdollActive(bool isActive)

@@ -41,4 +41,20 @@ public class TowerData : ScriptableObject
 
     [Header("Audio")]
     public AudioClip shootSound;
+    
+    [Header("Utility Tower Stats")]
+    [Tooltip("How much health per second the dispenser heals.")]
+    public float healthPerSecond = 0f;
+    [Tooltip("How much scrap per second the dispenser generates.")]
+    public int scrapPerSecond = 0;
+    
+    [Header("Radar Buffs (e.g., 1.2 = +20%)")]
+    [Tooltip("Fire rate multiplier to give other towers (1 = no buff).")]
+    public float fireRateBuff = 1f;
+    [Tooltip("Damage multiplier to give other towers (1 = no buff).")]
+    public float damageBuff = 1f;
+    
+    [Header("Radar Debuffs (e.g., 0.8 = 20% slow)")]
+    [Tooltip("Speed multiplier for enemies (1 = no debuff).")]
+    public float enemySpeedDebuff = 1f;
 }
