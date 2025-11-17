@@ -1312,6 +1312,7 @@ MonoBehaviour:
     m_Bits: 0
   pelvisRigidbody: {fileID: 0}
   _ragdollRigidbodies: []
+  ragdollMinTime: 3
   _agent: {fileID: 0}
   _attackThreshold: 2.5
 --- !u!195 &1047237946
