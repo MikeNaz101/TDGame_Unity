@@ -5860,7 +5860,7 @@ PrefabInstance:
     - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: 'availableTowers.Array.data[3]'
       value: 
-      objectReference: {fileID: 11400000, guid: 878d12515190a62459dfbe66f6f09339, type: 2}
+      objectReference: {fileID: 11400000, guid: 0da30f937f8e2fd489a3d91f02a868d0, type: 2}
     - target: {fileID: 5817540961977042581, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: 'availableTowers.Array.data[4]'
       value: 

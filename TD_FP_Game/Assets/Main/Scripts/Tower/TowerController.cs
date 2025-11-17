@@ -151,7 +151,7 @@ public class TowerController : MonoBehaviour
     /// <summary>
     /// Rotates the turret and barrel to face the current target.
     /// </summary>
-    protected void AimAtTarget()
+    protected virtual void AimAtTarget()
     {
         if (_turretBase == null || _barrel == null || _currentTarget == null) return;
 

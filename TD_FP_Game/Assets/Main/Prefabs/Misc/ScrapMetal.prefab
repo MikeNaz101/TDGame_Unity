@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2435346278006559233}
   - component: {fileID: 3224398008376509652}
   - component: {fileID: 7961088687152092847}
+  - component: {fileID: 4529087112370517752}
+  - component: {fileID: 2670502846076795757}
   m_Layer: 0
   m_Name: ScrapMetal
   m_TagString: Untagged
@@ -110,8 +112,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4.626551, y: 1.4278624, z: 2.1264477}
-  m_Center: {x: 0.18493338, y: 0.21393147, z: -0.05522718}
+  m_Size: {x: 4.626551, y: 1.4297504, z: 2.1264477}
+  m_Center: {x: 0.18493351, y: 0.21487543, z: -0.05522718}
 --- !u!114 &7961088687152092847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,3 +127,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScrapMetalPickup
   value: 10
+--- !u!65 &4529087112370517752
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3609530775625676480}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0000001, y: 1, z: 0.99999994}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &2670502846076795757
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3609530775625676480}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
