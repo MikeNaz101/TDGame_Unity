@@ -4,11 +4,10 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "NewEnemyData", menuName = "Aegis/Enemy Data", order = 1)]
 public class EnemyData : ScriptableObject
 {
-    // --- NEW: Simplified AI Behavior ---
     public enum AIMovementType
     {
-        Direct, // Moves directly to the target (CoreAttacker, Patroller, Spawner)
-        Wander  // Moves in a randomized "wavy" path towards the target (new Roamer)
+        Direct,
+        Wander
     }
 
     [Header("AI Behavior")]
@@ -41,6 +40,10 @@ public class EnemyData : ScriptableObject
 
     [Header("Economy")]
     public GameObject scrapMetalPrefab;
+    
+    [Header("VFX")]
+    [Tooltip("The particle effect to play when the enemy dies (if not ragdolling).")]
+    public GameObject deathParticlePrefab;
 
     [Header("Spawner (Queen) Settings")]
     [Tooltip("Is this enemy a spawner?")]

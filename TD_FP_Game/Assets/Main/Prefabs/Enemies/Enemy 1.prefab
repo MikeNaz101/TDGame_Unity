@@ -131,8 +131,7 @@ MonoBehaviour:
   _waveManager: {fileID: 0}
   _playerTarget: {fileID: 0}
   fov: {fileID: 5565102319335975971}
-  _ragdollRigidbodies:
-  - {fileID: 270624691207787136}
+  _ragdollRigidbodies: []
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 2048

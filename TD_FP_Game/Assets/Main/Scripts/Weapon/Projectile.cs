@@ -2,112 +2,155 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    // --- NEW ---
-    // These are set by the TowerController that fires this projectile.
+    // --- DATA ---
     [HideInInspector] public TowerData towerData;
     [HideInInspector] public Transform attacker;
+    [HideInInspector] public float damageMultiplier = 1f;
 
-    [Header("Tuning")]
+    [Header("Movement & Fuse")]
     public float projectileSpeed = 20f;
-    public float lifetime = 4f;
+    [Tooltip("Time in seconds before the bomb automatically explodes.")]
+    public float fuseTime = 3.0f; 
+    
+    [Header("Collision Logic")]
+    [Tooltip("Should it explode immediately when touching an enemy?")]
+    public bool explodeOnEnemyContact = true;
+    [Tooltip("Should it explode immediately when touching the ground/walls? (Uncheck for bouncing bombs)")]
+    public bool explodeOnEnvironmentContact = true;
 
-    // --- PRIVATE ---
+    // --- STATE ---
     private bool _hasImpacted = false;
+    private float _timer;
+    private Rigidbody _rb;
 
     void Start()
     {
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
+        _timer = fuseTime;
+        _rb = GetComponent<Rigidbody>();
+
+        if (_rb != null)
         {
-            rb.linearVelocity = transform.forward * projectileSpeed;
+            _rb.linearVelocity = transform.forward * projectileSpeed;
         }
         else
         {
             Debug.LogWarning("Projectile has no Rigidbody. Falling back to Transform movement.");
         }
-        Destroy(gameObject, lifetime);
+        
+        Destroy(gameObject, fuseTime + 5f);
     }
 
     void Update()
     {
-        // Fallback movement if no Rigidbody is present
-        if (GetComponent<Rigidbody>() == null)
+        if (_rb == null)
         {
             transform.Translate(Vector3.forward * projectileSpeed * Time.deltaTime);
         }
-    }
 
-    void OnTriggerEnter(Collider other)
-    {
-        // Prevent the projectile from triggering multiple times
-        if (_hasImpacted) return;
-
-        // Check if we hit an enemy or the environment
-        bool isEnemy = other.CompareTag("Enemy");
-        bool isEnvironment = other.gameObject.layer == LayerMask.NameToLayer("Default");
-
-        if (isEnemy || isEnvironment)
+        // Fuse Timer Logic
+        if (towerData != null && towerData.isExplosive && !_hasImpacted)
         {
-            _hasImpacted = true; // Lock this projectile
-
-            if (towerData == null)
+            _timer -= Time.deltaTime;
+            if (_timer <= 0f)
             {
-                Debug.LogError("Projectile impacted but has no TowerData!");
-                Destroy(gameObject);
-                return;
+                Explode(transform.position);
             }
-
-            // --- Handle Explosion or Direct Hit ---
-            if (towerData.isExplosive)
-            {
-                HandleExplosion(transform.position);
-            }
-            else if (isEnemy)
-            {
-                // Direct hit logic (non-explosive)
-                HandleDirectHit(other.GetComponent<EnemyController>());
-            }
-
-            // Spawn impact particle (works for both explosion and direct hit)
-            if (towerData.impactParticlePrefab != null)
-            {
-                Instantiate(towerData.impactParticlePrefab, transform.position, Quaternion.identity);
-            }
-
-            // Destroy the projectile
-            Destroy(gameObject);
         }
     }
 
-    /// <summary>
-    /// Applies damage to a single enemy.
-    /// </summary>
+    // --- CASE 1: Projectile is a TRIGGER (Ghost) ---
+    void OnTriggerEnter(Collider other)
+    {
+        HandleImpact(other.gameObject, other.transform.position);
+    }
+
+    // --- CASE 2: Projectile is SOLID (Physics Object) ---
+    void OnCollisionEnter(Collision collision)
+    {
+        HandleImpact(collision.gameObject, collision.contacts[0].point);
+    }
+
+    // --- SHARED LOGIC ---
+    void HandleImpact(GameObject otherObj, Vector3 hitPoint)
+    {
+        if (_hasImpacted) return;
+
+        bool isEnemy = otherObj.CompareTag("Enemy");
+        
+        // Check layers safely
+        bool isEnvironment = otherObj.layer == LayerMask.NameToLayer("Default"); // Adjust if your walls are on a different layer
+
+        if (towerData == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // --- EXPLOSIVE LOGIC ---
+        if (towerData.isExplosive)
+        {
+            if (isEnemy && explodeOnEnemyContact)
+            {
+                Explode(transform.position); // Use bomb position for center of blast
+            }
+            else if (isEnvironment && explodeOnEnvironmentContact)
+            {
+                Explode(hitPoint);
+            }
+            // If explodeOnEnvironmentContact is FALSE, it will just bounce!
+        }
+        // --- BULLET LOGIC ---
+        else
+        {
+            if (isEnemy)
+            {
+                _hasImpacted = true;
+                HandleDirectHit(otherObj.GetComponent<EnemyController>());
+                Destroy(gameObject);
+            }
+            else if (isEnvironment)
+            {
+                Destroy(gameObject);
+            }
+        }
+    }
+
+    void Explode(Vector3 position)
+    {
+        _hasImpacted = true;
+        HandleExplosion(position);
+
+        if (towerData.impactParticlePrefab != null)
+        {
+            Instantiate(towerData.impactParticlePrefab, position, Quaternion.identity);
+        }
+
+        Destroy(gameObject);
+    }
+
     void HandleDirectHit(EnemyController enemy)
     {
         if (enemy != null)
         {
-            enemy.TakeDamage(towerData.damage, attacker);
+            enemy.TakeDamage(towerData.damage * damageMultiplier, attacker);
         }
     }
 
-    /// <summary>
-    /// Finds all enemies in a radius and applies explosive damage/force.
-    /// </summary>
     void HandleExplosion(Vector3 explosionCenter)
     {
         Collider[] hits = Physics.OverlapSphere(explosionCenter, towerData.explosionRadius);
 
         foreach (Collider hit in hits)
         {
+            // Check for tag to avoid friendly fire or hitting yourself
             if (hit.CompareTag("Enemy"))
             {
                 EnemyController enemy = hit.GetComponent<EnemyController>();
                 if (enemy != null)
                 {
-                    // We now pass the 'attacker' transform
                     enemy.TakeExplosion(
-                        towerData.damage,
-                        attacker, // <-- This is the added parameter
+                        towerData.damage * damageMultiplier,
+                        attacker,
                         explosionCenter,
                         towerData.explosionForce,
                         towerData.explosionRadius

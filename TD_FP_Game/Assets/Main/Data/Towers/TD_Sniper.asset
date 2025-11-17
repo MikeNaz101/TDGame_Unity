@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6dcc75fa6bc694bb16d405aefadc6e, type: 3}
+  m_Name: TD_Sniper
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  towerName: Sniper Tower
+  description: Long Distance Extermination
+  towerIcon: {fileID: 21300018, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  towerPrefab: {fileID: 4376194662093663467, guid: 2f97467e9fb745d449bab461dc87b8d9, type: 3}
+  scrapCost: 10
+  attackType: 0
+  projectilePrefab: {fileID: 0}
+  damage: 1000
+  fireRate: 3
+  range: 35
+  isExplosive: 0
+  explosionRadius: 3
+  explosionForce: 500
+  impactParticlePrefab: {fileID: 0}
+  shootSound: {fileID: 8300000, guid: 614cd7dc9daa6b84286af1e08ac67172, type: 3}
+  healthPerSecond: 0
+  scrapPerSecond: 0
+  fireRateBuff: 1
+  damageBuff: 1
+  enemySpeedDebuff: 1

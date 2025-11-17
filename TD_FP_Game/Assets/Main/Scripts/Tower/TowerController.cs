@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq; // <-- IMPORTANT: We need this for sorting!
+using System.Linq;
 
 [RequireComponent(typeof(SphereCollider))]
 [RequireComponent(typeof(AudioSource))]
@@ -22,7 +22,7 @@ public class TowerController : MonoBehaviour
     [Tooltip("The part of the tower that rotates up/down (X-Axis).")]
     [SerializeField] private Transform _barrel;
     [Tooltip("The empty GameObject where shots/projectiles originate.")]
-    [SerializeField] private Transform _shootPoint;
+    [SerializeField] public Transform _shootPoint;
     
     [Header("Targeting")]
     [Tooltip("The targeting strategy for this tower.")]
@@ -32,22 +32,28 @@ public class TowerController : MonoBehaviour
     [SerializeField] private float _aimSpeed = 10f;
     [SerializeField] private float _aimTolerance = 3f;
 
-    // --- Private References ---
-    private TowerData _towerData;
-    private SphereCollider _rangeTrigger;
-    private AudioSource _audioSource;
-    private LineRenderer _hitscanTracer;
-    
+    // --- Public Properties (for PC UI) ---
     [HideInInspector] public string TowerName { get; private set; }
     [HideInInspector] public int TowerID { get; private set; }
 
-    // --- Target & State ---
-    // This list is now the core of our targeting
-    private List<EnemyController> _enemiesInRange = new List<EnemyController>();
-    private EnemyController _currentTarget;
-    private float _fireCooldown = 0f;
+    // --- Protected References (for child classes) ---
+    protected TowerData _towerData;
+    protected AudioSource _audioSource;
+    protected LineRenderer _hitscanTracer;
+    protected PlayerStats _playerStats;
+    protected Transform _playerTarget;
 
-    void Awake()
+    // --- Target & State (Protected for child classes) ---
+    protected List<EnemyController> _enemiesInRange = new List<EnemyController>();
+    protected EnemyController _currentTarget;
+    protected float _fireCooldown = 0f;
+    protected float _fireRateMultiplier = 1f;
+    protected float _damageMultiplier = 1f;
+    
+    private SphereCollider _rangeTrigger;
+
+
+    protected virtual void Awake()
     {
         _rangeTrigger = GetComponent<SphereCollider>();
         _audioSource = GetComponent<AudioSource>();
@@ -62,6 +68,13 @@ public class TowerController : MonoBehaviour
         
         // Register this tower with the global registry and get a unique ID
         TowerID = TowerRegistry.RegisterTower(this);
+        
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            _playerTarget = playerObj.transform;
+            _playerStats = playerObj.GetComponent<PlayerStats>();
+        }
     }
 
     public void Initialize(TowerData data)
@@ -73,7 +86,17 @@ public class TowerController : MonoBehaviour
         TowerName = _towerData.towerName;
     }
 
-    void Update()
+    protected virtual void OnDestroy()
+    {
+        // Tell the registry we are being destroyed
+        TowerRegistry.UnregisterTower(this);
+    }
+    
+    /// <summary>
+    /// This is the default Update loop for an attacking tower.
+    /// Utility towers (like Radar) will override this.
+    /// </summary>
+    protected virtual void Update()
     {
         // 1. Cooldown
         if (_fireCooldown > 0)
@@ -82,10 +105,8 @@ public class TowerController : MonoBehaviour
         }
 
         // 2. Target Acquisition
-        // Check if our target is dead, destroyed, or no longer active
         if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
         {
-            // Find a new target based on our rules
             UpdateTarget();
         }
 
@@ -93,53 +114,47 @@ public class TowerController : MonoBehaviour
         if (_currentTarget != null)
         {
             AimAtTarget();
-            Debug.Log("Tower Aimed and is calling ReyFire!!");
             TryFire();
         }
     }
 
     /// <summary>
-    /// This is the new brain. It cleans the list, sorts it if needed,
-    /// and sets the new _currentTarget to be the enemy at the front.
+    /// Cleans the list, sorts it based on priority, and sets a new target.
     /// </summary>
-    private void UpdateTarget()
+    protected void UpdateTarget()
     {
-        // 1. Clean the list of any enemies that were destroyed
+        // 1. Clean the list
         _enemiesInRange.RemoveAll(enemy => enemy == null || !enemy.gameObject.activeInHierarchy);
 
-        // 2. Apply sorting logic ONLY for Weakest/Strongest
-        // (First/Last are sorted automatically by how we add them)
+        // 2. Apply sorting logic
         switch (_targetingPriority)
         {
             case TargetingPriority.Weakest:
-                // Sorts the list by health, lowest to highest
                 _enemiesInRange = _enemiesInRange.OrderBy(e => e.CurrentHealth).ToList();
                 break;
             case TargetingPriority.Strongest:
-                // Sorts the list by health, highest to lowest
                 _enemiesInRange = _enemiesInRange.OrderByDescending(e => e.CurrentHealth).ToList();
                 break;
         }
 
-        // 3. Set the new target to the one at the "front" of the list
+        // 3. Set the new target
         if (_enemiesInRange.Count > 0)
         {
             _currentTarget = _enemiesInRange[0];
         }
         else
         {
-            _currentTarget = null; // We have no targets
+            _currentTarget = null;
         }
     }
 
     /// <summary>
     /// Rotates the turret and barrel to face the current target.
     /// </summary>
-    private void AimAtTarget()
+    protected virtual void AimAtTarget()
     {
         if (_turretBase == null || _barrel == null || _currentTarget == null) return;
 
-        // --- Aiming logic is unchanged ---
         Vector3 targetDir = _currentTarget.transform.position - _turretBase.position;
         Quaternion lookRotation = Quaternion.LookRotation(targetDir);
         Vector3 euler = Quaternion.Slerp(_turretBase.rotation, lookRotation, Time.deltaTime * _aimSpeed).eulerAngles;
@@ -152,29 +167,29 @@ public class TowerController : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks if the tower is aimed and the cooldown is ready, then fires.
+    /// Default check for firing.
     /// </summary>
-    private void TryFire()
+    protected virtual void TryFire()
     {
-        Debug.Log("Tower Should be trying to fire!");
         if (_fireCooldown > 0 || _currentTarget == null || _towerData == null)
         {
             return;
         }
 
         Vector3 targetDir = _currentTarget.transform.position - _shootPoint.position;
-        Shoot();
-        _fireCooldown = _towerData.fireRate;
         if (Vector3.Angle(_shootPoint.forward, targetDir) < _aimTolerance)
         {
             Shoot();
-            _fireCooldown = _towerData.fireRate;
+            _fireCooldown = _towerData.fireRate/ _fireRateMultiplier;
         }
     }
 
-    private void Shoot()
+    /// <summary>
+    /// Default attack logic (Hitscan or Projectile).
+    /// Child classes (like Flamethrower) will override this.
+    /// </summary>
+    protected virtual void Shoot()
     {
-        // --- Firing logic is unchanged ---
         if (_towerData.shootSound != null)
         {
             _audioSource.PlayOneShot(_towerData.shootSound);
@@ -182,8 +197,7 @@ public class TowerController : MonoBehaviour
 
         if (_towerData.attackType == TowerData.AttackType.Hitscan)
         {
-            Debug.Log("Tower Shot HS Ray!");
-            _currentTarget.TakeDamage(_towerData.damage, this.transform);
+            _currentTarget.TakeDamage(_towerData.damage * _damageMultiplier, this.transform);
             if (_hitscanTracer != null)
             {
                 StartCoroutine(ShowHitscanTrace());
@@ -191,7 +205,6 @@ public class TowerController : MonoBehaviour
         }
         else
         {
-            Debug.Log("Tower Shot Bomb!!");
             if (_towerData.projectilePrefab == null) return;
             
             GameObject proj = Instantiate(
@@ -205,14 +218,14 @@ public class TowerController : MonoBehaviour
             {
                 pScript.towerData = _towerData;
                 pScript.attacker = this.transform;
+                pScript.damageMultiplier = _damageMultiplier;
             }
         }
     }
 
-    private IEnumerator ShowHitscanTrace()
+    protected IEnumerator ShowHitscanTrace()
     {
-        // --- Tracer logic is unchanged ---
-        if (_currentTarget == null) yield break; // Safety check
+        if (_currentTarget == null) yield break;
         
         _hitscanTracer.enabled = true;
         _hitscanTracer.SetPosition(0, _shootPoint.position);
@@ -222,32 +235,18 @@ public class TowerController : MonoBehaviour
         
         _hitscanTracer.enabled = false;
     }
-    
-    /// <summary>
-    /// This is called by the PC UI buttons to change the targeting mode.
-    /// </summary>
-    /// <param name="priorityIndex">0=First, 1=Last, 2=Weakest, 3=Strongest</param>
-    public void SetTargetingPriority(int priorityIndex)
-    {
-        // Cast the integer from the button click to the enum
-        _targetingPriority = (TargetingPriority)priorityIndex;
-        
-        // Force the tower to find a new target based on the new rules
-        UpdateTarget();
-    }
 
-    void OnTriggerEnter(Collider other)
+    // --- Trigger Detection ---
+    protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
         {
             EnemyController enemy = other.GetComponent<EnemyController>();
             if (enemy != null && !_enemiesInRange.Contains(enemy))
             {
-                // Add the enemy to the list based on our targeting rule
                 switch (_targetingPriority)
                 {
                     case TargetingPriority.Last:
-                        // Adds the new enemy to the "front" of the list
                         _enemiesInRange.Insert(0, enemy);
                         break;
                     
@@ -255,7 +254,6 @@ public class TowerController : MonoBehaviour
                     case TargetingPriority.Weakest:
                     case TargetingPriority.Strongest:
                     default:
-                        // Adds the new enemy to the "end" of the list
                         _enemiesInRange.Add(enemy);
                         break;
                 }
@@ -263,18 +261,15 @@ public class TowerController : MonoBehaviour
         }
     }
 
-    void OnTriggerExit(Collider other)
+    protected virtual void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Enemy"))
         {
             EnemyController enemy = other.GetComponent<EnemyController>();
             if (enemy != null && _enemiesInRange.Contains(enemy))
             {
-                // Remove the enemy from the list
                 _enemiesInRange.Remove(enemy);
                 
-                // If the enemy that left WAS our target,
-                // set target to null so we find a new one next frame.
                 if (_currentTarget == enemy)
                 {
                     _currentTarget = null;
@@ -283,9 +278,30 @@ public class TowerController : MonoBehaviour
         }
     }
     
-    void OnDestroy()
+    /// <summary>
+    /// Public method called by the PC UI to change targeting.
+    /// </summary>
+    public void SetTargetingPriority(int priorityIndex)
     {
-        // Tell the registry we are being destroyed
-        TowerRegistry.UnregisterTower(this);
+        _targetingPriority = (TargetingPriority)priorityIndex;
+        UpdateTarget(); // Re-sort and find a new target immediately
+    }
+    
+    /// <summary>
+    /// Called by a Radar Tower to apply a buff.
+    /// </summary>
+    public void ApplyBuff(float fireRateBuff, float damageBuff)
+    {
+        _fireRateMultiplier = fireRateBuff;
+        _damageMultiplier = damageBuff;
+    }
+    
+    /// <summary>
+    /// Called by a Radar Tower when a buff expires.
+    /// </summary>
+    public void RemoveBuff()
+    {
+        _fireRateMultiplier = 1f;
+        _damageMultiplier = 1f;
     }
 }

@@ -25,6 +25,7 @@ MonoBehaviour:
   visionRange: 25
   patrolWaitTime: 2
   scrapMetalPrefab: {fileID: 3609530775625676480, guid: 012bf2f65129f7c4db77522b829b50b2, type: 3}
+  deathParticlePrefab: {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
   isSpawner: 0
   spawnerTimeLimit: 60
   spawnPrefabs: []
