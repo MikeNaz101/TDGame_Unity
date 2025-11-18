@@ -16,6 +16,9 @@ public class WaveManager : MonoBehaviour
     [Header("Core Reference")]
     [Tooltip("The central core/base the enemies are targeting.")]
     public Transform coreTarget; // Still needed for context, but EnemyController finds its own target
+    
+    [Header("Boss Integration")]
+    public BossWaveManager bossWaveManager;
 
     private int currentWaveIndex = 0;
     private int enemiesRemaining = 0;
@@ -43,8 +46,9 @@ public class WaveManager : MonoBehaviour
             // 1. Preparation Phase
             Debug.Log("Starting Preparation for " + currentWave.waveName);
             yield return new WaitForSeconds(currentWave.preparationTime);
-
+            
             // 2. Spawn Phase
+            bossWaveManager.CheckForBossSpawn(currentWaveIndex + 1); // +1 because index starts at 0
             yield return StartCoroutine(SpawnWave(currentWave));
             
             // 3. Cleanup/Waiting Phase

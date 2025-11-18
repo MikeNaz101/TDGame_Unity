@@ -977,7 +977,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponControllerHC
   cameraShake: {fileID: 7170994607310426319}
   mainCamera: {fileID: 6908724278379209201}
-  rangeToZoomRatio: 20
+  playerVirtualCamera: {fileID: 7283623207307441769}
+  rangeToZoomRatio: 95
   adsTarget: {fileID: 1992113726465873071}
   hitScanLayer:
     serializedVersion: 2
@@ -2276,11 +2277,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8865742244735632108, guid: 9c1a85a86a558594dba080f9da49866d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -8872.348
+      value: -106709.09
       objectReference: {fileID: 0}
     - target: {fileID: 8865742244735632108, guid: 9c1a85a86a558594dba080f9da49866d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2116.786
+      value: 28626.389
       objectReference: {fileID: 0}
     - target: {fileID: 9100705737334284020, guid: 9c1a85a86a558594dba080f9da49866d, type: 3}
       propertyPath: m_AnchorMax.y

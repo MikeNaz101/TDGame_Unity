@@ -24,7 +24,7 @@ MonoBehaviour:
   reloadTime: 10
   recoilKickback: 0.5
   adsSpeed: 8
-  aimDownSightsPosition: {x: 0, y: 0, z: 0}
+  aimDownSightsPosition: {x: 2, y: 0, z: 2}
   shootSound: {fileID: 8300000, guid: 8794ef618587109438c2f691e83cb0cc, type: 3}
   reloadSound: {fileID: 8300000, guid: 44a28a2b5ee275e4ca542d36ce0a4b1c, type: 3}
   equipSound: {fileID: 8300000, guid: edade11325ed6b64c8c8e17293a4861f, type: 3}

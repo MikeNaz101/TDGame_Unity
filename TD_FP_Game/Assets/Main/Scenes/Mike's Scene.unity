@@ -737,17 +737,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &576324121 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 890133321744519364, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
-  m_PrefabInstance: {fileID: 394385701}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f0f5a95a931d364daa67070bbd91b69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponControllerHC
 --- !u!1 &653354469
 GameObject:
   m_ObjectHideFlags: 0
@@ -1315,6 +1304,8 @@ MonoBehaviour:
   ragdollMinTime: 3
   _agent: {fileID: 0}
   _attackThreshold: 2.5
+  _currentRankLevel: -1
+  _meshRenderer: {fileID: 0}
 --- !u!195 &1047237946
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1933,10 +1924,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3942da7f894f74242a25a55ff44451fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MLAgent
-  playerWeaponController: {fileID: 576324121}
-  shotsRequired: 5
-  highAccuracyThreshold: 0.75
-  lowAccuracyThreshold: 0.5
 --- !u!1 &2007806298
 GameObject:
   m_ObjectHideFlags: 0
@@ -5807,8 +5794,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6874041550782128805}
     - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: bossWaveManager
+      value: 
+      objectReference: {fileID: 1418618829324808643}
+    - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: waves.Array.size
-      value: 2
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: 'waves.Array.data[0]'
@@ -5817,7 +5808,35 @@ PrefabInstance:
     - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: 'waves.Array.data[1]'
       value: 
-      objectReference: {fileID: 11400000, guid: cdc0ac9c32c90ba44bedbf0b717da695, type: 2}
+      objectReference: {fileID: 11400000, guid: f4df516a593ca014db673bdccbedf3db, type: 2}
+    - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'waves.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 56c4e9bb0838eb84eaa403289f3f8c4e, type: 2}
+    - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'waves.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 56c4e9bb0838eb84eaa403289f3f8c4e, type: 2}
+    - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'waves.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: f4df516a593ca014db673bdccbedf3db, type: 2}
+    - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'waves.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 56c4e9bb0838eb84eaa403289f3f8c4e, type: 2}
+    - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'waves.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 6504122c0b575404ebcf6637612071cc, type: 2}
+    - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'waves.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: f4df516a593ca014db673bdccbedf3db, type: 2}
+    - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      propertyPath: 'waves.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 56c4e9bb0838eb84eaa403289f3f8c4e, type: 2}
     - target: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       propertyPath: spawnPoints.Array.size
       value: 1
@@ -5921,7 +5940,43 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4724443251228400480, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1921303330}
+    - targetCorrespondingSourceObject: {fileID: 4724443251228400480, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1418618829324808643}
   m_SourcePrefab: {fileID: 100100000, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+--- !u!114 &1418618829324808642 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3577139905063714373, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+  m_PrefabInstance: {fileID: 1418618829324808641}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1580730253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a02b918d1d0afce4f9b50b0aa256a367, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaveManager
+--- !u!114 &1418618829324808643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1580730253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8b85cfe31b00c743aa66a3ed4e2fecd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossWaveManager
+  bossPrefabs:
+  - rank: 0
+    bossPrefab: {fileID: 5358199103257218831, guid: 88bea02a5a0f74044ad116157a79feff, type: 3}
+  - rank: 1
+    bossPrefab: {fileID: 5358199103257218831, guid: 6bf6119c9d61f4b43a71d8a6f35a42cb, type: 3}
+  - rank: 2
+    bossPrefab: {fileID: 5358199103257218831, guid: 895df2c77043b1f4eb105332ac381888, type: 3}
+  - rank: 3
+    bossPrefab: {fileID: 5358199103257218831, guid: 2301c272efa8bd64684768c10f744466, type: 3}
+  waveManager: {fileID: 1418618829324808642}
 --- !u!1 &1486709814640690698
 GameObject:
   m_ObjectHideFlags: 0

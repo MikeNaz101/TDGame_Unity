@@ -5,7 +5,7 @@ using UnityEngine;
 /// and adjusting enemy behavior (stance).
 /// </summary>
 public class MLAgent : MonoBehaviour
-{
+{/*
     [Header("References")]
     [Tooltip("Drag the Player object's WeaponControllerHS script here.")]
     public WeaponControllerHS playerWeaponController;
@@ -61,5 +61,5 @@ public class MLAgent : MonoBehaviour
             playerWeaponController.shotsFired = 0;
             playerWeaponController.shotsHit = 0;
         }
-    }
+    }*/
 }
