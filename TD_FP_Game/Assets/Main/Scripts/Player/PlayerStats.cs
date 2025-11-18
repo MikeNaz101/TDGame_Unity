@@ -11,17 +11,16 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public Transform transform => base.transform;
 
     [Header("Resources")]
-    public int scrapMetal = 0; // Public field for the collected resource
+    public int scrapMetal = 0; 
 
     [Header("Game References")]
-    public TowerManager towerManager; // Assigned in Inspector
+    public TowerManager towerManager; 
 
     void Start()
     {
         currentHealth = maxHealth;
         currentEnergy = maxEnergy;
 
-        // Find Tower Manager automatically if not set
         if (towerManager == null)
         {
             towerManager = FindObjectOfType<TowerManager>();
@@ -50,7 +49,6 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
     void Die()
     {
-        // TODO: Implement game over or player respawn logic
         Debug.Log("Player has died! Implementing game over.");
         gameObject.SetActive(false); 
     }
@@ -60,35 +58,36 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public void AddScrap(int amount)
     {
         scrapMetal += amount;
-        Debug.Log("Scrap Metal: " + scrapMetal);
+        // Debug.Log("Scrap Metal: " + scrapMetal);
     }
 
-    // --- TOWER BUILDING LOGIC (Called by WeaponController) ---
-    // Attempts to build a tower at the specified location if the player has enough resources.
+    // --- NEW: SPENDING LOGIC ---
+    public bool SpendScrap(int amount)
+    {
+        if (scrapMetal >= amount)
+        {
+            scrapMetal -= amount;
+            return true; // Purchase successful
+        }
+        return false; // Not enough money
+    }
+
+    // --- TOWER BUILDING LOGIC ---
     public bool TryBuildTower(int towerIndex, Vector3 position)
     {
-        if (towerManager == null)
-        {
-            Debug.LogError("Tower Manager is not assigned. Cannot build tower.");
-            return false;
-        }
+        if (towerManager == null) return false;
 
-        // 1. Get the cost of the selected tower
         int cost = towerManager.GetTowerCost(towerIndex);
 
-        // 2. Check resource requirement
-        if (scrapMetal >= cost)
+        if (SpendScrap(cost)) // Use the new method
         {
-            // 3. Subtract cost and build
-            scrapMetal -= cost;
             towerManager.BuildTower(towerIndex, position);
-            Debug.Log($"Built tower {towerIndex} for {cost} scrap. Remaining scrap: {scrapMetal}");
+            Debug.Log($"Built tower {towerIndex} for {cost} scrap.");
             return true;
         }
         else
         {
             Debug.LogWarning($"Not enough scrap metal! Need {cost}, have {scrapMetal}.");
-            // Optionally play a sound or show a UI notification for failure
             return false;
         }
     }

@@ -11,11 +11,18 @@ public class PC_UI_Manager : MonoBehaviour
     public GameObject TowerList_Container;
     public GameObject TowerOptions_Container;
     public GameObject TowerSettings_Container;
+    public GameObject BotUpgrade_Container;
     // No "InteractPrompt_Container" needed, we will reuse the 'pcDisplay' text.
 
     [Header("List Prefab")]
     public GameObject TowerListButton_Prefab;
     public Transform TowerList_ContentParent;
+    
+    [Header("Bot Upgrade UI")]
+    public Button btn_UpgradeCapacity;
+    public Button btn_UpgradeFlight;
+    public Button btn_UpgradeHeal;
+    public TextMeshProUGUI botStatusText;
 
     [Header("Animation")]
     public RectTransform SelectedButton_Transform;
@@ -32,8 +39,14 @@ public class PC_UI_Manager : MonoBehaviour
     // --- Internal State ---
     private TowerController _selectedTower;
     private GameObject _selectedButtonInstance;
+    private ScrapCollectorBot _botScript;
+    private PlayerStats _playerStats;
     private Vector3 _selectedButtonOriginalPos;
     private Transform _selectedButtonOriginalParent;
+    
+    private const int COST_CAPACITY = 50;
+    private const int COST_FLIGHT = 150;
+    private const int COST_HEAL = 300;
     
     private bool hasShownWelcomeMessage = false;
     private Coroutine _startupCoroutine;
@@ -43,6 +56,10 @@ public class PC_UI_Manager : MonoBehaviour
         // Start with ALL screens hidden.
         ShowScreen(null); 
         pcDisplay.gameObject.SetActive(false);
+        
+        // Find Bot and Player references
+        _botScript = FindObjectOfType<ScrapCollectorBot>();
+        _playerStats = FindObjectOfType<PlayerStats>();
     }
     
     public void StartPCInterface()
@@ -131,6 +148,92 @@ public class PC_UI_Manager : MonoBehaviour
             {
                 typewriter.StopTyping();
             }
+        }
+    }
+    
+    // --- BOT UPGRADE MENU ---
+    
+    public void OnMainMenu_BotUpgradesClicked()
+    {
+        RefreshBotUI();
+        ShowScreen(BotUpgrade_Container);
+        if (typewriter != null) typewriter.DisplayText(pcDisplay, "Bot Modification Module Loaded.");
+    }
+
+    private void RefreshBotUI()
+    {
+        if (_botScript == null)
+        {
+            botStatusText.text = "ERROR: No Bot Found.";
+            return;
+        }
+
+        // Logic: Show Capacity upgrade first. 
+        // Then Flight. 
+        // Then Heal.
+        
+        bool hasMaxCapacity = _botScript.carryCapacity >= 5;
+        bool hasFlight = _botScript.canFly;
+        bool hasHeal = _botScript.canHeal;
+
+        // Upgrade 1: Capacity
+        btn_UpgradeCapacity.gameObject.SetActive(!hasMaxCapacity);
+        btn_UpgradeCapacity.GetComponentInChildren<TMP_Text>().text = $"Expand Cargo ({COST_CAPACITY} Scrap)";
+
+        // Upgrade 2: Flight (Only appears if Capacity is upgraded at least once)
+        btn_UpgradeFlight.gameObject.SetActive(_botScript.carryCapacity > 1 && !hasFlight);
+        btn_UpgradeFlight.GetComponentInChildren<TMP_Text>().text = $"Flight Systems ({COST_FLIGHT} Scrap)";
+
+        // Upgrade 3: Heal (Only appears if Flight is unlocked)
+        btn_UpgradeHeal.gameObject.SetActive(hasFlight && !hasHeal);
+        btn_UpgradeHeal.GetComponentInChildren<TMP_Text>().text = $"Medical Module ({COST_HEAL} Scrap)";
+        
+        // Status Text
+        string status = $"Current Load: {_botScript.carryCapacity} slots\n";
+        status += hasFlight ? "Flight: ONLINE\n" : "Flight: Offline\n";
+        status += hasHeal ? "Medical: ONLINE" : "Medical: Offline";
+        botStatusText.text = status;
+    }
+
+    public void OnBuy_Capacity()
+    {
+        if (_playerStats.SpendScrap(COST_CAPACITY))
+        {
+            _botScript.UpgradeCapacity(_botScript.carryCapacity + 2); // Add 2 slots
+            if(typewriter != null) typewriter.DisplayText(pcDisplay, "Cargo capacity expanded.");
+            RefreshBotUI();
+        }
+        else
+        {
+            if(typewriter != null) typewriter.DisplayText(pcDisplay, "Insufficient Funds.");
+        }
+    }
+
+    public void OnBuy_Flight()
+    {
+        if (_playerStats.SpendScrap(COST_FLIGHT))
+        {
+            _botScript.UpgradeFlight();
+            if(typewriter != null) typewriter.DisplayText(pcDisplay, "Flight systems installed.");
+            RefreshBotUI();
+        }
+        else
+        {
+            if(typewriter != null) typewriter.DisplayText(pcDisplay, "Insufficient Funds.");
+        }
+    }
+
+    public void OnBuy_Heal()
+    {
+        if (_playerStats.SpendScrap(COST_HEAL))
+        {
+            _botScript.UpgradeHealing();
+            if(typewriter != null) typewriter.DisplayText(pcDisplay, "Medical protocols active.");
+            RefreshBotUI();
+        }
+        else
+        {
+            if(typewriter != null) typewriter.DisplayText(pcDisplay, "Insufficient Funds.");
         }
     }
 
@@ -258,6 +361,7 @@ public class PC_UI_Manager : MonoBehaviour
         TowerList_Container.SetActive(false);
         TowerOptions_Container.SetActive(false);
         TowerSettings_Container.SetActive(false);
+        if(BotUpgrade_Container != null) BotUpgrade_Container.SetActive(false); // Hide bot screen too
         
         if (screenToShow != null)
         {

@@ -1,49 +1,77 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
-using System.Linq;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class ScrapCollectorBot : MonoBehaviour
 {
-    // Simple state machine for the bot's behavior
-    private enum BotState { Idle, Fetching, Returning }
+    private enum BotState { Idle, Fetching, Returning, Healing }
 
     [Header("References")]
-    [Tooltip("The player's stat script, to know who to give scrap to. Will try to auto-find if null.")]
     public PlayerStats playerStats;
 
     [Header("Tuning")]
-    [Tooltip("How close the bot needs to get to scrap to pick it up.")]
-    public float collectionDistance = 1.5f;
-    [Tooltip("How far the bot will scan for scrap from its home position.")]
-    public float detectionRange = 30f;
+    public float collectionDistance = 2.5f;
+    public float detectionRange = 50f;
+    public float baseSpeed = 3.5f;
 
+    [Header("Upgradable Stats")]
+    public int carryCapacity = 1;       // Upgrade 1 increases this
+    public bool canFly = false;         // Upgrade 2
+    public bool canHeal = false;        // Upgrade 3
+    public float healAmount = 10f;
+    public float healCooldown = 5f;
+
+    // --- Internal State ---
     private NavMeshAgent agent;
-    private Vector3 homePosition; // The spot it returns to
+    private Vector3 homePosition;
     private BotState state = BotState.Idle;
-    private Transform currentScrapTarget;
+    private Transform currentTarget;
+    
+    // Inventory
+    private int currentScrapCount = 0;
+    private int currentScrapValueStored = 0;
+    
+    // Healing
+    private float lastHealTime = 0f;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         homePosition = transform.position;
+        agent.speed = baseSpeed;
 
-        // Auto-find PlayerStats if it wasn't assigned in the Inspector
         if (playerStats == null)
         {
             playerStats = FindObjectOfType<PlayerStats>();
         }
+    }
 
-        if (playerStats == null)
-        {
-            Debug.LogError("Scrap Bot can't find PlayerStats! Scrap will not be collected.");
-        }
+    // --- PUBLIC UPGRADE METHODS (Called by UI) ---
+    public void UpgradeCapacity(int newCapacity)
+    {
+        carryCapacity = newCapacity;
+        Debug.Log("Bot Upgrade: Capacity increased to " + carryCapacity);
+    }
+
+    public void UpgradeFlight()
+    {
+        canFly = true;
+        agent.baseOffset = 1.5f; // Hover effect
+        agent.speed = baseSpeed * 2.0f; // Fly faster
+        agent.acceleration = 20f;
+        Debug.Log("Bot Upgrade: Flight Systems Online.");
+    }
+
+    public void UpgradeHealing()
+    {
+        canHeal = true;
+        Debug.Log("Bot Upgrade: Medkit Installed.");
     }
 
     void Update()
     {
-        // Run the logic for the bot's current state
         switch (state)
         {
             case BotState.Idle:
@@ -55,94 +83,153 @@ public class ScrapCollectorBot : MonoBehaviour
             case BotState.Returning:
                 UpdateReturning();
                 break;
+            case BotState.Healing:
+                UpdateHealing();
+                break;
         }
     }
 
     void UpdateIdle()
     {
-        // Make sure the bot is stopped
-        if (agent.hasPath)
+        // If we are holding scrap, drop it off first
+        if (currentScrapCount > 0)
         {
-            agent.ResetPath();
+            state = BotState.Returning;
+            return;
         }
 
-        // Look for the nearest piece of scrap
-        Transform nearestScrap = FindNearestScrap();
-        if (nearestScrap != null)
+        // Priority 1: Heal Player (if unlocked and player needs it)
+        if (canHeal && playerStats.currentHealth < playerStats.maxHealth && Time.time > lastHealTime + healCooldown)
         {
-            // Found scrap! Go get it.
-            currentScrapTarget = nearestScrap;
-            agent.SetDestination(currentScrapTarget.position);
-            state = BotState.Fetching;
+            state = BotState.Healing;
+            return;
+        }
+
+        // Priority 2: Get Scrap
+        // Only look for scrap if we have room
+        if (currentScrapCount < carryCapacity)
+        {
+            Transform nearestScrap = FindNearestScrap();
+            if (nearestScrap != null)
+            {
+                currentTarget = nearestScrap;
+                agent.SetDestination(currentTarget.position);
+                state = BotState.Fetching;
+            }
+            else
+            {
+                // No scrap found, return to home/follow player loosely
+                if(Vector3.Distance(transform.position, homePosition) > 5f)
+                {
+                    agent.SetDestination(homePosition);
+                }
+            }
+        }
+        else
+        {
+            // Full capacity
+            state = BotState.Returning;
         }
     }
 
     void UpdateFetching()
     {
-        if (currentScrapTarget == null)
+        // Target validation
+        if (currentTarget == null)
         {
-            // The scrap must have been picked up by the player first. Go home.
-            state = BotState.Returning;
+            state = BotState.Idle;
             return;
         }
 
-        // Check if we've reached the scrap
-        if (Vector3.Distance(transform.position, currentScrapTarget.position) <= collectionDistance)
+        // Go to scrap
+        if (!agent.pathPending && agent.remainingDistance <= collectionDistance)
         {
-            // We're close enough, collect it.
-            CollectScrap(currentScrapTarget.gameObject);
+            CollectScrap(currentTarget.gameObject);
         }
     }
 
     void UpdateReturning()
     {
-        // Set destination to home, if we aren't already heading there
-        if (!agent.hasPath || agent.destination != homePosition)
-        {
-            agent.SetDestination(homePosition);
-        }
+        // Go home
+        agent.SetDestination(homePosition);
 
-        // Check if we've arrived home
-        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+        if (!agent.pathPending && agent.remainingDistance <= collectionDistance)
         {
-            state = BotState.Idle; // We're home. Go back to idle.
+            // Deposit all scrap
+            if (playerStats != null && currentScrapValueStored > 0)
+            {
+                playerStats.AddScrap(currentScrapValueStored);
+                Debug.Log($"Bot deposited {currentScrapValueStored} scrap.");
+            }
+
+            // Reset inventory
+            currentScrapCount = 0;
+            currentScrapValueStored = 0;
+
+            state = BotState.Idle;
+        }
+    }
+
+    void UpdateHealing()
+    {
+        if (playerStats == null) return;
+
+        // Approach Player
+        agent.SetDestination(playerStats.transform.position);
+
+        if (!agent.pathPending && agent.remainingDistance <= collectionDistance)
+        {
+            // Heal
+            playerStats.Heal(healAmount);
+            lastHealTime = Time.time;
+            
+            // Go back to work
+            state = BotState.Idle;
         }
     }
 
     void CollectScrap(GameObject scrapObject)
     {
-        if (scrapObject == null) return;
-
         ScrapMetalPickup scrap = scrapObject.GetComponent<ScrapMetalPickup>();
         
-        // Add scrap to the player
-        if (scrap != null && playerStats != null)
+        if (scrap != null)
         {
-            playerStats.AddScrap(scrap.value);
+            currentScrapValueStored += scrap.value;
+            currentScrapCount++;
         }
 
-        // Destroy the scrap object
-        Destroy(scrapObject); // This triggers OnDestroy()
+        Destroy(scrapObject);
 
-        // Go home
-        currentScrapTarget = null;
+        // Decide next move:
+        // If we have space, look for more scrap nearby immediately
+        if (currentScrapCount < carryCapacity)
+        {
+            Transform nextScrap = FindNearestScrap();
+            if (nextScrap != null)
+            {
+                currentTarget = nextScrap;
+                agent.SetDestination(currentTarget.position);
+                state = BotState.Fetching;
+                return;
+            }
+        }
+
+        // If full or no more scrap, go home
+        currentTarget = null;
         state = BotState.Returning;
     }
 
     Transform FindNearestScrap()
     {
-        // Clean the list of any scrap that might have been destroyed by other means
         ScrapMetalPickup.AvailableScrap.RemoveAll(item => item == null);
 
         Transform nearest = null;
         float minDistance = Mathf.Infinity;
 
-        // Loop through all available scrap
         foreach (Transform scrap in ScrapMetalPickup.AvailableScrap)
         {
             float distance = Vector3.Distance(transform.position, scrap.position);
             
-            // Check if it's in range and the closest one we've found so far
             if (distance <= detectionRange && distance < minDistance)
             {
                 minDistance = distance;
@@ -152,12 +239,13 @@ public class ScrapCollectorBot : MonoBehaviour
         return nearest;
     }
 
-    // Public method called by ScrapMetalPickup.cs if the bot's trigger hits it
+    // Triggered if the player runs over scrap while bot is nearby? 
+    // (Keeping legacy support, though bot logic handles itself mostly now)
     public void NotifyCollection(ScrapMetalPickup scrap)
     {
-        if (scrap != null)
+        if (state != BotState.Returning && currentScrapCount < carryCapacity)
         {
-             CollectScrap(scrap.gameObject);
+            CollectScrap(scrap.gameObject);
         }
     }
 }
