@@ -45,8 +45,8 @@ public class PC_UI_Manager : MonoBehaviour
     private Transform _selectedButtonOriginalParent;
     
     private const int COST_CAPACITY = 50;
-    private const int COST_FLIGHT = 150;
-    private const int COST_HEAL = 300;
+    private const int COST_FLIGHT = 50;
+    private const int COST_HEAL = 100;
     
     private bool hasShownWelcomeMessage = false;
     private Coroutine _startupCoroutine;

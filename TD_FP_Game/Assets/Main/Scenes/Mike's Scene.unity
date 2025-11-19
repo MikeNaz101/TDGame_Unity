@@ -8624,7 +8624,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ScrapCollectorBot
   playerStats: {fileID: 5570603580508221585}
   collectionDistance: 1.5
-  detectionRange: 30
+  detectionRange: 50
+  baseSpeed: 5
+  carryCapacity: 1
+  canFly: 0
+  canHeal: 0
+  healAmount: 10
+  healCooldown: 5
 --- !u!1 &7345414623803433868
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,6 +17,9 @@ public class EnemyController : MonoBehaviour, IDamageable
     public Transform _playerTarget;
     public FieldOfView fov;
     public LayerMask obstacleLayer;
+    
+    [Header("Fall Kill Settings")]
+    public float fallKillThreshold = -20f;
 
     [Header("Ragdoll")]
     public Rigidbody pelvisRigidbody;
@@ -123,6 +126,13 @@ public class EnemyController : MonoBehaviour, IDamageable
     void Update()
     {
         if (_isDead) return;
+        
+        // --- NEW: FALL CHECK ---
+        if (transform.position.y < fallKillThreshold)
+        {
+            HandleFallDeath();
+            return;
+        }
         
         _timeSinceLastAttack += Time.deltaTime;
         _sensorCooldown -= Time.deltaTime;
@@ -456,7 +466,33 @@ public class EnemyController : MonoBehaviour, IDamageable
     #endregion
 
     #region --- Damage & Death ---
+    
+    private void HandleFallDeath()
+    {
+        if (_isDead) return;
+        _isDead = true;
 
+        // 1. Tell WaveManager we are gone
+        if (_waveManager != null) _waveManager.EnemyDestroyed();
+
+        // 2. Spawn Scrap at Bot's Home Base
+        if (enemyData != null && enemyData.scrapMetalPrefab != null)
+        {
+            Vector3 spawnPos = new Vector3(0, 5f, 0); // Default fallback
+            
+            ScrapCollectorBot bot = FindObjectOfType<ScrapCollectorBot>();
+            if (bot != null)
+            {
+                // Spawn 5 units ABOVE the bot's home
+                spawnPos = bot.GetHomePosition() + Vector3.up * 5f;
+            }
+            
+            Instantiate(enemyData.scrapMetalPrefab, spawnPos, Quaternion.identity);
+        }
+
+        // 3. Destroy Self
+        Destroy(gameObject);
+    }
     public void TakeDamage(float amount)
     {
         TakeDamage(amount, null, DamageType.Physical);
@@ -601,6 +637,45 @@ public class EnemyController : MonoBehaviour, IDamageable
     #endregion
 
     #region --- Utility & Ragdoll Methods ---
+    
+    // --- ANTI-CLIP PUNISHMENT ---
+    // Teleports the enemy away and ragdolls them. Used when they glitch through doors.
+    public void PunishTrespasser()
+    {
+        if (_isDead) return;
+
+        // 1. Calculate Teleport Position (20 units X/Z, 10 units Y)
+        Vector3 randomOffset;
+        if (Random.value > 0.5f)
+            randomOffset = new Vector3(20f * (Random.value > 0.5f ? 1 : -1), 10f, 0f);
+        else
+            randomOffset = new Vector3(0f, 10f, 20f * (Random.value > 0.5f ? 1 : -1));
+
+        Vector3 punishPos = transform.position + randomOffset;
+
+        Debug.LogWarning($"{name} cheated! Teleporting to {punishPos}");
+
+        // 2. Teleport (Must use Warp for NavMeshAgents)
+        if (_agent != null)
+        {
+            _agent.Warp(punishPos);
+        }
+        else
+        {
+            transform.position = punishPos;
+        }
+
+        // 3. Apply "Explosion" effect (Ragdoll + Force)
+        // We simulate an explosion right below their feet to launch them
+        TakeExplosion(
+            10f, // 0 Damage (or add damage if you want to hurt them)
+            null, // No specific attacker
+            punishPos + Vector3.down, // Explosion origin (below feet)
+            5f, // Force
+            5f,  // Radius
+            2.0f // Upward modifier
+        );
+    }
 
     // --- UPDATED: Robust Ground Check for both Ragdolls and Boxes ---
     private IEnumerator MonitorRagdollState(bool isRagdoll)
