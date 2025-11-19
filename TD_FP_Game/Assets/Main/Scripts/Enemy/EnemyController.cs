@@ -29,6 +29,8 @@ public class EnemyController : MonoBehaviour, IDamageable
     [Header("AI & Navigation")]
     [SerializeField] private NavMeshAgent _agent;
     [SerializeField] private float _attackThreshold = 2.5f;
+    [Tooltip("How often to check if the path to the core is blocked.")]
+    [SerializeField] private float _pathCheckInterval = 1.0f;
 
     // --- NEW: Rank & Enhancements ---
     [Header("Military Rank Enhancements")]
@@ -60,6 +62,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private Transform _soundInvestigationPos;
     private Transform _attackSource;
     private float _sensorCooldown = 0f;
+    private float _pathCheckTimer = 0f;
     
     // Stance / Movement defaults
     private float _originalMoveSpeed;
@@ -301,23 +304,59 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (_currentTarget.transform != _playerTarget && _coreTarget != null) { SetNewTarget(_coreTarget.GetComponent<IDamageable>()); }
     }
 
-    private void UpdatePursueState() { 
+    private void UpdatePursueState() 
+    { 
         _agent.isStopped = false;
-        if (Vector3.Distance(transform.position, _currentTarget.transform.position) <= _agent.stoppingDistance) { 
-            _state = EnemyState.Attacking; 
-            return; 
+        
+        // --- BLOCKED PATH CHECK ---
+        if (_currentTarget.transform == _coreTarget)
+        {
+            _pathCheckTimer += Time.deltaTime;
+            if (_pathCheckTimer > _pathCheckInterval)
+            {
+                _pathCheckTimer = 0f;
+                
+                if (!_agent.pathPending && (_agent.pathStatus == NavMeshPathStatus.PathPartial || _agent.pathStatus == NavMeshPathStatus.PathInvalid))
+                {
+                    GameObject bestDoor = FindBestDoor();
+                    if (bestDoor != null)
+                    {
+                        SetNewTarget(bestDoor.GetComponent<IDamageable>());
+                        Debug.Log($"Path to Core blocked. {name} switching target to Door: {bestDoor.name}");
+                    }
+                }
+            }
         }
+        
+        if (Vector3.Distance(transform.position, _currentTarget.transform.position) <= _agent.stoppingDistance) { _state = EnemyState.Attacking; return; }
         _agent.SetDestination(_currentTarget.transform.position);
     }
+    
+    // --- UPDATED: RANDOM DOOR SELECTION ---
+    private GameObject FindBestDoor()
+    {
+        // 1. Find all doors in the scene
+        GameObject[] doors = GameObject.FindGameObjectsWithTag("Door");
+        
+        if (doors.Length == 0) return null;
+
+        // 2. Filter out doors that might be null or destroyed (just in case)
+        // and pick a RANDOM one from the list.
+        // This ensures enemies spread out to different doors.
+        GameObject randomDoor = doors[Random.Range(0, doors.Length)];
+
+        return randomDoor;
+    }
+    // --------------------------------------
 
     private void UpdateAttackState() { 
-        float dist = Vector3.Distance(transform.position, _currentTarget.transform.position);
-        if (dist > _agent.stoppingDistance + 1.5f) { _state = EnemyState.Pursuing; return; }
-        
+        if (Vector3.Distance(transform.position, _currentTarget.transform.position) > _agent.stoppingDistance + 1.5f) { _state = EnemyState.Pursuing; return; }
         _agent.isStopped = true; 
         RotateTowards(_currentTarget.transform.position);
-        
-        if (_timeSinceLastAttack >= enemyData.attackCooldown) { TryAttack(); }
+        if (_timeSinceLastAttack >= enemyData.attackCooldown)
+        {
+            TryAttack();
+        }
     }
 
     void TryAttack() 

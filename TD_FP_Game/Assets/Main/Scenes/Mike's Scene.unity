@@ -168,7 +168,7 @@ NavMeshObstacle:
   m_Carve: 0
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
+  m_TimeToStationary: 0
 --- !u!65 &99942974
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -310,7 +310,7 @@ NavMeshObstacle:
   m_Carve: 0
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
+  m_TimeToStationary: 0
 --- !u!65 &145608579
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1165,7 +1165,7 @@ NavMeshObstacle:
   m_Carve: 0
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
+  m_TimeToStationary: 0
 --- !u!65 &859514653
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1299,11 +1299,13 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 0
+  fallKillThreshold: -20
   pelvisRigidbody: {fileID: 0}
   _ragdollRigidbodies: []
   ragdollMinTime: 3
   _agent: {fileID: 0}
   _attackThreshold: 2.5
+  _pathCheckInterval: 1
   _currentRankLevel: -1
   _meshRenderer: {fileID: 0}
 --- !u!195 &1047237946
@@ -1698,7 +1700,7 @@ NavMeshObstacle:
   m_Carve: 0
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5
+  m_TimeToStationary: 0
 --- !u!65 &1690631126
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8405,7 +8407,7 @@ Transform:
   m_GameObject: {fileID: 4827147627571259709}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.425, y: 0.607, z: 13.583}
+  m_LocalPosition: {x: -0.389, y: 0.592, z: 14.588}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8424,6 +8426,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CoreHealth
   maxHealth: 1000
+  requiredDoorsDestroyed: 1
+  securityScanRadius: 1.5
 --- !u!65 &6877416241303318001
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8626,6 +8630,9 @@ MonoBehaviour:
   collectionDistance: 1.5
   detectionRange: 50
   baseSpeed: 5
+  fallThreshold: -20
+  stuckCheckInterval: 3
+  minMoveDistance: 0.5
   carryCapacity: 1
   canFly: 0
   canHeal: 0
