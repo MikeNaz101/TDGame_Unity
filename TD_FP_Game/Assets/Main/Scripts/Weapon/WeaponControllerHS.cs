@@ -97,8 +97,7 @@ public class WeaponControllerHS : MonoBehaviour
 
         if(hipCrosshairUI != null) hipCrosshairUI.SetActive(true);
     }
-
-    // ... (Keep Update, HandleFiringInput, HandleDirectSwitching as they were) ...
+    
     void Update()
     {
         if (currentWeapon == null || playerStats == null) return;
@@ -190,14 +189,27 @@ public class WeaponControllerHS : MonoBehaviour
             mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, targetFOV, Time.deltaTime * lerpSpeed);
         }
     }
-
-    // ... (Keep Shoot, FlashMuzzle, Reload, GetAccuracy, ToggleShootingEnabled, EquipWeapon exactly as they were) ...
     
     void Shoot()
     {
         if (currentAmmo <= 0) return; 
+        
         currentAmmo--;
-        nextFireTime = currentWeapon.fireRate;
+
+        // --- NEW: Get Multiplier for THIS specific weapon name ---
+        float fireRateMult = 1f;
+        float damageMult = 1f;
+
+        if (UpgradeManager.Instance != null)
+        {
+            // Ask the manager for stats specific to "Pistol" or "Rocket Launcher"
+            fireRateMult = UpgradeManager.Instance.GetWeaponFireRateMult(currentWeapon.weaponName);
+            damageMult = UpgradeManager.Instance.GetWeaponDamageMult(currentWeapon.weaponName);
+        }
+        
+        nextFireTime = currentWeapon.fireRate / fireRateMult;
+        // ----------------------------------------------------------
+
         shotsFired++; 
         if (currentWeapon.shootSound != null) _audioSource.PlayOneShot(currentWeapon.shootSound);
         if(shootPoint != null) EnemyAIAudioEvents.ReportGunshot(shootPoint.position); 
@@ -208,7 +220,12 @@ public class WeaponControllerHS : MonoBehaviour
         if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
         {
             EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
-            if (enemy != null) { enemy.TakeDamage(currentWeapon.damage, transform.root); shotsHit++; }
+            if (enemy != null) 
+            { 
+                // Apply specific damage mult
+                enemy.TakeDamage(currentWeapon.damage * damageMult, transform.root); 
+                shotsHit++; 
+            }
         }
         if (cameraShake != null) cameraShake.Shake(currentWeapon.recoilKickback);
         StartCoroutine(FlashMuzzle());

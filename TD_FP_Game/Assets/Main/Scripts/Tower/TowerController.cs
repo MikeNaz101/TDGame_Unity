@@ -45,9 +45,13 @@ public class TowerController : MonoBehaviour
     protected float _fireCooldown = 0f;
     
     // Multipliers
-    protected float _fireRateMultiplier = 1f; // From Buffs
-    protected float _damageMultiplier = 1f;   // From Buffs
-    protected float _upgradeMultiplier = 1f;  // From Levels (Permanent)
+    protected float _fireRateMultiplier = 1f; // From Buffs (Radar)
+    protected float _damageMultiplier = 1f;   // From Buffs (Radar)
+    protected float _upgradeMultiplier = 1f;  // From Levels (Individual Upgrade)
+    
+    // --- NEW: GLOBAL MULTIPLIERS (From UpgradeManager) ---
+    protected float _globalDamageMult = 1f;
+    protected float _globalRangeMult = 1f;
 
     private SphereCollider _rangeTrigger;
 
@@ -70,12 +74,37 @@ public class TowerController : MonoBehaviour
         }
     }
 
+    protected virtual void Start()
+    {
+        // Check for global upgrades when created
+        RefreshGlobalStats();
+    }
+
+    // --- NEW: Called by UpgradeManager to update stats dynamically ---
+    public void RefreshGlobalStats()
+    {
+        if (UpgradeManager.Instance != null)
+        {
+            _globalDamageMult = UpgradeManager.Instance.GlobalTowerDamageMult;
+            _globalRangeMult = UpgradeManager.Instance.GlobalTowerRangeMult;
+            
+            // Apply Range Update immediately
+            if (_rangeTrigger != null && _towerData != null)
+            {
+                _rangeTrigger.radius = _towerData.range * _globalRangeMult;
+            }
+        }
+    }
+
     public void Initialize(TowerData data)
     {
         _towerData = data;
         _rangeTrigger.radius = _towerData.range;
         TowerName = _towerData.towerName;
         Level = 1;
+        
+        // Apply global stats immediately upon initialization
+        RefreshGlobalStats();
     }
 
     protected virtual void OnDestroy()
@@ -150,8 +179,8 @@ public class TowerController : MonoBehaviour
     {
         if (_towerData.shootSound != null) _audioSource.PlayOneShot(_towerData.shootSound);
 
-        // Combine multipliers: Buffs * Upgrades
-        float totalDmgMult = _damageMultiplier * _upgradeMultiplier;
+        // Combine multipliers: Buffs * Local Upgrade * GLOBAL Upgrade
+        float totalDmgMult = _damageMultiplier * _upgradeMultiplier * _globalDamageMult;
 
         if (_towerData.attackType == TowerData.AttackType.Hitscan)
         {
@@ -232,13 +261,11 @@ public class TowerController : MonoBehaviour
     {
         Level++;
         _upgradeMultiplier += 0.25f; // +25% damage per level
-        // Visual scaling or particle effect here
         Debug.Log($"{TowerName} Upgraded to Level {Level}!");
     }
 
     public void SellTower()
     {
-        // Spawn scrap or just give cash back logic is handled by the Menu calling PlayerStats
         Destroy(gameObject);
     }
 
