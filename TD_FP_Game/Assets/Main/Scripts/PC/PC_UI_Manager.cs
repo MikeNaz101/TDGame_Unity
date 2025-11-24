@@ -8,9 +8,9 @@ public class PC_UI_Manager : MonoBehaviour
     [Header("Screen Containers")]
     public GameObject MainMenu_Container;
     public GameObject BotUpgrade_Container;
-    public GameObject PlayerUpgrade_Container; // Was Upgrade_Container
+    public GameObject PlayerUpgrade_Container; 
     public GameObject WeaponList_Container; 
-    public GameObject WeaponSpecific_Container; // New specific menu
+    public GameObject WeaponSpecific_Container; 
 
     [Header("Typewriter")]
     public TypeWriterEffect typewriter;
@@ -30,7 +30,6 @@ public class PC_UI_Manager : MonoBehaviour
     [Header("Player UI")]
     public TextMeshProUGUI btnText_Health;
     public TextMeshProUGUI btnText_Speed;
-    // Tower upgrades can live here or be moved to ????
     public TextMeshProUGUI btnText_TowerDmg; 
 
     // --- WEAPON LIST UI ---
@@ -51,7 +50,9 @@ public class PC_UI_Manager : MonoBehaviour
     [Header("Weapon Specific UI")]
     public TextMeshProUGUI header_WeaponName;
     public TextMeshProUGUI btnText_SpecificDmg;
-    public TextMeshProUGUI btnText_SpecificRate; 
+    public TextMeshProUGUI btnText_SpecificRate;
+    public TextMeshProUGUI btnText_SpecificMaxAmmo;
+    public TextMeshProUGUI btnText_SpecificClip;
 
     // --- INTERNAL STATE ---
     private ScrapCollectorBot _botScript;
@@ -67,9 +68,14 @@ public class PC_UI_Manager : MonoBehaviour
     void Start()
     {
         ShowScreen(null); 
-        pcDisplay.gameObject.SetActive(false);
+        if(pcDisplay) pcDisplay.gameObject.SetActive(false);
         _botScript = FindObjectOfType<ScrapCollectorBot>();
         _playerStats = FindObjectOfType<PlayerStats>();
+
+        if (UpgradeManager.Instance == null)
+        {
+            Debug.LogError("CRITICAL ERROR: UpgradeManager is missing from the scene! Please create an empty object and attach 'UpgradeManager.cs'.");
+        }
     }
     
     public void StartPCInterface()
@@ -83,12 +89,12 @@ public class PC_UI_Manager : MonoBehaviour
         if (typewriter != null) typewriter.StopTyping();
         if (_startupCoroutine != null) { StopCoroutine(_startupCoroutine); _startupCoroutine = null; }
         ShowScreen(null);
-        pcDisplay.gameObject.SetActive(false); 
+        if(pcDisplay) pcDisplay.gameObject.SetActive(false); 
     }
 
     private IEnumerator StartupRoutine()
     {
-        pcDisplay.gameObject.SetActive(true);
+        if(pcDisplay) pcDisplay.gameObject.SetActive(true);
         if (typewriter != null && pcDisplay != null) 
         { 
             yield return typewriter.DisplayText(pcDisplay, pcWelcomeMessage); 
@@ -98,21 +104,23 @@ public class PC_UI_Manager : MonoBehaviour
         _startupCoroutine = null;
     }
 
-    public void ShowMainMenu() { pcDisplay.gameObject.SetActive(false); ShowScreen(MainMenu_Container); }
+    public void ShowMainMenu() { if(pcDisplay) pcDisplay.gameObject.SetActive(false); ShowScreen(MainMenu_Container); }
 
-    // --- INTERACTION PROMPT ---
     public void ShowInteractPrompt(bool show, string message)
     {
         if (show)
         {
             ShowScreen(null);
-            pcDisplay.gameObject.SetActive(true);
-            if (typewriter != null) typewriter.DisplayText(pcDisplay, message);
+            if(pcDisplay) 
+            {
+                pcDisplay.gameObject.SetActive(true);
+                if (typewriter != null) typewriter.DisplayText(pcDisplay, message);
+            }
         }
         else
         {
             ShowScreen(null);
-            pcDisplay.gameObject.SetActive(false);
+            if(pcDisplay) pcDisplay.gameObject.SetActive(false);
             if (typewriter != null) typewriter.StopTyping();
         }
     }
@@ -142,9 +150,7 @@ public class PC_UI_Manager : MonoBehaviour
 
     public void OnMainMenu_MysteryClicked() 
     { 
-        // Placeholder logic for the ???? button
         Type("ERROR: Encrypted Data. Access Denied.");
-        // OR show a "Coming Soon" screen
     }
 
     // --- PLAYER UPGRADES ---
@@ -152,14 +158,28 @@ public class PC_UI_Manager : MonoBehaviour
     private void UpdatePlayerUI()
     {
         if (UpgradeManager.Instance == null) return;
-        UpdateBtnText(UpgradeManager.Instance.healthUpgrade, btnText_Health, "Max Health +25%");
-        UpdateBtnText(UpgradeManager.Instance.speedUpgrade, btnText_Speed, "Speed +10%");
-        UpdateBtnText(UpgradeManager.Instance.towerDamageGlobal, btnText_TowerDmg, "Tower Damage +20%");
+        UpdateBtnText(UpgradeManager.Instance.healthUpgrade, btnText_Health, "Max Health");
+        UpdateBtnText(UpgradeManager.Instance.speedUpgrade, btnText_Speed, "Move Speed");
+        UpdateBtnText(UpgradeManager.Instance.towerDamageGlobal, btnText_TowerDmg, "Tower Dmg");
     }
 
-    public void OnBuy_PlayerHealth() => TryBuyGlobal(UpgradeManager.Instance.healthUpgrade, "Health", "Biological enhancement applied.");
-    public void OnBuy_PlayerSpeed() => TryBuyGlobal(UpgradeManager.Instance.speedUpgrade, "Speed", "Servos overclocked.");
-    public void OnBuy_TowerDamage() => TryBuyGlobal(UpgradeManager.Instance.towerDamageGlobal, "TowerDmg", "Global turret firmware updated.");
+    public void OnBuy_PlayerHealth() 
+    {
+        if (UpgradeManager.Instance == null) return;
+        TryBuyGlobal(UpgradeManager.Instance.healthUpgrade, "Health", "Biological enhancement applied.");
+    }
+
+    public void OnBuy_PlayerSpeed() 
+    {
+        if (UpgradeManager.Instance == null) return;
+        TryBuyGlobal(UpgradeManager.Instance.speedUpgrade, "Speed", "Servos overclocked.");
+    }
+
+    public void OnBuy_TowerDamage() 
+    {
+        if (UpgradeManager.Instance == null) return;
+        TryBuyGlobal(UpgradeManager.Instance.towerDamageGlobal, "TowerDmg", "Global turret firmware updated.");
+    }
 
     private void TryBuyGlobal(UpgradeManager.UpgradePath path, string key, string msg)
     {
@@ -171,7 +191,7 @@ public class PC_UI_Manager : MonoBehaviour
 
     private void UpdateWeaponListUI()
     {
-        if (UpgradeManager.Instance == null) return;
+        if (UpgradeManager.Instance == null || _playerStats == null) return;
 
         foreach (var row in weaponRows)
         {
@@ -183,29 +203,36 @@ public class PC_UI_Manager : MonoBehaviour
             
             if (isOwned)
             {
-                // Normal Color
+                // OWNED STATE
                 row.selectButtonImage.color = Color.white; 
-                row.selectButton.interactable = true;
+                row.selectButton.interactable = true; // Selectable
                 
-                // Purchase Button says "Owned"
                 var buyTxt = row.purchaseButton.GetComponentInChildren<TMP_Text>();
-                if(buyTxt) buyTxt.text = "OWNED";
+                if(buyTxt) buyTxt.text = "Already Owned!"; // Requested Text
                 row.purchaseButton.interactable = false; 
 
-                row.infoText.text = "Ready for Upgrade";
+                row.infoText.text = ""; 
             }
             else
             {
-                // Dull Color
+                // UNOWNED STATE
                 row.selectButtonImage.color = Color.gray; 
-                row.selectButton.interactable = false; // Can't click to upgrade
+                row.selectButton.interactable = true; // Keep 'interactable' for visuals, but logic blocks it below
 
-                // Purchase Button says Cost
+                // Update Button Text
                 var buyTxt = row.purchaseButton.GetComponentInChildren<TMP_Text>();
-                if(buyTxt) buyTxt.text = $"Purchase\n${cost}";
+                if(buyTxt) buyTxt.text = $"Purchase Weapon\nCost: {cost}"; // Requested Text
                 row.purchaseButton.interactable = true;
 
-                row.infoText.text = "Must purchase to upgrade";
+                if (_playerStats.scrapMetal < cost)
+                {
+                    row.infoText.text = "Insufficient Funds";
+                    row.infoText.color = Color.red;
+                }
+                else
+                {
+                    row.infoText.text = ""; 
+                }
             }
         }
     }
@@ -213,6 +240,8 @@ public class PC_UI_Manager : MonoBehaviour
     public void OnBuy_UnlockWeapon(int rowIndex)
     {
         if (rowIndex < 0 || rowIndex >= weaponRows.Length) return;
+        if (UpgradeManager.Instance == null) return;
+
         string wName = weaponRows[rowIndex].weaponName;
 
         if (UpgradeManager.Instance.TryUnlockWeapon(wName)) 
@@ -229,7 +258,19 @@ public class PC_UI_Manager : MonoBehaviour
     public void OnSelect_WeaponToUpgrade(int rowIndex)
     {
         if (rowIndex < 0 || rowIndex >= weaponRows.Length) return;
-        _selectedWeaponName = weaponRows[rowIndex].weaponName;
+        if (UpgradeManager.Instance == null) return;
+
+        string weaponName = weaponRows[rowIndex].weaponName;
+
+        // --- FIX: PREVENT SELECTION IF NOT OWNED ---
+        if (!UpgradeManager.Instance.IsWeaponUnlocked(weaponName))
+        {
+            Type("Access Denied: Weapon not owned.");
+            return;
+        }
+        // -------------------------------------------
+
+        _selectedWeaponName = weaponName;
         
         ShowScreen(WeaponSpecific_Container);
         UpdateWeaponSpecificUI();
@@ -242,22 +283,41 @@ public class PC_UI_Manager : MonoBehaviour
 
     private void UpdateWeaponSpecificUI()
     {
+        if (UpgradeManager.Instance == null) return;
         var wData = UpgradeManager.Instance.GetWeaponData(_selectedWeaponName);
         if (wData == null) return;
 
-        UpdateBtnText(wData.damagePath, btnText_SpecificDmg, "Damage +20%");
-        UpdateBtnText(wData.fireRatePath, btnText_SpecificRate, "Fire Rate +10%");
+        UpdateBtnText(wData.damagePath, btnText_SpecificDmg, "Damage");
+        UpdateBtnText(wData.fireRatePath, btnText_SpecificRate, "Fire Rate");
+        UpdateBtnText(wData.maxAmmoPath, btnText_SpecificMaxAmmo, "Max Ammo");
+        UpdateBtnText(wData.clipSizePath, btnText_SpecificClip, "Clip Size");
     }
 
     public void OnBuy_SpecificDmg()
     {
+        if (UpgradeManager.Instance == null) return;
         if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "Damage")) { UpdateWeaponSpecificUI(); Type("Ballistics improved."); }
         else Type("Insufficient funds.");
     }
 
     public void OnBuy_SpecificRate()
     {
+        if (UpgradeManager.Instance == null) return;
         if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "Rate")) { UpdateWeaponSpecificUI(); Type("Mechanism cycled."); }
+        else Type("Insufficient funds.");
+    }
+
+    public void OnBuy_SpecificMaxAmmo()
+    {
+        if (UpgradeManager.Instance == null) return;
+        if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "MaxAmmo")) { UpdateWeaponSpecificUI(); Type("Capacity increased."); }
+        else Type("Insufficient funds.");
+    }
+
+    public void OnBuy_SpecificClip()
+    {
+        if (UpgradeManager.Instance == null) return;
+        if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "ClipSize")) { UpdateWeaponSpecificUI(); Type("Magazine expanded."); }
         else Type("Insufficient funds.");
     }
 
@@ -265,9 +325,9 @@ public class PC_UI_Manager : MonoBehaviour
     private void RefreshBotUI()
     {
         if (_botScript == null) return;
-        if(btn_UpgradeCapacity) { btn_UpgradeCapacity.gameObject.SetActive(_botScript.carryCapacity < 5); btn_UpgradeCapacity.GetComponentInChildren<TMP_Text>().text = $"Expand Cargo ({COST_CAPACITY})"; }
-        if(btn_UpgradeFlight) { btn_UpgradeFlight.gameObject.SetActive(_botScript.carryCapacity > 1 && !_botScript.canFly); btn_UpgradeFlight.GetComponentInChildren<TMP_Text>().text = $"Flight ({COST_FLIGHT})"; }
-        if(btn_UpgradeHeal) { btn_UpgradeHeal.gameObject.SetActive(_botScript.canFly && !_botScript.canHeal); btn_UpgradeHeal.GetComponentInChildren<TMP_Text>().text = $"Medical ({COST_HEAL})"; }
+        if(btn_UpgradeCapacity) { btn_UpgradeCapacity.gameObject.SetActive(_botScript.carryCapacity < 5); btn_UpgradeCapacity.GetComponentInChildren<TMP_Text>().text = $"Expand Cargo\nCost: {COST_CAPACITY}"; }
+        if(btn_UpgradeFlight) { btn_UpgradeFlight.gameObject.SetActive(_botScript.carryCapacity > 1 && !_botScript.canFly); btn_UpgradeFlight.GetComponentInChildren<TMP_Text>().text = $"Flight Systems\nCost: {COST_FLIGHT}"; }
+        if(btn_UpgradeHeal) { btn_UpgradeHeal.gameObject.SetActive(_botScript.canFly && !_botScript.canHeal); btn_UpgradeHeal.GetComponentInChildren<TMP_Text>().text = $"Medical Module\nCost: {COST_HEAL}"; }
         if(botStatusText) botStatusText.text = $"Load: {_botScript.carryCapacity} | Flight: {(_botScript.canFly?"ON":"OFF")}";
     }
     public void OnBuy_BotCapacity() { if(_playerStats.SpendScrap(COST_CAPACITY)) { _botScript.UpgradeCapacity(_botScript.carryCapacity+2); RefreshBotUI(); Type("Bot Upgraded."); } else Type("No Cash."); }
@@ -279,8 +339,15 @@ public class PC_UI_Manager : MonoBehaviour
     private void UpdateBtnText(UpgradeManager.UpgradePath path, TextMeshProUGUI txt, string desc)
     {
         if (txt == null) return;
-        if (path.currentLevel >= path.maxLevel) txt.text = $"{desc}\nMAX";
-        else txt.text = $"{desc}\nLvl {path.currentLevel}->{path.currentLevel+1} (${path.GetCost()})";
+        if (path.currentLevel >= path.maxLevel) 
+        {
+            txt.text = $"{desc}\nMAX LEVEL";
+        }
+        else 
+        {
+            // Requested Format
+            txt.text = $"{desc} (Lvl {path.currentLevel})\nCost: {path.GetCost()}";
+        }
     }
 
     private void Type(string msg)

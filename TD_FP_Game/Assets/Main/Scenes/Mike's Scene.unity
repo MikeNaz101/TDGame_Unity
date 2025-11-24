@@ -181,7 +181,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sniper
+  m_text: Speed
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -345,12 +345,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: BackToTowerOptions
-        m_Mode: 1
+        m_MethodName: OnBuy_UnlockWeapon
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -406,7 +406,7 @@ GameObject:
   - component: {fileID: 40886689}
   - component: {fileID: 40886688}
   m_Layer: 0
-  m_Name: armor
+  m_Name: Armor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -476,19 +476,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 40886689}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1541427512}
-        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: OnTowerOptions_SettingsClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &40886689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -726,7 +714,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ShotGun
+  m_text: Armor
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1032,7 +1020,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: BackToTowerOptions
+        m_MethodName: BackToWeaponList
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1137,7 +1125,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rocket Launcher
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1273,7 +1261,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Pistol
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1501,7 +1489,7 @@ GameObject:
   - component: {fileID: 193728105}
   - component: {fileID: 193728104}
   m_Layer: 0
-  m_Name: RocketLauncher (1)
+  m_Name: AmmoClipSizeBuy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1573,7 +1561,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: BackToTowerOptions
+        m_MethodName: OnBuy_SpecificClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1816,7 +1804,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Pistol
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2224,7 +2212,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ShotGun
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2669,7 +2657,7 @@ GameObject:
   - component: {fileID: 466385106}
   - component: {fileID: 466385105}
   m_Layer: 0
-  m_Name: Sniper
+  m_Name: Fire Rate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2739,7 +2727,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 466385106}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_SpecificRate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &466385106
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2835,7 +2835,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Pistol
+  m_text: Health
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2926,7 +2926,7 @@ GameObject:
   - component: {fileID: 562520330}
   - component: {fileID: 562520329}
   m_Layer: 0
-  m_Name: Title_Text
+  m_Name: Player_Title_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3519,6 +3519,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &672778696 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7826868954368737097, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+  m_PrefabInstance: {fileID: 2990199822224518103}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &672778697 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7552479848403196906, guid: ca856316edee16645a670c6a08a9866f, type: 3}
@@ -3581,7 +3586,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ShotGun
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3746,12 +3751,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: BackToTowerOptions
-        m_Mode: 1
+        m_MethodName: OnSelect_WeaponToUpgrade
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -4165,7 +4170,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ShotGun
+  m_text: MaxAmmo
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4492,7 +4497,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sniper
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4584,7 +4589,7 @@ GameObject:
   - component: {fileID: 937813523}
   - component: {fileID: 937813522}
   m_Layer: 0
-  m_Name: Pistol
+  m_Name: Damage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4654,7 +4659,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 937813523}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_SpecificDmg
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &937813523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4706,7 +4723,7 @@ GameObject:
   - component: {fileID: 974787320}
   - component: {fileID: 974787319}
   m_Layer: 0
-  m_Name: Pistol (1)
+  m_Name: HealthBuy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4775,7 +4792,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 974787320}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_PlayerHealth
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &974787320
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4827,7 +4856,7 @@ GameObject:
   - component: {fileID: 997750847}
   - component: {fileID: 997750846}
   m_Layer: 0
-  m_Name: Pistol (1)
+  m_Name: DamageBuy (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4896,7 +4925,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 997750847}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_SpecificDmg
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &997750847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4992,7 +5033,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ShotGun
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5084,7 +5125,7 @@ GameObject:
   - component: {fileID: 1032391095}
   - component: {fileID: 1032391094}
   m_Layer: 0
-  m_Name: ShotGun (1)
+  m_Name: ArmorBuy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5153,19 +5194,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1032391095}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1541427512}
-        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: OnTowerOptions_SettingsClicked
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1032391095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5726,7 +5755,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rocket Launcher
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5818,7 +5847,7 @@ GameObject:
   - component: {fileID: 1166025873}
   - component: {fileID: 1166025872}
   m_Layer: 0
-  m_Name: Sniper (1)
+  m_Name: FireRateBuy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5887,7 +5916,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1166025873}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_SpecificRate
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1166025873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6102,7 +6143,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1264602919}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_PlayerHealth
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1264602919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6153,7 +6206,7 @@ GameObject:
   - component: {fileID: 1336201547}
   - component: {fileID: 1336201546}
   m_Layer: 0
-  m_Name: Title_Text
+  m_Name: Specific_Weapon_Title_Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6393,7 +6446,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: BackToTowerOptions
+        m_MethodName: BackToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6454,7 +6507,7 @@ GameObject:
   - component: {fileID: 1412107489}
   - component: {fileID: 1412107488}
   m_Layer: 0
-  m_Name: RocketLauncher
+  m_Name: AmmoClipSize
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6527,7 +6580,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: BackToTowerOptions
+        m_MethodName: OnBuy_SpecificClip
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6778,6 +6831,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6118365375258257242, guid: ca856316edee16645a670c6a08a9866f, type: 3}
   m_PrefabInstance: {fileID: 2990199822224518103}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1478614614 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+  m_PrefabInstance: {fileID: 2990199822224518103}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1 &1481550875
 GameObject:
   m_ObjectHideFlags: 0
@@ -6971,7 +7035,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sniper
+  m_text: Fire Rate
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7087,6 +7151,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7466418182991866233, guid: ca856316edee16645a670c6a08a9866f, type: 3}
   m_PrefabInstance: {fileID: 2990199822224518103}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1573596421 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2257731022432835904, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+  m_PrefabInstance: {fileID: 2990199822224518103}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1 &1575951065
 GameObject:
   m_ObjectHideFlags: 0
@@ -7100,7 +7175,7 @@ GameObject:
   - component: {fileID: 1575951068}
   - component: {fileID: 1575951067}
   m_Layer: 0
-  m_Name: ShotGun (1)
+  m_Name: MaxAmmoBuy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7172,7 +7247,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: OnTowerOptions_SettingsClicked
+        m_MethodName: OnBuy_SpecificMaxAmmo
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7225,6 +7300,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4724443251228400480, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
   m_PrefabInstance: {fileID: 1418618829324808641}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1584125906 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 890133321744519364, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+  m_PrefabInstance: {fileID: 394385701}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f0f5a95a931d364daa67070bbd91b69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponControllerHC
 --- !u!1 &1586489713
 GameObject:
   m_ObjectHideFlags: 0
@@ -7599,7 +7685,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rocket Launcher
+  m_text: Ammo Clip Size
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -7761,6 +7847,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1541427506}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
         m_MethodName: BackToTowerOptions
@@ -7896,12 +7994,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: OnTowerOptions_SettingsClicked
-        m_Mode: 1
+        m_MethodName: OnBuy_UnlockWeapon
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 2
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -8143,7 +8241,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Rocket Launcher
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8371,7 +8469,7 @@ GameObject:
   - component: {fileID: 1726983475}
   - component: {fileID: 1726983474}
   m_Layer: 0
-  m_Name: RocketLauncher
+  m_Name: ???
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8444,7 +8542,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: BackToTowerOptions
+        m_MethodName: OnMainMenu_MysteryClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8549,7 +8647,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Pistol
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8741,7 +8839,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1753627520}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_UnlockWeapon
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1753627520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8862,7 +8972,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1754716722}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_UnlockWeapon
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1754716722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8901,11 +9023,137 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1754716719}
   m_CullTransparentMesh: 1
+--- !u!1 &1832763157 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5376664881909257170, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+  m_PrefabInstance: {fileID: 2990199822224518103}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &1832763162
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832763157}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1832763163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832763157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e78187677269bb49bfa1d7a55b5ae8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIButtonSound
+  clickSound: {fileID: 8300000, guid: 39b3215957da8e0439a27de8b38fac4f, type: 3}
 --- !u!224 &1844523871 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3577193102566597882, guid: ca856316edee16645a670c6a08a9866f, type: 3}
   m_PrefabInstance: {fileID: 2990199822224518103}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1844523872 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+  m_PrefabInstance: {fileID: 2990199822224518103}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1 &1889834695
 GameObject:
   m_ObjectHideFlags: 0
@@ -8992,7 +9240,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1580730253}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3942da7f894f74242a25a55ff44451fc, type: 3}
   m_Name: 
@@ -9054,7 +9302,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Pistol
+  m_text: Damage
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9190,7 +9438,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sniper
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9684,7 +9932,7 @@ GameObject:
   - component: {fileID: 2049096003}
   - component: {fileID: 2049096002}
   m_Layer: 0
-  m_Name: Sniper (1)
+  m_Name: SpeedBuy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9753,7 +10001,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2049096003}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_PlayerSpeed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2049096003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9849,7 +10109,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Sniper
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -9941,7 +10201,7 @@ GameObject:
   - component: {fileID: 2110933165}
   - component: {fileID: 2110933164}
   m_Layer: 0
-  m_Name: ShotGun
+  m_Name: MaxAmmo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10014,7 +10274,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1541427512}
         m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
-        m_MethodName: OnTowerOptions_SettingsClicked
+        m_MethodName: OnBuy_SpecificMaxAmmo
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10145,7 +10405,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2134956879}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1541427512}
+        m_TargetAssemblyTypeName: PC_UI_Manager, Assembly-CSharp
+        m_MethodName: OnBuy_PlayerSpeed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2134956879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14073,6 +14345,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4724443251228400480, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1418618829324808643}
+    - targetCorrespondingSourceObject: {fileID: 4724443251228400480, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1418618829324808646}
   m_SourcePrefab: {fileID: 100100000, guid: ddf86ce9255477542b21fc9c57867419, type: 3}
 --- !u!114 &1418618829324808642 stripped
 MonoBehaviour:
@@ -14107,6 +14382,100 @@ MonoBehaviour:
   - rank: 3
     bossPrefab: {fileID: 5358199103257218831, guid: 2301c272efa8bd64684768c10f744466, type: 3}
   waveManager: {fileID: 1418618829324808642}
+--- !u!114 &1418618829324808646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1580730253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3475817698c5884789da8da94257169, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeManager
+  playerStats: {fileID: 5570603580508221585}
+  playerMovement: {fileID: 5570603580508221587}
+  weaponController: {fileID: 1584125906}
+  healthUpgrade:
+    upgradeName: Health
+    currentLevel: 1
+    maxLevel: 20
+    baseCost: 2
+    costMultiplier: 1.5
+  speedUpgrade:
+    upgradeName: Speed
+    currentLevel: 1
+    maxLevel: 20
+    baseCost: 2
+    costMultiplier: 1.5
+  towerDamageGlobal:
+    upgradeName: Tower Attack
+    currentLevel: 1
+    maxLevel: 10
+    baseCost: 100
+    costMultiplier: 1.5
+  towerRangeGlobal:
+    upgradeName: Tower Range
+    currentLevel: 1
+    maxLevel: 10
+    baseCost: 100
+    costMultiplier: 1.5
+  weaponUpgrades:
+  - weaponName: Pistol
+    unlockCost: 5
+    isUnlocked: 1
+    damagePath:
+      upgradeName: Damage
+      currentLevel: 0
+      maxLevel: 10
+      baseCost: 5
+      costMultiplier: 1
+    fireRatePath:
+      upgradeName: Fire Rate
+      currentLevel: 0
+      maxLevel: 10
+      baseCost: 2
+      costMultiplier: 1
+    maxAmmoPath:
+      upgradeName: Max Ammo
+      currentLevel: 0
+      maxLevel: 10
+      baseCost: 2
+      costMultiplier: 1
+    clipSizePath:
+      upgradeName: Clip Size
+      currentLevel: 0
+      maxLevel: 10
+      baseCost: 2
+      costMultiplier: 1
+  - weaponName: Sniper
+    unlockCost: 5
+    isUnlocked: 0
+    damagePath:
+      upgradeName: Damage
+      currentLevel: 0
+      maxLevel: 20
+      baseCost: 2
+      costMultiplier: 1
+    fireRatePath:
+      upgradeName: Fire Rate
+      currentLevel: 0
+      maxLevel: 10
+      baseCost: 2
+      costMultiplier: 1
+    maxAmmoPath:
+      upgradeName: Max Ammo
+      currentLevel: 0
+      maxLevel: 10
+      baseCost: 2
+      costMultiplier: 1
+    clipSizePath:
+      upgradeName: Clip Size
+      currentLevel: 0
+      maxLevel: 10
+      baseCost: 2
+      costMultiplier: 1
 --- !u!1 &1486709814640690698
 GameObject:
   m_ObjectHideFlags: 0
@@ -14769,9 +15138,117 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 394385702}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BackToMainMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: BackToTowerOptions
+      objectReference: {fileID: 0}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: PC_UI_Manager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1185513019693774485, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1512171208797819119, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_Name
       value: Pistol
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnMainMenu_WeaponsClicked
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: OnMainMenu_TowersClicked
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: PC_UI_Manager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2140226431270465122, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2257731022432835904, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2257731022432835904, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2257731022432835904, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 2257731022432835904, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2257731022432835904, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnSelect_WeaponToUpgrade
+      objectReference: {fileID: 0}
+    - target: {fileID: 2257731022432835904, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PC_UI_Manager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2257731022432835904, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 2284393228547013670, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_text
@@ -14785,6 +15262,38 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnSelect_WeaponToUpgrade
+      objectReference: {fileID: 0}
+    - target: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PC_UI_Manager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2537655972644604179, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 2659080373063225697, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -14792,6 +15301,54 @@ PrefabInstance:
     - target: {fileID: 2659080373063225697, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_SizeDelta.y
       value: -17
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnSelect_WeaponToUpgrade
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: OnTowerOptions_SettingsClicked
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: PC_UI_Manager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3499230983889812328, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3557873164341217498, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_AnchorMax.x
@@ -14832,6 +15389,42 @@ PrefabInstance:
     - target: {fileID: 3982044215703723256, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0.38999686
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnMainMenu_PlayerClicked
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: PC_UI_Manager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4222169547263971741, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 4402395803178654095, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -14907,7 +15500,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5913665326196009211, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6118365375258257242, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_LocalScale.x
@@ -14948,6 +15541,46 @@ PrefabInstance:
     - target: {fileID: 6349429206683903711, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -51.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1541427512}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnMainMenu_BotzClicked
+      objectReference: {fileID: 0}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: OnMainMenu_BotUpgradesClicked
+      objectReference: {fileID: 0}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: PC_UI_Manager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6771439137266161648, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7466418182991866233, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_LocalScale.x
@@ -14991,15 +15624,163 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7826868954368737097, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_Name
-      value: Upgrade_Container
+      value: Weapons_Container
       objectReference: {fileID: 0}
     - target: {fileID: 8352621475281868157, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_LocalScale.z
       value: 0.99329126
       objectReference: {fileID: 0}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: btnText_Speed
+      value: 
+      objectReference: {fileID: 23421524}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: btnText_Health
+      value: 
+      objectReference: {fileID: 507666913}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: btnText_TowerDmg
+      value: 
+      objectReference: {fileID: 140550721}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: header_WeaponName
+      value: 
+      objectReference: {fileID: 1336201546}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: btnText_SpecificDmg
+      value: 
+      objectReference: {fileID: 1952153432}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: WeaponList_Container
+      value: 
+      objectReference: {fileID: 672778696}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: btnText_SpecificClip
+      value: 
+      objectReference: {fileID: 1622163527}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: btnText_SpecificRate
+      value: 
+      objectReference: {fileID: 1496822015}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: PlayerUpgrade_Container
+      value: 
+      objectReference: {fileID: 751214705}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: btnText_SpecificMaxAmmo
+      value: 
+      objectReference: {fileID: 819306718}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: WeaponSpecific_Container
+      value: 
+      objectReference: {fileID: 1621800485}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[0].infoText
+      value: 
+      objectReference: {fileID: 178550854}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[1].infoText
+      value: 
+      objectReference: {fileID: 1963622605}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[2].infoText
+      value: 
+      objectReference: {fileID: 705616102}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[3].infoText
+      value: 
+      objectReference: {fileID: 175652248}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[0].weaponName
+      value: Pistol
+      objectReference: {fileID: 0}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[1].weaponName
+      value: Sniper
+      objectReference: {fileID: 0}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[2].weaponName
+      value: Shotgun
+      objectReference: {fileID: 0}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[3].weaponName
+      value: Rocket Launcher
+      objectReference: {fileID: 0}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[0].selectButton
+      value: 
+      objectReference: {fileID: 1573596421}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[1].selectButton
+      value: 
+      objectReference: {fileID: 1844523872}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[2].selectButton
+      value: 
+      objectReference: {fileID: 1478614614}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[3].selectButton
+      value: 
+      objectReference: {fileID: 731748811}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[0].purchaseButton
+      value: 
+      objectReference: {fileID: 1753627519}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[1].purchaseButton
+      value: 
+      objectReference: {fileID: 1754716721}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[2].purchaseButton
+      value: 
+      objectReference: {fileID: 1683839049}
+    - target: {fileID: 8357928615490334448, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: weaponRows.Array.data[3].purchaseButton
+      value: 
+      objectReference: {fileID: 35312574}
     - target: {fileID: 8471145891234125408, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1832763163}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PlaySound
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIButtonSound, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 8780755286590436737, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8812612134761550236, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_IsActive
@@ -15041,7 +15822,13 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6118365375258257242, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       insertIndex: 0
       addedObject: {fileID: 705616101}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5376664881909257170, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1832763162}
+    - targetCorrespondingSourceObject: {fileID: 5376664881909257170, guid: ca856316edee16645a670c6a08a9866f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1832763163}
   m_SourcePrefab: {fileID: 100100000, guid: ca856316edee16645a670c6a08a9866f, type: 3}
 --- !u!23 &3068965829200295856
 MeshRenderer:
@@ -16128,6 +16915,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 575514868ee1c7246b54b490555e2e65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+--- !u!114 &5570603580508221587 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4804962782072750936, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+  m_PrefabInstance: {fileID: 394385701}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c4fdc0c2acd9494d849b6797844d571, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoomMovement
 --- !u!4 &5598065346861422499
 Transform:
   m_ObjectHideFlags: 0

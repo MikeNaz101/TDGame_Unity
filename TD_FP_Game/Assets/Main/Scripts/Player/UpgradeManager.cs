@@ -39,6 +39,9 @@ public class UpgradeManager : MonoBehaviour
         // Each weapon has its own upgrade paths
         public UpgradePath damagePath; 
         public UpgradePath fireRatePath;
+        // --- NEW PATHS ---
+        public UpgradePath maxAmmoPath;
+        public UpgradePath clipSizePath;
     }
 
     // --- UPGRADE LISTS ---
@@ -146,13 +149,26 @@ public class UpgradeManager : MonoBehaviour
         var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
         if (w == null || !w.isUnlocked) return false;
 
-        UpgradePath path = (statType == "Damage") ? w.damagePath : w.fireRatePath;
+        UpgradePath path = null;
+        switch (statType)
+        {
+            case "Damage": path = w.damagePath; break;
+            case "Rate": path = w.fireRatePath; break;
+            case "MaxAmmo": path = w.maxAmmoPath; break;
+            case "ClipSize": path = w.clipSizePath; break;
+        }
+
+        if (path == null) return false;
+
         int cost = path.GetCost();
 
         if (playerStats.SpendScrap(cost))
         {
             path.currentLevel++;
             Debug.Log($"Upgraded {weaponName} {statType} to Lv {path.currentLevel}");
+            
+            // If updating ammo capacity, we might want to refill ammo immediately or wait for reload
+            // For simplicity, let's just update stats. WeaponController reads these every frame or on reload.
             return true;
         }
         return false;
@@ -174,6 +190,22 @@ public class UpgradeManager : MonoBehaviour
         if (w == null) return 1f;
         // Formula: +10% speed per level
         return 1f + (0.10f * (w.fireRatePath.currentLevel - 1));
+    }
+
+    public float GetWeaponMaxAmmoMult(string weaponName)
+    {
+        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        if (w == null) return 1f;
+        // Formula: +20% max ammo per level
+        return 1f + (0.20f * (w.maxAmmoPath.currentLevel - 1));
+    }
+
+    public float GetWeaponClipSizeMult(string weaponName)
+    {
+        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        if (w == null) return 1f;
+        // Formula: +20% clip size per level
+        return 1f + (0.20f * (w.clipSizePath.currentLevel - 1));
     }
     
     public WeaponUpgradeData GetWeaponData(string weaponName)
