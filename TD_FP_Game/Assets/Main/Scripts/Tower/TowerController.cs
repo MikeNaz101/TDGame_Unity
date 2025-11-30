@@ -7,13 +7,7 @@ using System.Linq;
 [RequireComponent(typeof(AudioSource))]
 public class TowerController : MonoBehaviour
 {
-    public enum TargetingPriority
-    {
-        First,      
-        Last,       
-        Weakest,    
-        Strongest   
-    }
+    public enum TargetingPriority { First, Last, Weakest, Strongest }
     
     [Header("Tower Components")]
     [SerializeField] private Transform _turretBase;
@@ -22,34 +16,36 @@ public class TowerController : MonoBehaviour
     
     [Header("Targeting")]
     [SerializeField] private TargetingPriority _targetingPriority = TargetingPriority.First;
-
-    [Header("Tuning")]
     [SerializeField] private float _aimSpeed = 10f;
     [SerializeField] private float _aimTolerance = 3f;
 
-    // --- Public Properties ---
-    [HideInInspector] public string TowerName { get; private set; }
-    [HideInInspector] public int TowerID { get; private set; }
-    [HideInInspector] public int Level { get; private set; } = 1;
+    // --- Properties ---
+    public string TowerName { get; private set; }
+    public int TowerID { get; private set; }
+    public TowerData Data => _towerData;
+    
+    // We track which upgrade index we are at for each path
+    // Key = Path Index, Value = Next Upgrade Index to buy
+    public int[] PathProgress { get; private set; }
 
-    // --- Protected References ---
+    // --- References ---
     protected TowerData _towerData;
     protected AudioSource _audioSource;
     protected LineRenderer _hitscanTracer;
     protected PlayerStats _playerStats;
     protected Transform _playerTarget;
 
-    // --- Target & State ---
+    // --- State ---
     protected List<EnemyController> _enemiesInRange = new List<EnemyController>();
     protected EnemyController _currentTarget;
     protected float _fireCooldown = 0f;
     
-    // Multipliers
-    protected float _fireRateMultiplier = 1f; // From Buffs (Radar)
-    protected float _damageMultiplier = 1f;   // From Buffs (Radar)
-    protected float _upgradeMultiplier = 1f;  // From Levels (Individual Upgrade)
+    // Multipliers (Base 1.0)
+    protected float _fireRateMultiplier = 1f; 
+    protected float _damageMultiplier = 1f;   
+    protected float _rangeMultiplier = 1f;
     
-    // --- NEW: GLOBAL MULTIPLIERS (From UpgradeManager) ---
+    // Global Multipliers
     protected float _globalDamageMult = 1f;
     protected float _globalRangeMult = 1f;
 
@@ -66,144 +62,150 @@ public class TowerController : MonoBehaviour
         
         TowerID = TowerRegistry.RegisterTower(this);
         
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-        {
-            _playerTarget = playerObj.transform;
-            _playerStats = playerObj.GetComponent<PlayerStats>();
-        }
+        var pObj = GameObject.FindGameObjectWithTag("Player");
+        if (pObj) { _playerTarget = pObj.transform; _playerStats = pObj.GetComponent<PlayerStats>(); }
     }
 
-    protected virtual void Start()
+    public void Initialize(TowerData data)
     {
-        // Check for global upgrades when created
+        _towerData = data;
+        TowerName = _towerData.towerName;
+        
+        // Initialize path tracking
+        if (_towerData.upgradePaths != null)
+        {
+            PathProgress = new int[_towerData.upgradePaths.Count];
+        }
+
         RefreshGlobalStats();
     }
 
-    // --- NEW: Called by UpgradeManager to update stats dynamically ---
+    protected virtual void OnDestroy() { TowerRegistry.UnregisterTower(this); }
+    
     public void RefreshGlobalStats()
     {
         if (UpgradeManager.Instance != null)
         {
             _globalDamageMult = UpgradeManager.Instance.GlobalTowerDamageMult;
             _globalRangeMult = UpgradeManager.Instance.GlobalTowerRangeMult;
-            
-            // Apply Range Update immediately
-            if (_rangeTrigger != null && _towerData != null)
-            {
-                _rangeTrigger.radius = _towerData.range * _globalRangeMult;
-            }
+        }
+        RecalculateStats();
+    }
+
+    // Call this whenever an upgrade is bought
+    protected void RecalculateStats()
+    {
+        if (_rangeTrigger != null && _towerData != null)
+        {
+            // Base Range * Local Multiplier * Global Multiplier
+            _rangeTrigger.radius = _towerData.range * _rangeMultiplier * _globalRangeMult;
         }
     }
 
-    public void Initialize(TowerData data)
+    // --- NEW: UPGRADE LOGIC ---
+    public void ApplyUpgrade(TowerUpgradeData upgrade)
     {
-        _towerData = data;
-        _rangeTrigger.radius = _towerData.range;
-        TowerName = _towerData.towerName;
-        Level = 1;
-        
-        // Apply global stats immediately upon initialization
-        RefreshGlobalStats();
+        switch (upgrade.effectType)
+        {
+            case TowerUpgradeType.Damage:
+                // Add percentage (e.g. +0.25)
+                _damageMultiplier += upgrade.effectValue;
+                break;
+            case TowerUpgradeType.FireRate:
+                // Increase speed means reducing cooldown, or just a rate multiplier
+                _fireRateMultiplier += upgrade.effectValue;
+                break;
+            case TowerUpgradeType.Range:
+                _rangeMultiplier += upgrade.effectValue;
+                break;
+            default:
+                // Hand off special upgrades to child classes
+                ApplySpecificUpgrade(upgrade);
+                break;
+        }
+        RecalculateStats();
     }
 
-    protected virtual void OnDestroy()
+    protected virtual void ApplySpecificUpgrade(TowerUpgradeData upgrade)
     {
-        TowerRegistry.UnregisterTower(this);
+        // Override in child classes (Flamethrower, Rocket, etc.)
     }
-    
+
     protected virtual void Update()
     {
         if (_fireCooldown > 0) _fireCooldown -= Time.deltaTime;
-
-        if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
-        {
-            UpdateTarget();
-        }
-
-        if (_currentTarget != null)
-        {
-            AimAtTarget();
-            TryFire();
-        }
+        if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy) UpdateTarget();
+        if (_currentTarget != null) { AimAtTarget(); TryFire(); }
     }
 
     protected void UpdateTarget()
     {
-        _enemiesInRange.RemoveAll(enemy => enemy == null || !enemy.gameObject.activeInHierarchy);
-
+        _enemiesInRange.RemoveAll(e => e == null || !e.gameObject.activeInHierarchy);
         switch (_targetingPriority)
         {
-            case TargetingPriority.Weakest:
-                _enemiesInRange = _enemiesInRange.OrderBy(e => e.CurrentHealth).ToList();
-                break;
-            case TargetingPriority.Strongest:
-                _enemiesInRange = _enemiesInRange.OrderByDescending(e => e.CurrentHealth).ToList();
-                break;
+            case TargetingPriority.Weakest: _enemiesInRange = _enemiesInRange.OrderBy(e => e.CurrentHealth).ToList(); break;
+            case TargetingPriority.Strongest: _enemiesInRange = _enemiesInRange.OrderByDescending(e => e.CurrentHealth).ToList(); break;
         }
-
-        if (_enemiesInRange.Count > 0) _currentTarget = _enemiesInRange[0];
-        else _currentTarget = null;
+        _currentTarget = _enemiesInRange.Count > 0 ? _enemiesInRange[0] : null;
     }
 
     protected virtual void AimAtTarget()
     {
-        if (_turretBase == null || _barrel == null || _currentTarget == null) return;
-
+        if (!_turretBase || !_barrel || !_currentTarget) return;
+        
         Vector3 targetDir = _currentTarget.transform.position - _turretBase.position;
-        Quaternion lookRotation = Quaternion.LookRotation(targetDir);
-        Vector3 euler = Quaternion.Slerp(_turretBase.rotation, lookRotation, Time.deltaTime * _aimSpeed).eulerAngles;
-
+        Vector3 euler = Quaternion.Slerp(_turretBase.rotation, Quaternion.LookRotation(targetDir), Time.deltaTime * _aimSpeed).eulerAngles;
         _turretBase.rotation = Quaternion.Euler(0f, euler.y, 0f);
         
-        Vector3 localTargetPos = _turretBase.InverseTransformPoint(_currentTarget.transform.position);
-        Quaternion barrelRotation = Quaternion.LookRotation(localTargetPos);
-        _barrel.localRotation = Quaternion.Slerp(_barrel.localRotation, barrelRotation, Time.deltaTime * _aimSpeed);
+        Vector3 localTarget = _turretBase.InverseTransformPoint(_currentTarget.transform.position);
+        _barrel.localRotation = Quaternion.Slerp(_barrel.localRotation, Quaternion.LookRotation(localTarget), Time.deltaTime * _aimSpeed);
     }
 
     protected virtual void TryFire()
     {
-        if (_fireCooldown > 0 || _currentTarget == null || _towerData == null) return;
-
-        Vector3 targetDir = _currentTarget.transform.position - _shootPoint.position;
-        if (Vector3.Angle(_shootPoint.forward, targetDir) < _aimTolerance)
+        if (_fireCooldown > 0 || !_currentTarget || !_towerData) return;
+        
+        if (Vector3.Angle(_shootPoint.forward, _currentTarget.transform.position - _shootPoint.position) < _aimTolerance)
         {
             Shoot();
-            // Combined cooldown logic: Data * Buffs
-            float finalFireRate = _towerData.fireRate / (_fireRateMultiplier); 
-            _fireCooldown = finalFireRate;
+            // Calculate final fire rate
+            float baseRate = _towerData.fireRate;
+            // Higher multiplier = Faster fire = Lower cooldown
+            _fireCooldown = baseRate / _fireRateMultiplier;
         }
     }
 
     protected virtual void Shoot()
     {
-        if (_towerData.shootSound != null) _audioSource.PlayOneShot(_towerData.shootSound);
-
-        // Combine multipliers: Buffs * Local Upgrade * GLOBAL Upgrade
-        float totalDmgMult = _damageMultiplier * _upgradeMultiplier * _globalDamageMult;
+        if (_towerData.shootSound) _audioSource.PlayOneShot(_towerData.shootSound);
+        
+        float finalDmg = _towerData.damage * _damageMultiplier * _globalDamageMult;
 
         if (_towerData.attackType == TowerData.AttackType.Hitscan)
         {
-            _currentTarget.TakeDamage(_towerData.damage * totalDmgMult, this.transform);
-            if (_hitscanTracer != null) StartCoroutine(ShowHitscanTrace());
+            _currentTarget.TakeDamage(finalDmg, transform);
+            if (_hitscanTracer) StartCoroutine(ShowHitscanTrace());
         }
         else
         {
-            if (_towerData.projectilePrefab == null) return;
+            if (!_towerData.projectilePrefab) return;
             GameObject proj = Instantiate(_towerData.projectilePrefab, _shootPoint.position, _shootPoint.rotation);
-            Projectile pScript = proj.GetComponent<Projectile>();
-            if (pScript != null)
-            {
-                pScript.towerData = _towerData;
-                pScript.attacker = this.transform;
-                pScript.damageMultiplier = totalDmgMult;
+            // Pass multipliers to projectile logic if needed
+            var p = proj.GetComponent<Projectile>();
+            if(p) { p.towerData = _towerData; p.attacker = transform; p.damageMultiplier = finalDmg / _towerData.damage; }
+            
+            // Handle specialized projectiles (Rocket)
+            var slowRocket = proj.GetComponent<SlowHomingRocket>();
+            if(slowRocket) { 
+                slowRocket.Initialize(_towerData, _currentTarget, transform); 
+                slowRocket.Launch(); // Assuming rocket logic handles launch timing inside if needed
             }
         }
     }
 
     protected IEnumerator ShowHitscanTrace()
     {
-        if (_currentTarget == null) yield break;
+        if (!_currentTarget) yield break;
         _hitscanTracer.enabled = true;
         _hitscanTracer.SetPosition(0, _shootPoint.position);
         _hitscanTracer.SetPosition(1, _currentTarget.transform.position + Vector3.up * 0.5f);
@@ -215,82 +217,27 @@ public class TowerController : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            EnemyController enemy = other.GetComponent<EnemyController>();
-            if (enemy != null && !_enemiesInRange.Contains(enemy))
-            {
-                if (_targetingPriority == TargetingPriority.Last) _enemiesInRange.Insert(0, enemy);
-                else _enemiesInRange.Add(enemy);
-            }
+            var e = other.GetComponent<EnemyController>();
+            if (e && !_enemiesInRange.Contains(e)) _enemiesInRange.Add(e);
         }
     }
-
     protected virtual void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Enemy"))
         {
-            EnemyController enemy = other.GetComponent<EnemyController>();
-            if (enemy != null && _enemiesInRange.Contains(enemy))
-            {
-                _enemiesInRange.Remove(enemy);
-                if (_currentTarget == enemy) _currentTarget = null;
-            }
+            var e = other.GetComponent<EnemyController>();
+            if (e) { _enemiesInRange.Remove(e); if (_currentTarget == e) _currentTarget = null; }
         }
     }
+
+    // --- UI HELPERS ---
+    public void SetTargetingPriority(int index) { _targetingPriority = (TargetingPriority)index; UpdateTarget(); }
+    public string GetPriorityName() => _targetingPriority.ToString();
+    public void CyclePriority() { SetTargetingPriority(((int)_targetingPriority + 1) % 4); }
+    public void SellTower() { Destroy(gameObject); }
+    public int GetSellValue() { return Mathf.RoundToInt(_towerData.scrapCost * 0.5f); } // Simplified
     
-    // --- MANAGEMENT METHODS ---
-
-    public void SetTargetingPriority(int priorityIndex)
-    {
-        _targetingPriority = (TargetingPriority)priorityIndex;
-        UpdateTarget(); 
-    }
-    
-    public string GetPriorityName()
-    {
-        return _targetingPriority.ToString();
-    }
-
-    public void CyclePriority()
-    {
-        int current = (int)_targetingPriority;
-        int next = (current + 1) % 4; // 4 enum values
-        SetTargetingPriority(next);
-    }
-
-    public void UpgradeTower()
-    {
-        Level++;
-        _upgradeMultiplier += 0.25f; // +25% damage per level
-        Debug.Log($"{TowerName} Upgraded to Level {Level}!");
-    }
-
-    public void SellTower()
-    {
-        Destroy(gameObject);
-    }
-
-    public int GetUpgradeCost()
-    {
-        if (_towerData == null) return 0;
-        return Mathf.RoundToInt(_towerData.scrapCost * 0.75f * Level); 
-    }
-
-    public int GetSellValue()
-    {
-        if (_towerData == null) return 0;
-        return Mathf.RoundToInt((_towerData.scrapCost / 2f) + (GetUpgradeCost() * 0.5f));
-    }
-
     // --- BUFFS ---
-    public void ApplyBuff(float fireRateBuff, float damageBuff)
-    {
-        _fireRateMultiplier = fireRateBuff;
-        _damageMultiplier = damageBuff;
-    }
-    
-    public void RemoveBuff()
-    {
-        _fireRateMultiplier = 1f;
-        _damageMultiplier = 1f;
-    }
+    public void ApplyBuff(float rate, float dmg) { _fireRateMultiplier = rate; _damageMultiplier = dmg; }
+    public void RemoveBuff() { _fireRateMultiplier = 1f; _damageMultiplier = 1f; }
 }

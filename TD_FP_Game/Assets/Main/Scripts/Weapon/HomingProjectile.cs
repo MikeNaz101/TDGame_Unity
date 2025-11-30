@@ -9,7 +9,7 @@ public class HomingProjectile : MonoBehaviour
     private Vector3 _lastKnownPosition;
 
     [Header("Flight Path")]
-    public float launchDuration = 3.0f;
+    public float launchDuration = 1.0f; // Shortened slightly for snappier feel
     public float launchSpeed = 10f;
     public float homingSpeed = 25f;
     public float turnSpeed = 5f;
@@ -17,11 +17,12 @@ public class HomingProjectile : MonoBehaviour
     [Header("Visuals")]
     public ParticleSystem engineParticles;
     public float particleBoostMultiplier = 3f;
-    
-    // --- NEW FIELD ---
-    [Tooltip("Visual fix. If rocket flies sideways, try setting X to 90 or -90.")]
     public Vector3 modelRotationOffset; 
-    // -----------------
+
+    // --- NEW: MULTIPLIERS (Set by Tower) ---
+    [HideInInspector] public float speedMultiplier = 1f;
+    [HideInInspector] public float radiusMultiplier = 1f;
+    [HideInInspector] public float damageMultiplier = 1f;
 
     private bool _isHoming = false;
     private float _timer = 0f;
@@ -40,7 +41,7 @@ public class HomingProjectile : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _rb.useGravity = false;
-        Destroy(gameObject, 15f);
+        Destroy(gameObject, 15f); // Safety destroy
     }
 
     void FixedUpdate()
@@ -49,27 +50,27 @@ public class HomingProjectile : MonoBehaviour
 
         _timer += Time.fixedDeltaTime;
 
+        // Apply Speed Multiplier
+        float currentLaunchSpeed = launchSpeed * speedMultiplier;
+        float currentHomingSpeed = homingSpeed * speedMultiplier;
+
         if (_timer < launchDuration)
         {
-            // Phase 1: Launch
-            _rb.linearVelocity = Vector3.up * launchSpeed;
+            // Phase 1: Launch Up
+            _rb.linearVelocity = Vector3.up * currentLaunchSpeed;
         }
         else
         {
             // Phase 2: Homing
             if (!_isHoming) ActivateHomingMode();
-            MoveTowardsTarget();
+            MoveTowardsTarget(currentHomingSpeed);
         }
         
-        // --- UPDATED ROTATION LOGIC ---
+        // Rotation Fix
         if (_rb.linearVelocity != Vector3.zero)
         {
-            // 1. Calculate where we are going (The "Physics" Rotation)
-            //Quaternion lookRot = Quaternion.LookRotation(_rb.linearVelocity);
-            
-            // 2. Add your offset to fix the "Sideways" mesh
-            // We apply the offset LOCAL to the look rotation
-            //transform.rotation = lookRot * Quaternion.Euler(modelRotationOffset);
+            Quaternion lookRot = Quaternion.LookRotation(_rb.linearVelocity);
+            transform.rotation = lookRot * Quaternion.Euler(modelRotationOffset);
         }
     }
 
@@ -84,7 +85,7 @@ public class HomingProjectile : MonoBehaviour
         }
     }
 
-    void MoveTowardsTarget()
+    void MoveTowardsTarget(float speed)
     {
         Vector3 targetPos;
         if (_targetEnemy != null && _targetEnemy.gameObject.activeInHierarchy)
@@ -98,15 +99,8 @@ public class HomingProjectile : MonoBehaviour
         }
 
         Vector3 direction = (targetPos - transform.position).normalized;
-        Vector3 newVelocity = Vector3.RotateTowards(_rb.linearVelocity, direction * homingSpeed, turnSpeed * Time.fixedDeltaTime, 10f);
-        _rb.linearVelocity = newVelocity.normalized * homingSpeed;
-        
-        // 1. Calculate where we are going (The "Physics" Rotation)
-        Quaternion lookRot = Quaternion.LookRotation(_rb.linearVelocity);
-            
-        // 2. Add your offset to fix the "Sideways" mesh
-        // We apply the offset LOCAL to the look rotation
-        transform.rotation = lookRot * Quaternion.Euler(modelRotationOffset);
+        Vector3 newVelocity = Vector3.RotateTowards(_rb.linearVelocity, direction * speed, turnSpeed * Time.fixedDeltaTime, 10f);
+        _rb.linearVelocity = newVelocity.normalized * speed;
     }
 
     void OnTriggerEnter(Collider other)
@@ -126,12 +120,17 @@ public class HomingProjectile : MonoBehaviour
 
         if (_towerData != null && _towerData.impactParticlePrefab != null)
         {
-            Instantiate(_towerData.impactParticlePrefab, position, Quaternion.identity);
+            // Scale particle effect for larger blasts?
+            GameObject vfx = Instantiate(_towerData.impactParticlePrefab, position, Quaternion.identity);
+            if (radiusMultiplier > 1.2f) vfx.transform.localScale *= radiusMultiplier; // Make explosion look bigger
         }
 
         if (_towerData != null)
         {
-            Collider[] hits = Physics.OverlapSphere(position, _towerData.explosionRadius);
+            // Calculate final radius
+            float finalRadius = _towerData.explosionRadius * radiusMultiplier;
+
+            Collider[] hits = Physics.OverlapSphere(position, finalRadius);
             foreach (Collider hit in hits)
             {
                 if (hit.CompareTag("Enemy"))
@@ -140,11 +139,11 @@ public class HomingProjectile : MonoBehaviour
                     if (enemy != null)
                     {
                         enemy.TakeExplosion(
-                            _towerData.damage, 
+                            _towerData.damage * damageMultiplier, // Apply Damage Mult
                             _attacker, 
                             position, 
                             _towerData.explosionForce, 
-                            _towerData.explosionRadius
+                            finalRadius // Apply Radius Mult
                         );
                     }
                 }

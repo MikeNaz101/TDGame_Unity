@@ -1,16 +1,15 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// A custom tower that fires in bursts (5s on, 5s off) and
-/// deals damage in a cone to enemies.
+/// A custom tower that fires in bursts and deals damage in a cone.
+/// Includes support for specific upgrades like Wider Flames and Burn DoT.
 /// </summary>
 public class Tower_Flamethrower : TowerController
 {
     [Header("Flamethrower Stats")]
     [Tooltip("The angle of the flame cone (e.g., 30 degrees).")]
-    [SerializeField] private float flameAngle = 30f;
+    public float flameAngle = 30f;
     
     [Header("Flamethrower Overheat")]
     [Tooltip("How long the tower fires for.")]
@@ -18,105 +17,93 @@ public class Tower_Flamethrower : TowerController
     [Tooltip("How long the tower must recharge after firing.")]
     [SerializeField] private float rechargeDuration = 5f;
 
-    [Header("Debug")]
-    [Tooltip("Enable this to see per-frame updates in the log.")]
-    [SerializeField] private bool _logSpammyUpdates = false;
+    [Header("Upgrades")]
+    public float burnDuration = 0f; // 0 = No burn, >0 = Seconds
+    public float burnDamage = 5f;   // Damage per second for the burn
 
-    // We store an array of ALL particle systems
-    private ParticleSystem[] allFlameParticles;
-
-    // New State Machine
+    // State Machine
     private enum FlameState { Ready, Firing, Recharging }
     private FlameState _flameState = FlameState.Ready;
-    private float _fireTimer = 0f;
-    private float _rechargeTimer = 0f;
+    private float _timer = 0f;
+
+    // Visuals
+    private ParticleSystem[] allFlameParticles;
 
     protected override void Awake()
     {
-        base.Awake(); // Calls TowerController.Awake()
+        base.Awake(); // Setup base tower logic
         
-        Debug.Log($"--- FLAMETHROWER AWAKE: {gameObject.name} ---");
-
+        // Find particles on the shoot point
         if (_shootPoint != null)
         {
-            Debug.Log($"[Awake] Found _shootPoint: {_shootPoint.name}");
-            
-            // Get ALL particle systems on the _shootPoint and all its children
-            allFlameParticles = _shootPoint.GetComponentsInChildren<ParticleSystem>(true); // 'true' includes inactive
-
-            if (allFlameParticles != null && allFlameParticles.Length > 0)
+            allFlameParticles = _shootPoint.GetComponentsInChildren<ParticleSystem>(true);
+            foreach (var ps in allFlameParticles)
             {
-                Debug.Log($"[Awake] SUCCESS: Found {allFlameParticles.Length} particle systems!");
-                
-                foreach (var ps in allFlameParticles)
-                {
-                    var main = ps.main;
-                    main.playOnAwake = false;
-                    main.loop = true; // We will control the loop
-                    ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                    Debug.Log($"[Awake] -- Configured {ps.name} to loop.");
-                }
-            }
-            else
-            {
-                Debug.LogError($"[Awake] FAILURE: No ParticleSystem components found on '{_shootPoint.name}' or any of its children!");
+                var main = ps.main;
+                main.loop = true;
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
         }
-        else
+    }
+
+    // --- UPGRADE LOGIC ---
+    protected override void ApplySpecificUpgrade(TowerUpgradeData upgrade)
+    {
+        switch (upgrade.effectType)
         {
-            Debug.LogError("[Awake] FAILURE: The '_shootPoint' is not assigned in the Inspector!");
+            case TowerUpgradeType.Flame_Width:
+                // Increase cone width by percentage (e.g. 0.5 = +50%)
+                flameAngle *= (1f + upgrade.effectValue); 
+                Debug.Log($"Flamethrower: Flames widened to {flameAngle} degrees!");
+                break;
+                
+            case TowerUpgradeType.Flame_BurnDot:
+                // Enable burning (value is duration, e.g. 5.0)
+                burnDuration = upgrade.effectValue; 
+                Debug.Log("Flamethrower: Napalm loaded!");
+                break;
         }
     }
 
     protected override void Update()
     {
+        // 1. Handle Target Logic (Base class)
         if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
         {
-            UpdateTarget(); 
-            if (_flameState == FlameState.Firing)
+            UpdateTarget();
+            // If still no target, stop firing (but don't reset recharge completely if currently recharging)
+            if (_currentTarget == null)
             {
-                if (_logSpammyUpdates) Debug.Log("[Update] Target lost while firing. Starting recharge.");
-                StartRecharge();
+                if (_flameState == FlameState.Firing) StopFiring();
+                return;
             }
         }
 
-        if (_currentTarget == null)
-        {
-            if (_logSpammyUpdates) Debug.Log("[Update] No target. Waiting.");
-            if (_flameState != FlameState.Recharging) StopFiringEffects();
-            return;
-        }
-
+        // 2. Aim
         AimAtTarget();
-        if (_logSpammyUpdates) Debug.Log($"[Update] Aiming at {_currentTarget.name}. Current state: {_flameState}");
-        
+
+        // 3. Firing State Machine
         switch (_flameState)
         {
             case FlameState.Ready:
-                if (_logSpammyUpdates) Debug.Log("[Update] State is Ready. Calling StartFiring().");
-                StartFiring();
+                // If we have a target, start blasting
+                if (_currentTarget != null) StartFiring();
                 break;
-                
+
             case FlameState.Firing:
-                _fireTimer -= Time.deltaTime;
-                if (_fireTimer <= 0f)
+                _timer -= Time.deltaTime;
+                ApplyFlameDamage(); // Deal damage every frame while firing
+                
+                if (_timer <= 0f)
                 {
-                    if (_logSpammyUpdates) Debug.Log("[Update] Firing timer up. Calling StartRecharge().");
                     StartRecharge();
                 }
-                else
-                {
-                    if (_logSpammyUpdates) Debug.Log($"[Update] Firing. Time left: {_fireTimer}");
-                    ApplyFlameDamage();
-                }
                 break;
-                
+
             case FlameState.Recharging:
-                _rechargeTimer -= Time.deltaTime;
-                if (_logSpammyUpdates) Debug.Log($"[Update] Recharging. Time left: {_rechargeTimer}");
-                if (_rechargeTimer <= 0f)
+                _timer -= Time.deltaTime;
+                if (_timer <= 0f)
                 {
-                    if (_logSpammyUpdates) Debug.Log("[Update] Recharge complete. Setting state to Ready.");
                     _flameState = FlameState.Ready;
                 }
                 break;
@@ -125,22 +112,15 @@ public class Tower_Flamethrower : TowerController
 
     private void StartFiring()
     {
-        Debug.Log("--- StartFiring() CALLED ---");
         _flameState = FlameState.Firing;
-        _fireTimer = fireDuration;
-        
-        if (allFlameParticles != null && allFlameParticles.Length > 0)
+        _timer = fireDuration;
+
+        if (allFlameParticles != null)
         {
-            Debug.Log($"[StartFiring] Playing all {allFlameParticles.Length} particle systems!");
-            foreach (var ps in allFlameParticles)
-            {
-                var main = ps.main;
-                main.loop = true; // Ensure loop is on
-                ps.Play();
-            }
+            foreach (var ps in allFlameParticles) ps.Play();
         }
         
-        if (_towerData.shootSound != null)
+        if (_towerData.shootSound && _audioSource)
         {
             _audioSource.clip = _towerData.shootSound;
             _audioSource.loop = true;
@@ -148,58 +128,121 @@ public class Tower_Flamethrower : TowerController
         }
     }
 
+    private void StopFiring()
+    {
+        // If we lose target mid-fire, we usually want to stop visuals 
+        // but maybe keep the heat (timer) running or switch to recharge.
+        if (_flameState == FlameState.Firing) 
+        {
+            StartRecharge();
+        }
+    }
+
     private void StartRecharge()
     {
-        Debug.Log("--- StartRecharge() CALLED ---");
         _flameState = FlameState.Recharging;
-        _rechargeTimer = rechargeDuration;
-        StopFiringEffects();
+        _timer = rechargeDuration;
+
+        if (allFlameParticles != null)
+        {
+            foreach (var ps in allFlameParticles) ps.Stop();
+        }
+
+        if (_audioSource.isPlaying) _audioSource.Stop();
     }
 
-    private void StopFiringEffects()
-    {
-        Debug.Log("--- StopFiringEffects() CALLED ---");
-        
-        if (allFlameParticles != null && allFlameParticles.Length > 0)
-        {
-            Debug.Log($"[StopFiringEffects] Stopping all {allFlameParticles.Length} particle systems.");
-            foreach (var ps in allFlameParticles)
-            {
-                var main = ps.main;
-                main.loop = false; // Turn loop off
-                ps.Stop();
-            }
-        }
-        
-        if (_audioSource.isPlaying)
-        {
-            _audioSource.Stop();
-        }
-    }
-    
     private void ApplyFlameDamage()
     {
-        if (_towerData == null) return;
+        // Calculate Damage per second
+        // Base Damage * Upgrade Mult * Global Mult
+        float dps = _towerData.damage * _damageMultiplier * _globalDamageMult;
         
-        float dps = _towerData.damage;
-        float range = _towerData.range;
-        
-        foreach (EnemyController enemy in _enemiesInRange)
+        // We iterate backwards to safely handle removals if an enemy dies
+        for (int i = _enemiesInRange.Count - 1; i >= 0; i--)
         {
-            if (enemy == null) continue;
+            EnemyController enemy = _enemiesInRange[i];
             
-            float dist = Vector3.Distance(_shootPoint.position, enemy.transform.position);
-            Vector3 dirToEnemy = (enemy.transform.position - _shootPoint.position).normalized;
-            float angleToEnemy = Vector3.Angle(_shootPoint.forward, dirToEnemy);
-
-            if (dist <= range && angleToEnemy <= (flameAngle / 2f))
+            if (enemy == null || !enemy.gameObject.activeInHierarchy)
             {
-                if (_logSpammyUpdates) Debug.Log($"[ApplyFlameDamage] Damaging {enemy.name}");
+                _enemiesInRange.RemoveAt(i);
+                continue;
+            }
+
+            // Check Cone Area
+            Vector3 dirToEnemy = (enemy.transform.position - _shootPoint.position).normalized;
+            float angle = Vector3.Angle(_shootPoint.forward, dirToEnemy);
+            float dist = Vector3.Distance(_shootPoint.position, enemy.transform.position);
+
+            // Get current range (Base * Multipliers)
+            // We can read the sphere collider radius since Base class updates it
+            float currentMaxRange = GetComponent<SphereCollider>().radius; 
+
+            if (dist <= currentMaxRange && angle <= (flameAngle / 2f))
+            {
+                // Deal Direct Fire Damage
                 enemy.TakeDamage(dps * Time.deltaTime, transform);
+
+                // Apply Burn DoT if unlocked
+                if (burnDuration > 0)
+                {
+                    ApplyBurn(enemy);
+                }
             }
         }
     }
 
-    protected override void TryFire() { }
-    protected override void Shoot() { }
+    private void ApplyBurn(EnemyController enemy)
+    {
+        // Check if enemy already has the burn component
+        BurnDebuff burn = enemy.GetComponent<BurnDebuff>();
+        if (burn == null)
+        {
+            burn = enemy.gameObject.AddComponent<BurnDebuff>();
+        }
+        
+        // Refresh/Apply duration
+        // Burn damage scales with your tower's damage upgrades too
+        burn.StartBurn(burnDuration, burnDamage * _damageMultiplier * _globalDamageMult);
+    }
+
+    // --- Override base methods we don't use ---
+    // We override these to be empty because we handle firing in Update()
+    protected override void TryFire() { } 
+    protected override void Shoot() { }   
+}
+
+// --- Nested Helper Component for DoT ---
+// This sits on the ENEMY and hurts them over time
+public class BurnDebuff : MonoBehaviour
+{
+    private float _timer;
+    private float _dps;
+    private EnemyController _target;
+
+    public void StartBurn(float duration, float damagePerSecond)
+    {
+        _timer = duration;
+        _dps = damagePerSecond;
+        if (_target == null) _target = GetComponent<EnemyController>();
+    }
+
+    void Update()
+    {
+        if (_timer > 0)
+        {
+            _timer -= Time.deltaTime;
+            if (_target != null && _target.gameObject.activeInHierarchy)
+            {
+                _target.TakeDamage(_dps * Time.deltaTime);
+            }
+            else
+            {
+                Destroy(this);
+            }
+        }
+        else
+        {
+            Destroy(this);
+        }
+    }
 }
