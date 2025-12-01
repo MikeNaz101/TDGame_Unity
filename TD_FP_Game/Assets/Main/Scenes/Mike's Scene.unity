@@ -2299,9 +2299,37 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 41382775111941983, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClick_OpenUpgrades
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346196354907563804, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: purchaseButton
+      value: 
+      objectReference: {fileID: 2013654811535337743, guid: 6f1f35bdb74f9f0499faa6b1238c4aa8, type: 3}
+    - target: {fileID: 2346196354907563804, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: buttonBaseScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346196354907563804, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: buttonBaseScale.z
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3281281594564700055, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3387314928946650841, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClick_Priority
+      objectReference: {fileID: 0}
+    - target: {fileID: 4955034543347966895, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -33.59
+      objectReference: {fileID: 0}
+    - target: {fileID: 4955034543347966895, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -28.5
       objectReference: {fileID: 0}
     - target: {fileID: 5676907677654854008, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2371,8 +2399,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7647891610778438037, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8842015070076918772, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClick_Sell
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5551027477120062507, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}

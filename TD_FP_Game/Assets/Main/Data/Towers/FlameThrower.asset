@@ -32,3 +32,8 @@ MonoBehaviour:
   fireRateBuff: 1
   damageBuff: 1
   enemySpeedDebuff: 1
+  upgradePaths:
+  - pathName: Hell Spawn
+    upgrades:
+    - {fileID: 11400000, guid: 39b49483de632ac428f7d100ca658055, type: 2}
+    - {fileID: 11400000, guid: f8a7c7d0d1e18f7418f7f2bcba0d034b, type: 2}

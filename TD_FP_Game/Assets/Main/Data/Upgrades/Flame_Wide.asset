@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9da0dafc983b184cbb388abde2e7b12, type: 3}
   m_Name: Flame_Wide
   m_EditorClassIdentifier: Assembly-CSharp::TowerUpgradeData
-  upgradeName: 
-  description: 
-  icon: {fileID: 0}
-  cost: 0
-  effectType: 0
-  effectValue: 0
+  upgradeName: Wide Flamage
+  description: Spread those flames everywhere!
+  icon: {fileID: 21300070, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  cost: 500
+  effectType: 4
+  effectValue: 0.5
