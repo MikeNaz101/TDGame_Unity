@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 585f5aee0c4742f4e93ec668f489abd7
+timeCreated: 1538623940
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/RailGun/Materials/RailGunMuzzleFlash.mat
+  uploadId: 290411

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ead5066617f6fea4294e60d14918bc5a
+timeCreated: 1548199084
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 36300000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/BridgeTestScene/OcclusionCullingData.asset
+  uploadId: 290411

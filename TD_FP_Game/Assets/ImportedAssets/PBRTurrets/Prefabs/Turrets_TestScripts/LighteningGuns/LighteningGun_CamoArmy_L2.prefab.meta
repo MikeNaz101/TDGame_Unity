@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1f1e725cf54ff9a46869b183d63a93c2
+timeCreated: 1542408259
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/LighteningGuns/LighteningGun_CamoArmy_L2.prefab
+  uploadId: 290411

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 031113c5cdb4f754fbf3706a85cb3093
+timeCreated: 1541440713
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Environment/Skyboxes/Night_Stary.mat
+  uploadId: 290411

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1a25317b360c7ae46bfeac8b55642be8
+timeCreated: 1547925989
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/CommonFiles/Shaders/ColorChange.shader
+  uploadId: 290411

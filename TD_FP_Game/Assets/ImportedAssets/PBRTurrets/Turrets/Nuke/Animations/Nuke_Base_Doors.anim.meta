@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f708f1d0b8d5dca458210eb0b1e8f391
+timeCreated: 1543095286
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/Nuke/Animations/Nuke_Base_Doors.anim
+  uploadId: 290411

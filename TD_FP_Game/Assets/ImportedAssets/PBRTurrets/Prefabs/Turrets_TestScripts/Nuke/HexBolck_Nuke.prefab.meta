@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5be4d6737701e0049a6097bc928c9a27
+timeCreated: 1543607048
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/Nuke/HexBolck_Nuke.prefab
+  uploadId: 290411

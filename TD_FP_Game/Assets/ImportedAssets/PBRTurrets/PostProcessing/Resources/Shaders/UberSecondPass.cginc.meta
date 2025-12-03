@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b6e42614562a56445ba4b5d90301f06f
+timeCreated: 1487080088
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/PostProcessing/Resources/Shaders/UberSecondPass.cginc
+  uploadId: 290411

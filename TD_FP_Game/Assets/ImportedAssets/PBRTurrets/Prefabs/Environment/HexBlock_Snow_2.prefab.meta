@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 994e45b74427b9842b48c22e936b6453
+timeCreated: 1541362472
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Environment/HexBlock_Snow_2.prefab
+  uploadId: 290411

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2c8f1635e4887064a9ca617b66d793e1
+timeCreated: 1542492410
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/Rockets/RocketLauncher_DigitalSnow_L1.prefab
+  uploadId: 290411

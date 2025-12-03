@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a606235b6daca73448bb449f9e7559be
+timeCreated: 1539739017
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/RailGuns/RailGun_CammoArmy_L1.prefab
+  uploadId: 290411

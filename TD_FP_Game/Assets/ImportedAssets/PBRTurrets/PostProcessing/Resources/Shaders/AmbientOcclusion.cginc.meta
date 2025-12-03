@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 447591ee3d9d4204899be5fe25968ea0
+timeCreated: 1473323470
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/PostProcessing/Resources/Shaders/AmbientOcclusion.cginc
+  uploadId: 290411

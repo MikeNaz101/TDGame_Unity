@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 564bdf5fcd1761e41abd197dfa62fba0
+timeCreated: 1541461124
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/CommonFiles/Scripts/EnemyMovement.cs
+  uploadId: 290411

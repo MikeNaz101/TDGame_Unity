@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5009982b33c4a004792b54e43594d022
+timeCreated: 1542620691
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Environment/HexBlock_AlienRock_3.prefab
+  uploadId: 290411

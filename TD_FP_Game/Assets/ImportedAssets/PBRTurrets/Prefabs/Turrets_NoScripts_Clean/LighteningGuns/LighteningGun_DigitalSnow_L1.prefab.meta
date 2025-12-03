@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8f0d91e360482e24589e83bfaeb6f83c
+timeCreated: 1542492382
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_NoScripts_Clean/LighteningGuns/LighteningGun_DigitalSnow_L1.prefab
+  uploadId: 290411

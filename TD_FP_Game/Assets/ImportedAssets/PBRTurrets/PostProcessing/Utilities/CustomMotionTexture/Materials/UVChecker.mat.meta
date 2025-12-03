@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 944463113244f4bf8b05c1757cd838a4
+timeCreated: 1487340121
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/PostProcessing/Utilities/CustomMotionTexture/Materials/UVChecker.mat
+  uploadId: 290411

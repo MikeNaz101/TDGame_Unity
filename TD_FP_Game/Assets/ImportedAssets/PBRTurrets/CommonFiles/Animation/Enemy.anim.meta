@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 565f7aa4c4cc5f9418e85d10cd0ad28e
+timeCreated: 1538334609
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/CommonFiles/Animation/Enemy.anim
+  uploadId: 290411

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: cc7b9f23c20c5a94d88bce2b27aa7103
+timeCreated: 1538425384
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/GatelingGuns/GatelingGun_ColorChanging_L3.prefab
+  uploadId: 290411

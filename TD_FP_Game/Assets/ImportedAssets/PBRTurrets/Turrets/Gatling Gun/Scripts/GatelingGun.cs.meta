@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 894c0bdffaec1ef4a9a44e1b6cfe39c5
+timeCreated: 1537904067
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/Gatling Gun/Scripts/GatelingGun.cs
+  uploadId: 290411
