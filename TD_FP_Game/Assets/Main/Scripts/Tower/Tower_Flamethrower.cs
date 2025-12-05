@@ -67,14 +67,16 @@ public class Tower_Flamethrower : TowerController
 
     protected override void Update()
     {
-        // 1. Handle Target Logic (Base class)
         if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
         {
             UpdateTarget();
-            // If still no target, stop firing (but don't reset recharge completely if currently recharging)
             if (_currentTarget == null)
             {
                 if (_flameState == FlameState.Firing) StopFiring();
+                
+                // --- FIX: Call the scan ---
+                PerformIdleScan(); 
+                // --------------------------
                 return;
             }
         }

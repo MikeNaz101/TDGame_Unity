@@ -191,10 +191,32 @@ public class PC_UI_Manager : MonoBehaviour
 
     private void UpdateWeaponListUI()
     {
-        if (UpgradeManager.Instance == null || _playerStats == null) return;
+        // 1. Check Global Managers
+        if (UpgradeManager.Instance == null || _playerStats == null) 
+        {
+            Debug.LogWarning("UpdateWeaponListUI: Managers missing.");
+            return;
+        }
+
+        // 2. Check Rows Array
+        if (weaponRows == null)
+        {
+            Debug.LogWarning("UpdateWeaponListUI: Weapon Rows array is null.");
+            return;
+        }
 
         foreach (var row in weaponRows)
         {
+            // 3. Check Row Object
+            if (row == null) continue;
+
+            // 4. Check UI Elements inside Row
+            if (row.selectButton == null || row.purchaseButton == null)
+            {
+                Debug.LogWarning($"UpdateWeaponListUI: Missing button ref for {row.weaponName}");
+                continue;
+            }
+
             bool isOwned = UpgradeManager.Instance.IsWeaponUnlocked(row.weaponName);
             int cost = UpgradeManager.Instance.GetWeaponUnlockCost(row.weaponName);
 
@@ -204,34 +226,38 @@ public class PC_UI_Manager : MonoBehaviour
             if (isOwned)
             {
                 // OWNED STATE
-                row.selectButtonImage.color = Color.white; 
-                row.selectButton.interactable = true; // Selectable
+                if(row.selectButtonImage) row.selectButtonImage.color = Color.white; 
+                row.selectButton.interactable = true;
                 
                 var buyTxt = row.purchaseButton.GetComponentInChildren<TMP_Text>();
-                if(buyTxt) buyTxt.text = "Already Owned!"; // Requested Text
+                if(buyTxt) buyTxt.text = "Already Purchased"; 
                 row.purchaseButton.interactable = false; 
 
-                row.infoText.text = ""; 
+                if(row.infoText) row.infoText.text = ""; 
             }
             else
             {
                 // UNOWNED STATE
-                row.selectButtonImage.color = Color.gray; 
-                row.selectButton.interactable = true; // Keep 'interactable' for visuals, but logic blocks it below
+                if(row.selectButtonImage) row.selectButtonImage.color = Color.gray; 
+                row.selectButton.interactable = false; 
 
-                // Update Button Text
                 var buyTxt = row.purchaseButton.GetComponentInChildren<TMP_Text>();
-                if(buyTxt) buyTxt.text = $"Purchase Weapon\nCost: {cost}"; // Requested Text
+                // Match User Request: "Purchase for (cost)"
+                if(buyTxt) buyTxt.text = $"Purchase for {cost}";
+                
                 row.purchaseButton.interactable = true;
 
-                if (_playerStats.scrapMetal < cost)
+                if(row.infoText)
                 {
-                    row.infoText.text = "Insufficient Funds";
-                    row.infoText.color = Color.red;
-                }
-                else
-                {
-                    row.infoText.text = ""; 
+                    if (_playerStats.scrapMetal < cost)
+                    {
+                        row.infoText.text = "Insufficient Funds";
+                        row.infoText.color = Color.red;
+                    }
+                    else
+                    {
+                        row.infoText.text = ""; 
+                    }
                 }
             }
         }
@@ -262,13 +288,11 @@ public class PC_UI_Manager : MonoBehaviour
 
         string weaponName = weaponRows[rowIndex].weaponName;
 
-        // --- FIX: PREVENT SELECTION IF NOT OWNED ---
         if (!UpgradeManager.Instance.IsWeaponUnlocked(weaponName))
         {
             Type("Access Denied: Weapon not owned.");
             return;
         }
-        // -------------------------------------------
 
         _selectedWeaponName = weaponName;
         
@@ -345,7 +369,6 @@ public class PC_UI_Manager : MonoBehaviour
         }
         else 
         {
-            // Requested Format
             txt.text = $"{desc} (Lvl {path.currentLevel})\nCost: {path.GetCost()}";
         }
     }

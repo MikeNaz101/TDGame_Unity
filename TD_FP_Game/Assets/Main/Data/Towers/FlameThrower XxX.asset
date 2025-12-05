@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b6dcc75fa6bc694bb16d405aefadc6e, type: 3}
-  m_Name: FlameThrower
+  m_Name: FlameThrower XxX
   m_EditorClassIdentifier: Assembly-CSharp::TowerData
-  towerName: FlameThrower
+  towerName: FlameThrowerXXX
   description: Spawner of Hell Fire!
   towerIcon: {fileID: 21300128, guid: 09e4c6a7d75923945afe43953ef58ad2, type: 3}
-  towerPrefab: {fileID: 4376194662093663467, guid: 692ce84a82395b44995068c79dcb05e7, type: 3}
+  towerPrefab: {fileID: 5475272149610925407, guid: d29ff7f1ab40c944097ec72a1ebb8b58, type: 3}
   scrapCost: 10
   attackType: 0
   projectilePrefab: {fileID: 8764043878647920493, guid: c4ed38c72957f2241ad144a1614956d9, type: 3}
   damage: 25
   fireRate: 0
-  range: 5
+  range: 10
   isExplosive: 0
   explosionRadius: 3
   explosionForce: 500
