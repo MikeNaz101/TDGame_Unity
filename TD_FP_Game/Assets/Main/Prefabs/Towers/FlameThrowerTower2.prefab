@@ -877,16 +877,16 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.496
+  m_Volume: 0.233
   m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 54
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 40
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -921,7 +921,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -979,14 +979,14 @@ MonoBehaviour:
   _towerRenderer: {fileID: 213598914516706938}
   _materialIndex: 0
   _emissionColor: {r: 1, g: 0.32455224, b: 0, a: 1}
-  _maxEmissionIntensity: 10
+  _maxEmissionIntensity: 50
   _targetingPriority: 0
   _aimSpeed: 5
   _aimTolerance: 3
   _idleScanSpeed: 1
   _idleScanAngle: 45
   _resetToForward: 0
-  flameAngle: 30
+  flameAngle: 45
   fireDuration: 10
   rechargeDuration: 3
   burnDuration: 0
@@ -1180,6 +1180,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6533005868664965544}
     m_Modifications:
+    - target: {fileID: 2150731608300640629, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 24.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2151269049435718871, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 2239910383286875957, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
       propertyPath: m_LocalScale.x
       value: 2.0272954
@@ -1190,7 +1198,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2239910383286875957, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7297785
+      value: 0.87675595
       objectReference: {fileID: 0}
     - target: {fileID: 2239910383286875957, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1198,11 +1206,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2239910383286875957, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.0000000085626
       objectReference: {fileID: 0}
     - target: {fileID: 2239910383286875957, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.13228
       objectReference: {fileID: 0}
     - target: {fileID: 2239910383286875957, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1236,9 +1244,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: CFXR Fire Breath
       objectReference: {fileID: 0}
+    - target: {fileID: 7794191290981701263, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
+      propertyPath: animatedLights.Array.data[0].intensityStart
+      value: 26.05
+      objectReference: {fileID: 0}
     - target: {fileID: 9121285593199061912, guid: fc2aaae0ed5422847b26d9b1d4771e44, type: 3}
       propertyPath: m_Intensity
-      value: 0
+      value: 16.025167
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -33,16 +33,19 @@ public class Tower_LightningGun : TowerController
     {
         base.Awake();
         
+        // FIX: Don't disable the game object. 
+        // Just make sure it's in Manual Mode so it doesn't fire until we say so.
         if (downwardLightning != null)
         {
             downwardLightning.ManualMode = true;
-            downwardLightning.gameObject.SetActive(false);
+            // We can disable the LineRenderer to hide it initially
+            var lr = downwardLightning.GetComponent<LineRenderer>();
+            if(lr != null) lr.enabled = false;
         }
 
         // Initialize Charge Particles
         if (chargeParticles != null)
         {
-            // Ensure it's not playing on awake
             chargeParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             var main = chargeParticles.main;
             main.startSize = 0.1f; 
@@ -61,17 +64,13 @@ public class Tower_LightningGun : TowerController
                 PerformIdleScan(); 
                 RotateBlades(0.2f);
                 
-                // If we lose target, stop charging immediately
                 if (_isCharging) ResetChargeEffect();
                 return;
             }
         }
 
         AimAtTarget(); 
-        
-        // Handle Charge Visuals while we have a target
         HandleChargeEffect();
-
         TryFire();
         RotateBlades(1.0f); 
     }
@@ -80,31 +79,23 @@ public class Tower_LightningGun : TowerController
     {
         if (chargeParticles == null) return;
 
-        // Start playing if not already
         if (!_isCharging)
         {
             _isCharging = true;
             chargeParticles.Play();
         }
 
-        // Calculate charge progress based on cooldown
-        // If cooldown is 0, we are at 100% charge (max size)
-        // If cooldown is full, we are at 0% charge
         float chargePercent = 1.0f;
-        
         if (_towerData != null && _towerData.fireRate > 0)
         {
             float totalRate = _towerData.fireRate / _fireRateMultiplier;
-            // Prevent divide by zero if rate is super fast
             if(totalRate > 0.01f)
             {
                 chargePercent = 1.0f - Mathf.Clamp01(_fireCooldown / totalRate);
             }
         }
 
-        // Apply size
         var main = chargeParticles.main;
-        // Use curve mode for smoother visual if needed, but constant is fine for frame updates
         main.startSize = Mathf.Lerp(0.1f, maxChargeSize, chargePercent);
     }
 
@@ -130,8 +121,6 @@ public class Tower_LightningGun : TowerController
             
             float finalFireRate = _towerData.fireRate / (_fireRateMultiplier);
             _fireCooldown = finalFireRate;
-            
-            // Visual reset happens here
             ResetChargeEffect(); 
         }
     }
@@ -148,11 +137,9 @@ public class Tower_LightningGun : TowerController
 
             if (downwardLightning != null)
             {
-                downwardLightning.gameObject.SetActive(true);
-                
-                // IMPORTANT: Wait one frame for the LightningBoltScript Start() to run
-                // if it hasn't already. This prevents NullReferenceException.
-                yield return null; 
+                // Enable the Line Renderer so it can be seen
+                var lr = downwardLightning.GetComponent<LineRenderer>();
+                if(lr != null) lr.enabled = true;
                 
                 downwardLightning.StartObject = null;
                 downwardLightning.EndObject = null;
@@ -163,6 +150,7 @@ public class Tower_LightningGun : TowerController
                 downwardLightning.StartPosition = skyPos;
                 downwardLightning.EndPosition = enemyPos;
                 
+                // Fire!
                 downwardLightning.Trigger(); 
             }
 
@@ -173,9 +161,15 @@ public class Tower_LightningGun : TowerController
                 StartCoroutine(ParalyzeEnemy(target));
             }
             
+            // Wait for duration of bolt
             yield return new WaitForSeconds(0.2f);
             
-            if (downwardLightning != null) downwardLightning.gameObject.SetActive(false);
+            // Hide it again
+            if (downwardLightning != null)
+            {
+                var lr = downwardLightning.GetComponent<LineRenderer>();
+                if(lr != null) lr.enabled = false;
+            }
         }
     }
 

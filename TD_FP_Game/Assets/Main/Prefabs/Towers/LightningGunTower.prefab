@@ -598,8 +598,8 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.332
-  m_Pitch: 1
+  m_Volume: 0.364
+  m_Pitch: 0.91
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -929,16 +929,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StartObject: {fileID: 1612242790093615672}
-  StartPosition: {x: 0, y: 0, z: 0}
+  StartPosition: {x: 0, y: 20, z: 0}
   EndObject: {fileID: 1341096301928321186}
   EndPosition: {x: 0, y: 0, z: 0}
-  Generations: 6
+  Generations: 5
   Duration: 0.264
   ChaosFactor: 0.382
-  ManualMode: 1
+  ManualMode: 0
   Rows: 1
-  Columns: 5
-  AnimationMode: 1
+  Columns: 1
+  AnimationMode: 0
 --- !u!1 &8139344190304998225
 GameObject:
   m_ObjectHideFlags: 0
