@@ -605,7 +605,7 @@ Transform:
   m_GameObject: {fileID: 6350358148800186739}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 29.371572, y: 0.000000059604645, z: 32.2901}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.43432, y: 0.43432, z: 0.43432}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -635,8 +635,8 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -694,9 +694,9 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
+  m_PlayOnAwake: 0
+  m_Volume: 0.5
+  m_Pitch: 0.72
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -704,7 +704,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 60
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -739,7 +739,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -794,6 +794,10 @@ MonoBehaviour:
   _turretBase: {fileID: 773849601657766539}
   _barrel: {fileID: 4734425063361947319}
   _shootPoint: {fileID: 1762381068219548812}
+  _towerRenderer: {fileID: 6596484898789295003}
+  _materialIndex: 0
+  _emissionColor: {r: 1, g: 0.38365346, b: 0, a: 1}
+  _maxEmissionIntensity: 10
   _targetingPriority: 0
   _aimSpeed: 1
   _aimTolerance: 3

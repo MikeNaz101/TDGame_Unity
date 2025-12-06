@@ -1,25 +1,38 @@
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class SlowHomingRocket : MonoBehaviour
 {
     [Header("Flight Characteristics")]
-    public float moveSpeed = 5f;         // Slow fly speed
-    public float turnSpeed = 2.0f;       // How fast it can turn (Radians/sec)
-    public float lifetime = 5.0f;        // Explode after 5 seconds
+    public float moveSpeed = 5f;         
+    public float turnSpeed = 5.0f;       
+    public float lifetime = 5.0f;        
     
     [Header("Visuals")]
-    public GameObject engineParticles;   // Trail effect
+    public GameObject engineParticles;   
+    public Vector3 modelRotationOffset; 
+
+    [Header("Audio")]
+    public AudioClip flightLoopSound;
+    public AudioClip explosionSound;
+
+    // Multipliers set by Tower
+    [HideInInspector] public float speedMultiplier = 1f;
+    [HideInInspector] public float radiusMultiplier = 1f;
+    [HideInInspector] public float damageMultiplier = 1f;
 
     private TowerData _data;
     private Transform _target;
-    private Transform _attacker; // The tower that shot this
+    private Transform _attacker; 
     private bool _isLaunched = false;
     private Vector3 _lastKnownTargetPos;
+    private AudioSource _audioSource;
 
     public void Initialize(TowerData data, EnemyController target, Transform attacker)
     {
         _data = data;
         _attacker = attacker;
+        _audioSource = GetComponent<AudioSource>();
         
         if (target != null)
         {
@@ -27,11 +40,9 @@ public class SlowHomingRocket : MonoBehaviour
             _lastKnownTargetPos = _target.position;
         }
 
-        // Disable collision while sitting on the launcher
         Collider col = GetComponent<Collider>();
         if(col) col.enabled = false;
         
-        // Disable engine particles initially
         if (engineParticles != null) engineParticles.SetActive(false);
     }
 
@@ -39,16 +50,20 @@ public class SlowHomingRocket : MonoBehaviour
     {
         _isLaunched = true;
         
-        // Enable collision
         Collider col = GetComponent<Collider>();
         if(col) col.enabled = true;
 
-        // Enable engine trail
         if (engineParticles != null) engineParticles.SetActive(true);
 
-        // Start the countdown for auto-detonation
-        //Destroy(gameObject, lifetime);
-        // Also invoke explosion logic if lifetime ends (Unity Destroy doesn't call custom logic)
+        // --- NEW: Play Flight Sound ---
+        if (_audioSource != null && flightLoopSound != null)
+        {
+            _audioSource.clip = flightLoopSound;
+            _audioSource.loop = true;
+            _audioSource.Play();
+        }
+        // ------------------------------
+
         Invoke("TimeOutExplosion", lifetime);
     }
 
@@ -56,34 +71,33 @@ public class SlowHomingRocket : MonoBehaviour
     {
         if (!_isLaunched) return;
 
-        // 1. Determine where we want to go
+        float currentSpeed = moveSpeed * speedMultiplier;
+
         Vector3 targetPos;
         if (_target != null)
         {
-            targetPos = _target.position; //+ Vector3.up; // Aim slightly up for center mass
+            targetPos = _target.position + Vector3.up; 
             _lastKnownTargetPos = targetPos;
         }
         else
         {
-            targetPos = _lastKnownTargetPos; // Target dead/gone, fly to last spot
+            targetPos = _lastKnownTargetPos; 
         }
 
-        // 2. Calculate Smooth Turn
         Vector3 directionToTarget = targetPos - transform.position;
-        
-        // RotateTowards gives us the smooth turn effect
         Vector3 newDirection = Vector3.RotateTowards(transform.forward, directionToTarget, turnSpeed * Time.deltaTime, 0.0f);
         
-        // Apply Rotation
-        transform.rotation = Quaternion.LookRotation(newDirection);
+        if (newDirection != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(newDirection) * Quaternion.Euler(modelRotationOffset);
+        }
 
-        // 3. Move Forward
-        transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        transform.position += newDirection.normalized * currentSpeed * Time.deltaTime;
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (!_isLaunched) return; // Don't explode if sitting on the launcher
+        if (!_isLaunched) return; 
 
         if (other.CompareTag("Enemy") || other.gameObject.layer == LayerMask.NameToLayer("Default"))
         {
@@ -98,30 +112,44 @@ public class SlowHomingRocket : MonoBehaviour
 
     void Explode()
     {
-        CancelInvoke("TimeOutExplosion"); // Stop the timer check
+        CancelInvoke("TimeOutExplosion"); 
 
-        // 1. Visuals
-        if (_data.impactParticlePrefab != null)
+        // --- NEW: Play Explosion Sound ---
+        // We create a temporary audio source at the location because this object is about to be destroyed
+        if (explosionSound != null)
         {
-            Instantiate(_data.impactParticlePrefab, transform.position, Quaternion.identity);
+            AudioSource.PlayClipAtPoint(explosionSound, transform.position);
+        }
+        // ---------------------------------
+
+        if (_data != null && _data.impactParticlePrefab != null)
+        {
+            GameObject vfx = Instantiate(_data.impactParticlePrefab, transform.position, Quaternion.identity);
+            // Scale explosion visual based on upgrade
+            if (radiusMultiplier > 1.0f) vfx.transform.localScale *= radiusMultiplier;
         }
 
-        // 2. Area Damage
-        Collider[] hits = Physics.OverlapSphere(transform.position, _data.explosionRadius);
-        foreach (Collider hit in hits)
+        if (_data != null)
         {
-            if (hit.CompareTag("Enemy"))
+            float finalRadius = _data.explosionRadius * radiusMultiplier;
+            float finalDamage = _data.damage * damageMultiplier;
+
+            Collider[] hits = Physics.OverlapSphere(transform.position, finalRadius);
+            foreach (Collider hit in hits)
             {
-                EnemyController enemy = hit.GetComponent<EnemyController>();
-                if (enemy != null)
+                if (hit.CompareTag("Enemy"))
                 {
-                    enemy.TakeExplosion(
-                        _data.damage, 
-                        _attacker, 
-                        transform.position, 
-                        _data.explosionForce, 
-                        _data.explosionRadius
-                    );
+                    EnemyController enemy = hit.GetComponent<EnemyController>();
+                    if (enemy != null)
+                    {
+                        enemy.TakeExplosion(
+                            finalDamage, 
+                            _attacker, 
+                            transform.position, 
+                            _data.explosionForce, 
+                            finalRadius
+                        );
+                    }
                 }
             }
         }

@@ -20,6 +20,19 @@ public class TowerController : MonoBehaviour
     [SerializeField] private Transform _barrel;
     [SerializeField] public Transform _shootPoint;
     
+    // --- UPDATED: MUZZLE FLASH ---
+    // Changed to private/hidden because we auto-find it now.
+    // If you prefer manual assignment, add [SerializeField] back.
+    protected ParticleSystem _muzzleFlash;
+    // -----------------------------
+
+    // --- VISUALS ---
+    [Header("Visuals")]
+    [SerializeField] private Renderer _towerRenderer;
+    [SerializeField] private int _materialIndex = 0;
+    [SerializeField] private Color _emissionColor = Color.cyan;
+    [SerializeField] private float _maxEmissionIntensity = 2.0f;
+    
     [Header("Targeting")]
     [SerializeField] private TargetingPriority _targetingPriority = TargetingPriority.First;
 
@@ -27,20 +40,14 @@ public class TowerController : MonoBehaviour
     [SerializeField] private float _aimSpeed = 10f;
     [SerializeField] private float _aimTolerance = 3f;
 
-    // --- NEW: IDLE SCAN SETTINGS ---
     [Header("Idle Behavior")]
-    [Tooltip("How fast it scans left/right.")]
     [SerializeField] private float _idleScanSpeed = 1.0f;
-    [Tooltip("How wide the scan angle is (in degrees).")]
     [SerializeField] private float _idleScanAngle = 45f;
-    [Tooltip("If true, the turret resets to forward before scanning.")]
     [SerializeField] private bool _resetToForward = true;
     
-    // Internal Idle State
     private Quaternion _initialBaseRotation;
-    private Quaternion _initialBarrelRotation; // NEW: Store initial barrel rotation
-    private float _idleTimer;
-    private float _randomOffset; // NEW: Random start time offset
+    private Quaternion _initialBarrelRotation; 
+    private float _randomOffset; 
 
     // --- Public Properties ---
     public string TowerName { get; private set; }
@@ -55,13 +62,13 @@ public class TowerController : MonoBehaviour
     protected LineRenderer _hitscanTracer;
     protected PlayerStats _playerStats;
     protected Transform _playerTarget;
+    protected Material _targetMaterial; 
 
     // --- Target & State ---
     protected List<EnemyController> _enemiesInRange = new List<EnemyController>();
     protected EnemyController _currentTarget;
     protected float _fireCooldown = 0f;
     
-    // Multipliers
     protected float _fireRateMultiplier = 1f; 
     protected float _damageMultiplier = 1f;   
     protected float _rangeMultiplier = 1f;
@@ -89,18 +96,29 @@ public class TowerController : MonoBehaviour
             _playerStats = playerObj.GetComponent<PlayerStats>();
         }
 
-        // Store initial rotations for scanning logic
-        if (_turretBase != null)
-        {
-            _initialBaseRotation = _turretBase.rotation;
-        }
-        if (_barrel != null)
-        {
-            _initialBarrelRotation = _barrel.localRotation;
-        }
+        if (_turretBase != null) _initialBaseRotation = _turretBase.rotation;
+        if (_barrel != null) _initialBarrelRotation = _barrel.localRotation;
         
-        // Generate random offset for idle animation
         _randomOffset = Random.Range(0f, 100f);
+
+        // --- Setup Material ---
+        if (_towerRenderer != null)
+        {
+            _targetMaterial = _towerRenderer.materials[_materialIndex];
+            _targetMaterial.EnableKeyword("_EMISSION"); 
+        }
+
+        // --- NEW: AUTO-FIND MUZZLE FLASH ---
+        if (_shootPoint != null)
+        {
+            // Look for a particle system on the ShootPoint or its immediate children
+            _muzzleFlash = _shootPoint.GetComponentInChildren<ParticleSystem>();
+            if (_muzzleFlash != null)
+            {
+                _muzzleFlash.Stop(); // Ensure it doesn't play on start
+            }
+        }
+        // -----------------------------------
     }
 
     protected virtual void Start()
@@ -151,9 +169,30 @@ public class TowerController : MonoBehaviour
 
     protected virtual void ApplySpecificUpgrade(TowerUpgradeData upgrade) { }
 
+    protected void PerformIdleScan()
+    {
+        if (_turretBase == null || _barrel == null) return;
+
+        float time = Time.time + _randomOffset;
+
+        // 1. Pan Left/Right (Y-Axis)
+        float sineY = Mathf.Sin(time * _idleScanSpeed);
+        float angleY = sineY * _idleScanAngle;
+        Quaternion targetBaseRot = _initialBaseRotation * Quaternion.Euler(0f, angleY, 0f);
+        _turretBase.rotation = Quaternion.RotateTowards(_turretBase.rotation, targetBaseRot, _aimSpeed * Time.deltaTime * 5f);
+
+        // 2. Pan Up/Down (X-Axis)
+        float cosineX = Mathf.Cos(time * _idleScanSpeed * 0.7f); 
+        float angleX = cosineX * 15f; 
+        Quaternion targetBarrelRot = _initialBarrelRotation * Quaternion.Euler(angleX, 0f, 0f);
+        _barrel.localRotation = Quaternion.RotateTowards(_barrel.localRotation, targetBarrelRot, _aimSpeed * Time.deltaTime * 5f);
+    }
+
     protected virtual void Update()
     {
         if (_fireCooldown > 0) _fireCooldown -= Time.deltaTime;
+
+        UpdateEmission();
 
         if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
         {
@@ -171,32 +210,15 @@ public class TowerController : MonoBehaviour
         }
     }
 
-    protected void PerformIdleScan()
+    protected void UpdateEmission()
     {
-        if (_turretBase == null || _barrel == null) return;
+        if (_targetMaterial == null || _towerData == null) return;
 
-        // Use Time.time + _randomOffset to desynchronize the towers
-        float time = Time.time + _randomOffset;
-
-        // 1. Pan Left/Right (Y-Axis) - Applied to BASE
-        // Sine wave between -1 and 1 based on time and speed
-        float sineY = Mathf.Sin(time * _idleScanSpeed);
-        float angleY = sineY * _idleScanAngle;
-        
-        // Rotate base relative to initial rotation
-        Quaternion targetBaseRot = _initialBaseRotation * Quaternion.Euler(0f, angleY, 0f);
-        _turretBase.rotation = Quaternion.RotateTowards(_turretBase.rotation, targetBaseRot, _aimSpeed * Time.deltaTime * 5f);
-
-        // 2. Pan Up/Down (X-Axis) - Applied to BARREL
-        // We use Cosine so the movement is offset from the horizontal scan (figure-8 pattern)
-        // We use a smaller angle (e.g., 15 degrees) so it doesn't look at the floor/sky
-        float cosineX = Mathf.Cos(time * _idleScanSpeed * 0.7f); // Different speed for variety
-        float angleX = cosineX * 15f; 
-
-        // Apply rotation relative to initial barrel rotation
-        // Important: Use localRotation because barrel is a child of base
-        Quaternion targetBarrelRot = _initialBarrelRotation * Quaternion.Euler(angleX, 0f, 0f);
-        _barrel.localRotation = Quaternion.RotateTowards(_barrel.localRotation, targetBarrelRot, _aimSpeed * Time.deltaTime * 5f);
+        float finalFireRate = _towerData.fireRate / _fireRateMultiplier;
+        float chargePercent = 1.0f - Mathf.Clamp01(_fireCooldown / finalFireRate);
+        float currentIntensity = chargePercent * _maxEmissionIntensity;
+        Color finalColor = _emissionColor * currentIntensity;
+        _targetMaterial.SetColor("_EmissionColor", finalColor);
     }
 
     protected void UpdateTarget()
@@ -223,7 +245,7 @@ public class TowerController : MonoBehaviour
 
         Vector3 targetPosition = _currentTarget.transform.position;
 
-        // --- 1. Turret Base Rotation (Y-Axis / Left-Right) ---
+        // 1. Turret Base
         Vector3 targetPosFlattened = new Vector3(targetPosition.x, _turretBase.position.y, targetPosition.z);
         Vector3 dirToTargetFlat = (targetPosFlattened - _turretBase.position).normalized;
         
@@ -233,7 +255,7 @@ public class TowerController : MonoBehaviour
             _turretBase.rotation = Quaternion.RotateTowards(_turretBase.rotation, lookRotBase, _aimSpeed * Time.deltaTime * 50f); 
         }
 
-        // --- 2. Barrel Rotation (X-Axis / Up-Down) ---
+        // 2. Barrel
         Vector3 dirToTarget = (targetPosition - _barrel.position).normalized;
         Quaternion lookRotBarrel = Quaternion.LookRotation(dirToTarget);
         Quaternion localTargetRot = Quaternion.Inverse(_barrel.parent.rotation) * lookRotBarrel;
@@ -262,6 +284,13 @@ public class TowerController : MonoBehaviour
 
     protected virtual void Shoot()
     {
+        // --- PLAY FLASH ---
+        if (_muzzleFlash != null)
+        {
+            _muzzleFlash.Play();
+        }
+        // ------------------
+
         if (_towerData.shootSound != null) _audioSource.PlayOneShot(_towerData.shootSound);
 
         float totalDmgMult = _damageMultiplier * _upgradeMultiplier * _globalDamageMult;
@@ -283,11 +312,9 @@ public class TowerController : MonoBehaviour
                 pScript.damageMultiplier = totalDmgMult;
             }
             
-            // Homing Logic Support
             var homing = proj.GetComponent<HomingProjectile>();
             if(homing) homing.Initialize(_towerData, transform, _currentTarget);
             
-            // Rocket Logic Support
             var slowRocket = proj.GetComponent<SlowHomingRocket>();
             if(slowRocket) { 
                 slowRocket.Initialize(_towerData, _currentTarget, transform); 

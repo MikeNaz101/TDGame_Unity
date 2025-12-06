@@ -3,18 +3,42 @@ using System.Collections;
 
 public class Tower_RocketLauncher : TowerController
 {
-    [Header("Rocket Settings")]
-    [Tooltip("How long the rocket sits visible on the launcher before firing.")]
+    [Header("Rocket Launcher Settings")]
+    [Tooltip("Time to prepare rocket before launch.")]
     public float prepareTime = 1.0f;
 
+    [Tooltip("Assign multiple points here to cycle through them (e.g. Left, Right). If empty, uses default ShootPoint.")]
+    public Transform[] alternateFirePoints;
+
+    // --- NEW: Launch Sound ---
+    [Header("Audio")]
+    public AudioClip launchSound; 
+    // -------------------------
+
+    // Specific Multipliers
+    private float _rocketSpeedMult = 1f;
+    private float _blastRadiusMult = 1f;
     private bool _isReloading = false;
+    private int _currentFirePointIndex = 0;
+
+    protected override void ApplySpecificUpgrade(TowerUpgradeData upgrade)
+    {
+        switch (upgrade.effectType)
+        {
+            case TowerUpgradeType.Rocket_Speed:
+                _rocketSpeedMult += upgrade.effectValue; 
+                Debug.Log($"Rocket: Speed boosted to {_rocketSpeedMult}x");
+                break;
+            case TowerUpgradeType.Rocket_BlastRadius:
+                _blastRadiusMult += upgrade.effectValue; 
+                Debug.Log($"Rocket: Radius boosted to {_blastRadiusMult}x");
+                break;
+        }
+    }
 
     protected override void TryFire()
     {
-        // If we are already in the middle of the firing sequence or cooldown, do nothing
         if (_isReloading || _fireCooldown > 0 || _currentTarget == null) return;
-
-        // Start the unique firing sequence
         StartCoroutine(FireSequence());
     }
 
@@ -22,51 +46,57 @@ public class Tower_RocketLauncher : TowerController
     {
         _isReloading = true;
 
-        // 1. Instantiate the rocket VISUALLY at the shoot point
-        // We parent it to the shootPoint so it rotates with the turret while aiming
         if (_towerData.projectilePrefab != null)
         {
-            GameObject rocketObj = Instantiate(_towerData.projectilePrefab, _shootPoint.position, _shootPoint.rotation, _shootPoint);
+            // 1. Determine which point to use
+            Transform currentPoint = _shootPoint; // Default
+            
+            if (alternateFirePoints != null && alternateFirePoints.Length > 0)
+            {
+                currentPoint = alternateFirePoints[_currentFirePointIndex];
+                _currentFirePointIndex = (_currentFirePointIndex + 1) % alternateFirePoints.Length;
+            }
+
+            // 2. Spawn Visual Rocket
+            GameObject rocketObj = Instantiate(_towerData.projectilePrefab, currentPoint.position, currentPoint.rotation, currentPoint);
+            
             SlowHomingRocket rocketScript = rocketObj.GetComponent<SlowHomingRocket>();
 
             if (rocketScript != null)
             {
-                // Initialize data but DO NOT launch yet
-                rocketScript.Initialize(_towerData, _currentTarget, transform); // transform is attacker
+                rocketScript.Initialize(_towerData, _currentTarget, transform);
                 
-                // 2. Wait for the "Prepare" time (1 second)
+                // Apply Upgrades
+                rocketScript.moveSpeed *= _rocketSpeedMult; 
+                rocketScript.radiusMultiplier = _blastRadiusMult; // Ensure this exists in SlowHomingRocket if needed
+
+                // 3. Wait
                 yield return new WaitForSeconds(prepareTime);
 
-                // 3. Check if rocket still exists (wasn't destroyed by something else)
+                // 4. Launch
                 if (rocketObj != null)
                 {
-                    // Unparent so it flies freely
                     rocketObj.transform.SetParent(null);
-                    
-                    // Launch!
                     rocketScript.Launch();
                     
-                    // Play Sound
-                    if (_towerData.shootSound != null)
+                    // --- PLAY LAUNCH SOUND ---
+                    if (launchSound != null && _audioSource != null)
                     {
-                        _audioSource.PlayOneShot(_towerData.shootSound);
+                        _audioSource.PlayOneShot(launchSound);
                     }
+                    // -------------------------
                 }
             }
         }
-        
-        // 4. Handle Cooldown
-        // We subtract the prepare time so the FireRate in TowerData represents the total cycle time
-        // e.g., if FireRate is 3s and Prepare is 1s, we wait 2 more seconds.
-        float remainingCooldown = Mathf.Max(0f, _towerData.fireRate - prepareTime);
+
+        // 5. Cooldown
+        float baseRate = _towerData.fireRate / _fireRateMultiplier;
+        float remainingCooldown = Mathf.Max(0f, baseRate - prepareTime);
         _fireCooldown = remainingCooldown;
-        
-        // Wait for the cooldown to finish before allowing another shot
         yield return new WaitForSeconds(remainingCooldown);
 
         _isReloading = false;
     }
 
-    // Override Shoot to do nothing, as we handle it in the Coroutine
-    protected override void Shoot() { }
+    protected override void Shoot() { } 
 }
