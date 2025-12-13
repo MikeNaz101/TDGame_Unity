@@ -51,7 +51,8 @@ public class Tower_Sniper : TowerController
         if (_currentTarget == null) return;
 
         // Apply Damage
-        _currentTarget.TakeDamage(damage, transform);
+        //_currentTarget.TakeDamage(damage, transform);
+        _currentTarget.TakeDamage(damage, transform, _towerData.damageType);
 
         // Visuals
         if (_hitscanTracer != null)

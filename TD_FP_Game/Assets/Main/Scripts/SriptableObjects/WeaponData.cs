@@ -15,6 +15,7 @@ public class WeaponData : ScriptableObject
     [Header("Hitscan & Damage")]
     public float damage = 10f;
     public float range = 100f;
+    public DamageType damageType = DamageType.Physical;
     
     [Header("Fire Rate & Type")]
     public float fireRate = 0.1f;

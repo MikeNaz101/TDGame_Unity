@@ -284,12 +284,10 @@ public class TowerController : MonoBehaviour
 
     protected virtual void Shoot()
     {
-        // --- PLAY FLASH ---
         if (_muzzleFlash != null)
         {
             _muzzleFlash.Play();
         }
-        // ------------------
 
         if (_towerData.shootSound != null) _audioSource.PlayOneShot(_towerData.shootSound);
 
@@ -297,7 +295,8 @@ public class TowerController : MonoBehaviour
 
         if (_towerData.attackType == TowerData.AttackType.Hitscan)
         {
-            _currentTarget.TakeDamage(_towerData.damage * totalDmgMult, this.transform);
+            //_currentTarget.TakeDamage(_towerData.damage * totalDmgMult, this.transform);
+            _currentTarget.TakeDamage(_towerData.damage * totalDmgMult, this.transform, _towerData.damageType);
             if (_hitscanTracer != null) StartCoroutine(ShowHitscanTrace());
         }
         else

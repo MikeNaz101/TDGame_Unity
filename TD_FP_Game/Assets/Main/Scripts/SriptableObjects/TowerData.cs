@@ -13,10 +13,12 @@ public class TowerData : ScriptableObject
 
     [Header("Building")]
     public GameObject towerPrefab;
+    public GameObject ghostPrefab;
     public int scrapCost = 100;
 
     [Header("Combat Stats")]
     public AttackType attackType = AttackType.Hitscan;
+    public DamageType damageType = DamageType.Physical;
     public GameObject projectilePrefab;
     public float damage = 10f;
     public float fireRate = 0.5f;

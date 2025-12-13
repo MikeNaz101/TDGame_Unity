@@ -154,7 +154,8 @@ public class Tower_LightningGun : TowerController
                 downwardLightning.Trigger(); 
             }
 
-            target.TakeDamage(damage, transform);
+            //target.TakeDamage(damage, transform);
+            target.TakeDamage(damage, transform, DamageType.Electric);
 
             if (Random.value < paralyzeChance)
             {

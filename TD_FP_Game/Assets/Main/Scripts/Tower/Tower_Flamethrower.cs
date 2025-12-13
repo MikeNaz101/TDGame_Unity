@@ -182,7 +182,8 @@ public class Tower_Flamethrower : TowerController
             if (dist <= currentMaxRange && angle <= (flameAngle / 2f))
             {
                 // Deal Direct Fire Damage
-                enemy.TakeDamage(dps * Time.deltaTime, transform);
+                //enemy.TakeDamage(dps * Time.deltaTime, transform);
+                enemy.TakeDamage(dps * Time.deltaTime, transform, DamageType.Fire);
 
                 // Apply Burn DoT if unlocked
                 if (burnDuration > 0)

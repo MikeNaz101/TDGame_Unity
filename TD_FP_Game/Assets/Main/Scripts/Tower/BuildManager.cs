@@ -20,7 +20,13 @@ public class BuildManager : MonoBehaviour
     [Header("Building Visuals")]
     public GameObject buildMenuUI;
     public LineRenderer aimRay;
-    public GameObject buildIndicatorPrefab; 
+    
+    [Tooltip("The generic pulsing ring prefab we created earlier.")]
+    public GameObject rangeRipplePrefab;
+    private GameObject _currentGhostInstance;
+    private GameObject _currentRippleInstance;
+    private RangeRipple _activeRippleScript;
+    private int _lastTowerIndex = -1; // To track when we switch towers
     
     [Header("Tuning")]
     public float maxBuildDistance = 15f;
@@ -119,21 +125,25 @@ public class BuildManager : MonoBehaviour
 
         bool isLocationValid = false; 
 
+        // --- NEW: Fetch Range ---
+        float towerRange = 5f; // Default safety
+        if (towerManager != null && selectedTowerIndex < towerManager.availableTowers.Length)
+        {
+            towerRange = towerManager.availableTowers[selectedTowerIndex].range;
+        }
+        // ------------------------
+
         if (Physics.Raycast(ray, out hit, maxBuildDistance, LayerMask.GetMask("Default")))
         {
             if (NavMesh.SamplePosition(hit.point, out NavMeshHit navHit, _navMeshSampleDistance, NavMesh.AllAreas))
             {
                 if ((navHit.mask & _unbuildableAreaMask) == 0)
                 {
-                    // --- CHANGED LOGIC HERE ---
-                    // Instead of just checking .Length, we grab all colliders and loop through them.
                     Collider[] hits = Physics.OverlapSphere(navHit.position, _minBuildProximity, _towerLayer);
                     bool isBlockedByTower = false;
 
                     foreach (Collider col in hits)
                     {
-                        // If the collider is NOT a trigger (meaning it's the physical tower), it blocks us.
-                        // If it IS a trigger (meaning it's just the range sphere), we ignore it.
                         if (!col.isTrigger)
                         {
                             isBlockedByTower = true;
@@ -141,13 +151,11 @@ public class BuildManager : MonoBehaviour
                         }
                     }
 
-                    // Only valid if NO physical tower is blocking
                     if (!isBlockedByTower)
                     {
                         isLocationValid = true;
                         currentBuildLocation = navHit.position; 
                     }
-                    // --------------------------
                 }
             }
             
@@ -166,8 +174,73 @@ public class BuildManager : MonoBehaviour
             }
         }
         
-        if (isLocationValid) UpdateBuildIndicator(currentBuildLocation, true); 
-        else { currentBuildLocation = Vector3.zero; UpdateBuildIndicator(Vector3.zero, false); }
+        // --- UPDATED CALL: Pass Range ---
+        if (isLocationValid) 
+            UpdateBuildIndicator(currentBuildLocation, true, towerRange); 
+        else 
+        { 
+            currentBuildLocation = Vector3.zero; 
+            UpdateBuildIndicator(Vector3.zero, false, towerRange); 
+        }
+    }
+
+    void UpdateBuildIndicator(Vector3 position, bool isValid, float range)
+    {
+        // 1. Handle the Ripple (Create once, reuse always)
+        if (_currentRippleInstance == null && rangeRipplePrefab != null)
+        {
+            _currentRippleInstance = Instantiate(rangeRipplePrefab);
+            _activeRippleScript = _currentRippleInstance.GetComponent<RangeRipple>();
+        }
+
+        // 2. Handle the Ghost (Re-create only if tower changes)
+        if (_lastTowerIndex != selectedTowerIndex)
+        {
+            // Destroy old ghost
+            if (_currentGhostInstance != null) Destroy(_currentGhostInstance);
+            
+            // Spawn new ghost
+            if (towerManager != null && selectedTowerIndex < towerManager.availableTowers.Length)
+            {
+                TowerData data = towerManager.availableTowers[selectedTowerIndex];
+                if (data.ghostPrefab != null)
+                {
+                    _currentGhostInstance = Instantiate(data.ghostPrefab);
+                    
+                    // Optional: Strip colliders so the ghost doesn't interfere with raycasts
+                    foreach (var c in _currentGhostInstance.GetComponentsInChildren<Collider>()) c.enabled = false;
+                }
+            }
+            _lastTowerIndex = selectedTowerIndex;
+        }
+
+        // 3. Update Positions & State
+        if (position != Vector3.zero)
+        {
+            // Update Ripple
+            if (_currentRippleInstance != null)
+            {
+                _currentRippleInstance.transform.position = position;
+                _currentRippleInstance.SetActive(true);
+                if (_activeRippleScript != null) _activeRippleScript.SetProperties(range, isValid);
+            }
+
+            // Update Ghost
+            if (_currentGhostInstance != null)
+            {
+                _currentGhostInstance.transform.position = position;
+                _currentGhostInstance.SetActive(true);
+                
+                // Optional: Tint ghost Red/Green if it has standard renderers
+                // (This depends on your materials, simpler to rely on the ripple for color info)
+            }
+        }
+        else
+        {
+            // Hide everything if aiming at the sky/invalid area
+            if (_currentRippleInstance != null) _currentRippleInstance.SetActive(false);
+            if (_currentGhostInstance != null) _currentGhostInstance.SetActive(false);
+        }
     }
 
     void MenuSelectionPhase()
@@ -201,17 +274,8 @@ public class BuildManager : MonoBehaviour
         weaponController.ToggleShootingEnabled(true); 
         if (aimRay != null) aimRay.enabled = false;
         if (buildMenuUI != null) buildMenuUI.SetActive(false);
-        if (buildIndicatorInstance != null) Destroy(buildIndicatorInstance.gameObject);
+        if (_currentGhostInstance != null) _currentGhostInstance.SetActive(false);
+        if (_currentRippleInstance != null) _currentRippleInstance.SetActive(false);
         inputScript.build = false; 
-    }
-    
-    void UpdateBuildIndicator(Vector3 position, bool isValid)
-    {
-        if (buildIndicatorPrefab == null) return;
-        if (buildIndicatorInstance == null) buildIndicatorInstance = Instantiate(buildIndicatorPrefab, transform.root).transform;
-        buildIndicatorInstance.position = position;
-        Renderer indicatorRenderer = buildIndicatorInstance.GetComponent<Renderer>();
-        if(indicatorRenderer != null) indicatorRenderer.material.color = isValid ? Color.green : Color.red;
-        buildIndicatorInstance.gameObject.SetActive(isValid);
     }
 }

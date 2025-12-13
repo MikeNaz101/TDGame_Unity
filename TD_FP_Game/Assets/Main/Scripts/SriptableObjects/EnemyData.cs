@@ -25,9 +25,12 @@ public class EnemyData : ScriptableObject
     public GameObject enemyPrefab; 
 
     [Header("Combat Stats")]
-    public float baseHealth = 50f;
     public float attackDamage = 10f;
     public float attackCooldown = 1.5f;
+    
+    [Header("Combat Stats")]
+    public float baseHealth = 50f;
+    public ArmorType armorType = ArmorType.Unarmored;
 
     [Header("Movement & AI")]
     public float moveSpeed = 3.5f;

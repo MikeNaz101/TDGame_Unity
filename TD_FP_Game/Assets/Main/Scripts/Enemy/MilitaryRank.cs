@@ -11,9 +11,3 @@ public enum MilitaryRank
     SergeantMajor = 6,   // Transparency on Hit
     CommandSergeantMajor = 7 // Ghost Mode (Immunity)
 }
-
-public enum DamageType
-{
-    Physical,
-    Elemental // For Rank 7 immunity
-}

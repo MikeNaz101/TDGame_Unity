@@ -234,7 +234,8 @@ public class WeaponControllerHS : MonoBehaviour
             EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
             if (enemy != null) 
             { 
-                enemy.TakeDamage(currentWeapon.damage * damageMult, transform.root); 
+                //enemy.TakeDamage(currentWeapon.damage * damageMult, transform.root);
+                enemy.TakeDamage(currentWeapon.damage * damageMult, transform.root, currentWeapon.damageType);
                 shotsHit++; 
             }
         }

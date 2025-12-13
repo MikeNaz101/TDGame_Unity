@@ -532,55 +532,65 @@ public class EnemyController : MonoBehaviour, IDamageable
         // 3. Destroy Self
         Destroy(gameObject);
     }
+    
     public void TakeDamage(float amount)
     {
+        // Call the main method with "null" for attacker and "Physical" as the default type
         TakeDamage(amount, null, DamageType.Physical);
     }
-
-    // Overloaded for Interface compliance
-    public void TakeDamage(float amount, Transform attacker)
-    {
-        TakeDamage(amount, attacker, DamageType.Physical);
-    }
     
-    // Ghost Mode damage logic
+    // Replace your duplicate TakeDamage methods with this ONE complete method:
     public void TakeDamage(float amount, Transform attacker, DamageType damageType)
     {
         if (_isDead) return;
 
-        // Rank 7: Ghost Mode
+        // --- 1. GHOST MODE CHECK (Rank 7) ---
         if (_currentRankLevel >= MilitaryRank.CommandSergeantMajor)
         {
-            // If strictly Physical damage...
-            if (damageType != DamageType.Elemental)
+            // Ghost Mode is immune to Physical attacks (Bullets/Explosions), 
+            // but vulnerable to Elemental attacks (Fire/Energy/etc.)
+            if (damageType == DamageType.Physical) 
             {
                 if (!_isWeakened)
                 {
-                    // Full Strength: Total Immunity
                     Debug.Log("Enemy is in Ghost Mode! Immune.");
-                    return; 
+                    return; // Total Immunity
                 }
                 else
                 {
-                    // Weakened: 50% Damage Reduction (Halved Effect)
+                    // If the commander died, they are weakened (take 50% damage)
                     amount *= 0.5f;
                 }
             }
         }
 
-        // Rank 6: Transparency on Hit (Visual only, handled in ReceivePenalty)
+        // --- 2. TRANSPARENCY CHECK (Rank 6) ---
+        // Make them visible for a moment if hit
         if (_currentRankLevel >= MilitaryRank.SergeantMajor && !_isWeakened)
         {
             SetTransparency(0.3f);
         }
 
-        _currentHealth -= amount;
+        // --- 3. ARMOR CALCULATION ---
+        float multiplier = DamageMultiplier.GetMultiplier(damageType, enemyData.armorType);
+        float finalDamage = amount * multiplier;
+
+        // Optional: Visual logs for weakness/resistance
+        if (multiplier > 1.0f) Debug.Log("Critical Hit! Weakness Exploited!");
+        if (multiplier < 1.0f) Debug.Log("Resisted!");
+
+        // --- 4. APPLY DAMAGE ---
+        _currentHealth -= finalDamage;
+    
+        // Distraction logic
         if (enemyData.canBeDistracted) _attackSource = attacker;
-        
+    
+        // Death check
         if (_currentHealth <= 0f) Die(true);
     }
     
     // --- TakeExplosion (Resets state if already hit) ---
+    // Update TakeExplosion to use Explosive type
     public void TakeExplosion(float damage, Transform attacker, Vector3 explosionPosition, float explosionForce, float explosionRadius, float upwardModifier = 3.0f)
     {
         if (_isDead) return;
@@ -613,6 +623,7 @@ public class EnemyController : MonoBehaviour, IDamageable
             } else {
                 if (_mainRigidbody != null) {
                     _mainRigidbody.isKinematic = false;
+                    TakeDamage(damage, attacker, DamageType.Explosive);
                     _mainRigidbody.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardModifier, ForceMode.Impulse);
                 }
             }
