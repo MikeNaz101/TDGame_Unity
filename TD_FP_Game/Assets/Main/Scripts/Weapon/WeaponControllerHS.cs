@@ -29,6 +29,7 @@ public class WeaponControllerHS : MonoBehaviour
     
     [Header("Weapon Data")]
     public WeaponData[] inventory; // Drag ALL possible weapons here
+    public GameObject tracerPrefab; // Assign a prefab with a LineRenderer attached
     
     [Header("Lock-On Settings")]
     public float lockOnRange = 50f;
@@ -230,9 +231,10 @@ public class WeaponControllerHS : MonoBehaviour
 
     void Shoot()
     {
-        if (currentAmmo <= 0) return; 
+        if (currentAmmo <= 0) return;
         currentAmmo--;
 
+        // 1. Calculate Multipliers
         float fireRateMult = 1f;
         float damageMult = 1f;
 
@@ -241,31 +243,32 @@ public class WeaponControllerHS : MonoBehaviour
             fireRateMult = UpgradeManager.Instance.GetWeaponFireRateMult(currentWeapon.weaponName);
             damageMult = UpgradeManager.Instance.GetWeaponDamageMult(currentWeapon.weaponName);
         }
-        
-        nextFireTime = currentWeapon.fireRate / fireRateMult;
-        shotsFired++; 
-        
-        if (currentWeapon.shootSound != null) _audioSource.PlayOneShot(currentWeapon.shootSound);
-        if(shootPoint != null) EnemyAIAudioEvents.ReportGunshot(shootPoint.position); 
-        if (cameraShake != null) cameraShake.Shake(currentWeapon.recoilKickback);
-        StartCoroutine(FlashMuzzle());
 
-        // --- CASE 1: PROJECTILE WEAPON (Rocket Launcher) ---
+        nextFireTime = currentWeapon.fireRate / fireRateMult;
+        shotsFired++;
+
+        // 2. Play Effects
+        if (currentWeapon.shootSound != null) _audioSource.PlayOneShot(currentWeapon.shootSound);
+        if (shootPoint != null) EnemyAIAudioEvents.ReportGunshot(shootPoint.position);
+        if (cameraShake != null) cameraShake.Shake(currentWeapon.recoilKickback);
+
+        // --- CASE 1: ROCKET LAUNCHER (Projectile) ---
         if (currentWeapon.projectilePrefab != null)
         {
-            // Spawn the rocket at the shoot point
+            // Spawn Rocket
             GameObject proj = Instantiate(currentWeapon.projectilePrefab, shootPoint.position, shootPoint.rotation);
-            
-            // Setup SlowHomingRocket if attached
+
+            // Handle Locking Logic (if upgraded)
             SlowHomingRocket rocket = proj.GetComponent<SlowHomingRocket>();
             if (rocket != null)
             {
                 rocket.damageMultiplier = damageMult;
-                rocket.Initialize(null, _currentLockTarget, transform.root);
-                rocket.Launch(); 
+                // Pass the lock target we found in Update()
+                rocket.Initialize(null, _currentLockTarget, transform.root); 
+                rocket.Launch();
             }
-            
-            // Standard Projectile Setup
+
+            // Handle Standard Projectile Logic
             Projectile p = proj.GetComponent<Projectile>();
             if (p != null)
             {
@@ -277,23 +280,27 @@ public class WeaponControllerHS : MonoBehaviour
             Rigidbody rb = proj.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                // Launch forward from camera look direction
                 rb.linearVelocity = mainCamera.transform.forward * currentWeapon.launchForce;
             }
 
             inputScript.fire = false;
-            return; // Stop here, do not do hitscan logic
+            return; // EXIT FUNCTION HERE for Rockets
         }
 
-        // --- CASE 2: HITSCAN WEAPON (Shotgun / Rifle) ---
-        
-        // Track hits per enemy to calculate "Full Hit Bonus"
+        // --- CASE 2: HITSCAN WEAPON (Rifle & Shotgun) ---
+        // This logic runs for EVERY hitscan weapon.
+        // If it's a Rifle, pellets is 1. If Shotgun, pellets is 8.
+
         Dictionary<EnemyController, int> enemyHits = new Dictionary<EnemyController, int>();
-        int totalPellets = Mathf.Max(1, currentWeapon.pellets);
-        
+        int totalPellets = Mathf.Max(1, currentWeapon.pellets); // Ensure at least 1 pellet
+
+        // Create the list to hold visuals
+        List<Vector3> pelletHitPoints = new List<Vector3>();
+
+        // Loop through every pellet
         for (int i = 0; i < totalPellets; i++)
         {
-            // Calculate Random Spread
+            // Calculate Spread
             Vector3 forward = mainCamera.transform.forward;
             if (currentWeapon.spreadAngle > 0)
             {
@@ -307,23 +314,34 @@ public class WeaponControllerHS : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
             {
+                // HIT: Add point to visuals
+                pelletHitPoints.Add(hit.point);
+
                 EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
-                if (enemy != null) 
-                { 
+                if (enemy != null)
+                {
                     if (!enemyHits.ContainsKey(enemy)) enemyHits[enemy] = 0;
                     enemyHits[enemy]++;
                 }
             }
+            else
+            {
+                // MISS: Add point at max range so visual still draws
+                pelletHitPoints.Add(ray.GetPoint(currentWeapon.range));
+            }
         }
 
-        // Apply Damage based on accumulated hits
-        foreach(var kvp in enemyHits)
+        // 3. Draw Tracers (Now we are 100% sure the list is full)
+        StartCoroutine(FlashMultiMuzzle(pelletHitPoints));
+
+        // 4. Apply Damage
+        foreach (var kvp in enemyHits)
         {
             EnemyController enemy = kvp.Key;
             int hits = kvp.Value;
-            
+
             // Base damage is per pellet * number of hits
-            float finalDamage = currentWeapon.damage * hits * damageMult; 
+            float finalDamage = currentWeapon.damage * hits * damageMult;
 
             // Check for Full Hit Bonus (Only if shotgun has multiple pellets)
             if (hits == totalPellets && totalPellets > 1)
@@ -332,12 +350,11 @@ public class WeaponControllerHS : MonoBehaviour
                 Debug.Log($"MEATSHOT! {enemy.name} took bonus damage from full spray.");
             }
 
-            // Apply damage with correct type
             enemy.TakeDamage(finalDamage, transform.root, currentWeapon.damageType);
-            shotsHit += hits; 
+            shotsHit += hits;
         }
 
-        inputScript.fire = false; 
+        inputScript.fire = false;
     }
 
     IEnumerator FlashMuzzle()
@@ -354,6 +371,63 @@ public class WeaponControllerHS : MonoBehaviour
         currentGunTracer.enabled = true;
         yield return new WaitForSeconds(0.05f); 
         currentGunTracer.enabled = false;
+    }
+    
+    IEnumerator FlashMultiMuzzle(List<Vector3> hitPoints)
+    {
+        // DEBUG 1: Check if the list arrived
+        if (hitPoints == null || hitPoints.Count == 0)
+        {
+            Debug.LogError("FlashMultiMuzzle: No hit points to draw! List is empty or null.");
+            yield break;
+        }
+
+        // DEBUG 2: Check references
+        if (tracerPrefab == null)
+        {
+            Debug.LogError("FlashMultiMuzzle: Tracer Prefab is NULL! Assign it in the Inspector.");
+            yield break;
+        }
+        if (shootPoint == null)
+        {
+            Debug.LogError("FlashMultiMuzzle: Shoot Point is NULL!");
+            yield break;
+        }
+
+        Debug.Log($"FlashMultiMuzzle: Attempting to draw {hitPoints.Count} tracers.");
+
+        foreach (Vector3 hitPoint in hitPoints)
+        {
+            // 1. Create a temporary tracer object
+            GameObject tracerObj = Instantiate(tracerPrefab, shootPoint.position, Quaternion.identity);
+        
+            // DEBUG 3: Check instantiation
+            if (tracerObj == null)
+            {
+                Debug.LogError("FlashMultiMuzzle: Failed to instantiate tracer!");
+                continue;
+            }
+
+            LineRenderer lr = tracerObj.GetComponent<LineRenderer>();
+
+            if (lr != null)
+            {
+                // 2. Set the positions
+                lr.SetPosition(0, shootPoint.position);
+                lr.SetPosition(1, hitPoint);
+            
+                // DEBUG 4: Confirm positions
+                // Debug.Log($"Drawing line from {shootPoint.position} to {hitPoint}");
+            }
+            else
+            {
+                Debug.LogError("FlashMultiMuzzle: Tracer Prefab does not have a LineRenderer component!");
+            }
+
+            // 3. Destroy it after a tiny delay
+            Destroy(tracerObj, 0.05f);
+        }
+        yield return null;
     }
 
     IEnumerator Reload()
@@ -437,7 +511,17 @@ public class WeaponControllerHS : MonoBehaviour
         } else currentAdsReticleInstance = null; 
 
         currentGunTracer = currentGunInstance.GetComponentInChildren<LineRenderer>();
-        shootPoint = currentGunInstance.transform.Find("ShootPoint");
+        ShootPointTag tagScript = currentGunInstance.GetComponentInChildren<ShootPointTag>();
+        if (tagScript != null)
+        {
+            shootPoint = tagScript.transform;
+        }
+        else
+        {
+            // Fallback: Try to find by name if tag is missing
+            shootPoint = currentGunInstance.transform.Find("ShootPoint");
+            if (shootPoint == null) Debug.LogError($"Could not find ShootPoint on {currentWeapon.weaponName}! Make sure it has the 'ShootPointTag' script attached.");
+        }
         
         currentAmmo = GetUpgradedClipSize();
         currentReserveAmmo = GetUpgradedMaxAmmo();
