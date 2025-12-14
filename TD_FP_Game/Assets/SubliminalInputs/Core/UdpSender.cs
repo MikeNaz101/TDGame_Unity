@@ -1,8 +1,8 @@
 using UnityEngine;
 using System.Net.Sockets;
 using System.Net;
-using SubliminalSarcasm.InputSystem;
 using SubliminalSarcasm.NetworkData;
+using SubliminalSarcasm.InputSystem;
 
 namespace SubliminalSarcasm.Core
 {
@@ -11,8 +11,11 @@ namespace SubliminalSarcasm.Core
         public InputInterceptor InputSource;
         
         [Header("Network Settings")]
-        public string ServerIP = "127.0.0.1"; // "Localhost"
+        public string ServerIP = ""; // Default to empty
         public int Port = 8080;
+        
+        // NEW: Safety switch
+        public bool IsReadyToSend = false; 
 
         private UdpClient _udpClient;
         private IPEndPoint _remoteEndPoint;
@@ -20,40 +23,47 @@ namespace SubliminalSarcasm.Core
         void Start()
         {
             _udpClient = new UdpClient();
-            _remoteEndPoint = new IPEndPoint(IPAddress.Parse(ServerIP), Port);
+            // Don't setup the endpoint yet. Wait for the UI.
+        }
+
+        // Call this via the UI Button
+        public void SetServerIP(string newIP)
+        {
+            if(string.IsNullOrEmpty(newIP)) return;
+
+            ServerIP = newIP;
+            try {
+                _remoteEndPoint = new IPEndPoint(IPAddress.Parse(ServerIP), Port);
+                IsReadyToSend = true; // NOW we are allowed to send
+                Debug.Log($"Target Locked: {ServerIP}. Sending Data...");
+            }
+            catch {
+                Debug.LogError("Invalid IP Address!");
+                IsReadyToSend = false;
+            }
         }
 
         void FixedUpdate()
         {
-            // 1. Get Data
-            NormalizedInputFrame frame = InputSource.CurrentInput;
+            // GATE: Stop if we aren't ready
+            if (!IsReadyToSend || _remoteEndPoint == null) return;
 
-            // 2. Crush to Bytes
+            NormalizedInputFrame frame = InputSource.CurrentInput;
             byte[] data = PacketSerializer.Serialize(frame);
 
-            // 3. Fire into the Internet
-            // This now leaves your computer and travels over Wi-Fi!
             try
             {
                 _udpClient.Send(data, data.Length, _remoteEndPoint);
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Socket Error: {e.Message}");
+                // Silently fail or log sparingly
             }
         }
 
         void OnDestroy()
         {
             _udpClient?.Close();
-        }
-        
-        public void SetServerIP(string newIP)
-        {
-            ServerIP = newIP;
-            // Re-initialize the endpoint with the new address
-            _remoteEndPoint = new IPEndPoint(IPAddress.Parse(ServerIP), Port);
-            Debug.Log($"Target IP changed to: {ServerIP}");
         }
     }
 }

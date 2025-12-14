@@ -29,6 +29,13 @@ public class WeaponControllerHS : MonoBehaviour
     
     [Header("Weapon Data")]
     public WeaponData[] inventory; // Drag ALL possible weapons here
+    
+    [Header("Lock-On Settings")]
+    public float lockOnRange = 50f;
+    [Tooltip("Radius of the aim assist sphere check.")]
+    public float lockOnRadius = 1.5f; 
+    public LayerMask enemyLayer; // Assign this in Inspector!
+    private EnemyController _currentLockTarget;
 
     // --- PRIVATE STATE ---
     private GameObject currentGunInstance;
@@ -85,6 +92,7 @@ public class WeaponControllerHS : MonoBehaviour
         {
             HandleDirectSwitching();
             HandleADS(); 
+            HandleLockOn();
             HandleFiringInput();
 
             if (inputScript.reload && !isReloading)
@@ -183,7 +191,19 @@ public class WeaponControllerHS : MonoBehaviour
         
         if (isAiming)
         {
-            if (adsTarget != null) targetLocalPosition = adsTarget.localPosition;
+            // --- FIX: Read from Weapon Data instead of static transform ---
+            if (currentWeapon != null)
+            {
+                // This uses the specific offset defined in the scriptable object
+                targetLocalPosition = currentWeapon.aimDownSightsPosition;
+            }
+            else if (adsTarget != null) 
+            {
+                // Fallback to the physical target if weapon data is missing
+                targetLocalPosition = adsTarget.localPosition;
+            }
+            // -------------------------------------------------------------
+
             float zoomFactor = 1f + (currentWeapon.range / rangeToZoomRatio);
             targetFOV = Mathf.Clamp(baseFOV / zoomFactor, 10f, baseFOV);
         }
@@ -192,6 +212,8 @@ public class WeaponControllerHS : MonoBehaviour
         if (currentAdsReticleInstance != null) currentAdsReticleInstance.SetActive(isAiming);
 
         float lerpSpeed = currentWeapon != null ? currentWeapon.adsSpeed : 10f;
+        
+        // Smoothly move the weapon to the calculated target position
         transform.localPosition = Vector3.Lerp(transform.localPosition, targetLocalPosition, Time.deltaTime * lerpSpeed);
         
         if (playerVirtualCamera != null)
@@ -221,26 +243,100 @@ public class WeaponControllerHS : MonoBehaviour
         }
         
         nextFireTime = currentWeapon.fireRate / fireRateMult;
-
         shotsFired++; 
+        
         if (currentWeapon.shootSound != null) _audioSource.PlayOneShot(currentWeapon.shootSound);
         if(shootPoint != null) EnemyAIAudioEvents.ReportGunshot(shootPoint.position); 
-
-        Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
-        {
-            EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
-            if (enemy != null) 
-            { 
-                //enemy.TakeDamage(currentWeapon.damage * damageMult, transform.root);
-                enemy.TakeDamage(currentWeapon.damage * damageMult, transform.root, currentWeapon.damageType);
-                shotsHit++; 
-            }
-        }
         if (cameraShake != null) cameraShake.Shake(currentWeapon.recoilKickback);
         StartCoroutine(FlashMuzzle());
+
+        // --- CASE 1: PROJECTILE WEAPON (Rocket Launcher) ---
+        if (currentWeapon.projectilePrefab != null)
+        {
+            // Spawn the rocket at the shoot point
+            GameObject proj = Instantiate(currentWeapon.projectilePrefab, shootPoint.position, shootPoint.rotation);
+            
+            // Setup SlowHomingRocket if attached
+            SlowHomingRocket rocket = proj.GetComponent<SlowHomingRocket>();
+            if (rocket != null)
+            {
+                rocket.damageMultiplier = damageMult;
+                rocket.Initialize(null, _currentLockTarget, transform.root);
+                rocket.Launch(); 
+            }
+            
+            // Standard Projectile Setup
+            Projectile p = proj.GetComponent<Projectile>();
+            if (p != null)
+            {
+                p.attacker = transform.root;
+                p.damageMultiplier = damageMult;
+            }
+
+            // Apply Launch Force
+            Rigidbody rb = proj.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                // Launch forward from camera look direction
+                rb.linearVelocity = mainCamera.transform.forward * currentWeapon.launchForce;
+            }
+
+            inputScript.fire = false;
+            return; // Stop here, do not do hitscan logic
+        }
+
+        // --- CASE 2: HITSCAN WEAPON (Shotgun / Rifle) ---
+        
+        // Track hits per enemy to calculate "Full Hit Bonus"
+        Dictionary<EnemyController, int> enemyHits = new Dictionary<EnemyController, int>();
+        int totalPellets = Mathf.Max(1, currentWeapon.pellets);
+        
+        for (int i = 0; i < totalPellets; i++)
+        {
+            // Calculate Random Spread
+            Vector3 forward = mainCamera.transform.forward;
+            if (currentWeapon.spreadAngle > 0)
+            {
+                float xSpread = Random.Range(-currentWeapon.spreadAngle, currentWeapon.spreadAngle);
+                float ySpread = Random.Range(-currentWeapon.spreadAngle, currentWeapon.spreadAngle);
+                forward = Quaternion.Euler(xSpread, ySpread, 0) * forward;
+            }
+
+            Ray ray = new Ray(mainCamera.transform.position, forward);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
+            {
+                EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
+                if (enemy != null) 
+                { 
+                    if (!enemyHits.ContainsKey(enemy)) enemyHits[enemy] = 0;
+                    enemyHits[enemy]++;
+                }
+            }
+        }
+
+        // Apply Damage based on accumulated hits
+        foreach(var kvp in enemyHits)
+        {
+            EnemyController enemy = kvp.Key;
+            int hits = kvp.Value;
+            
+            // Base damage is per pellet * number of hits
+            float finalDamage = currentWeapon.damage * hits * damageMult; 
+
+            // Check for Full Hit Bonus (Only if shotgun has multiple pellets)
+            if (hits == totalPellets && totalPellets > 1)
+            {
+                finalDamage *= currentWeapon.fullHitBonus;
+                Debug.Log($"MEATSHOT! {enemy.name} took bonus damage from full spray.");
+            }
+
+            // Apply damage with correct type
+            enemy.TakeDamage(finalDamage, transform.root, currentWeapon.damageType);
+            shotsHit += hits; 
+        }
+
         inputScript.fire = false; 
     }
 
@@ -291,6 +387,34 @@ public class WeaponControllerHS : MonoBehaviour
         float mult = 1f;
         if (UpgradeManager.Instance != null) mult = UpgradeManager.Instance.GetWeaponMaxAmmoMult(currentWeapon.weaponName);
         return Mathf.RoundToInt(currentWeapon.reserveAmmo * mult);
+    }
+    
+    void HandleLockOn()
+    {
+        _currentLockTarget = null;
+
+        // 1. Check if we have the upgrade
+        if (UpgradeManager.Instance == null || !UpgradeManager.Instance.IsGuidanceUnlocked(currentWeapon.weaponName))
+        {
+            return;
+        }
+
+        // 2. Raycast/SphereCast to find enemy
+        Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
+        RaycastHit hit;
+        
+        // SphereCast is better than Raycast because it's "forgiving" (thick ray)
+        if (Physics.SphereCast(ray, lockOnRadius, out hit, lockOnRange, enemyLayer))
+        {
+            EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
+            if (enemy != null && !enemy._isDead) // Assume you have IsDead property or check health > 0
+            {
+                _currentLockTarget = enemy;
+                 
+                // Optional: Change Crosshair Color here to indicate lock
+                // Debug.DrawLine(shootPoint.position, enemy.transform.position, Color.red);
+            }
+        }
     }
     
     public float GetAccuracy() { if (shotsFired == 0) return 0f; return (float)shotsHit / (float)shotsFired; }

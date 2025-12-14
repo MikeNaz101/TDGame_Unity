@@ -15,6 +15,11 @@ public class SlowHomingRocket : MonoBehaviour
     [Header("Audio")]
     public AudioClip flightLoopSound;
     public AudioClip explosionSound;
+    
+    [Header("Weapon Fallback Stats")]
+    public float weaponDamage = 50f;
+    public float weaponRadius = 5f;
+    public float weaponForce = 500f;
 
     // Multipliers set by Tower
     [HideInInspector] public float speedMultiplier = 1f;
@@ -73,26 +78,32 @@ public class SlowHomingRocket : MonoBehaviour
 
         float currentSpeed = moveSpeed * speedMultiplier;
 
-        Vector3 targetPos;
+        // --- CASE 1: HOMING ENABLED (Target Exists) ---
         if (_target != null)
         {
-            targetPos = _target.position + Vector3.up; 
-            _lastKnownTargetPos = targetPos;
+            // Update last known position in case they disappear/die
+            if (_target.gameObject.activeInHierarchy)
+            {
+                _lastKnownTargetPos = _target.position + Vector3.up; 
+            }
+
+            Vector3 directionToTarget = _lastKnownTargetPos - transform.position;
+            Vector3 newDirection = Vector3.RotateTowards(transform.forward, directionToTarget, turnSpeed * Time.deltaTime, 0.0f);
+            
+            if (newDirection != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(newDirection) * Quaternion.Euler(modelRotationOffset);
+            }
         }
+        // --- CASE 2: DUMB FIRE (Fly Straight) ---
         else
         {
-            targetPos = _lastKnownTargetPos; 
+            // Just keep current rotation and move forward
+            // (No rotation code needed, it stays facing launch direction)
         }
 
-        Vector3 directionToTarget = targetPos - transform.position;
-        Vector3 newDirection = Vector3.RotateTowards(transform.forward, directionToTarget, turnSpeed * Time.deltaTime, 0.0f);
-        
-        if (newDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.LookRotation(newDirection) * Quaternion.Euler(modelRotationOffset);
-        }
-
-        transform.position += newDirection.normalized * currentSpeed * Time.deltaTime;
+        // Apply movement (works for both cases)
+        transform.position += transform.forward * currentSpeed * Time.deltaTime;
     }
 
     void OnTriggerEnter(Collider other)
@@ -114,42 +125,46 @@ public class SlowHomingRocket : MonoBehaviour
     {
         CancelInvoke("TimeOutExplosion"); 
 
-        // --- NEW: Play Explosion Sound ---
-        // We create a temporary audio source at the location because this object is about to be destroyed
-        if (explosionSound != null)
-        {
-            AudioSource.PlayClipAtPoint(explosionSound, transform.position);
-        }
-        // ---------------------------------
+        // Play Sound
+        if (explosionSound != null) AudioSource.PlayClipAtPoint(explosionSound, transform.position);
 
+        // Spawn VFX
         if (_data != null && _data.impactParticlePrefab != null)
         {
             GameObject vfx = Instantiate(_data.impactParticlePrefab, transform.position, Quaternion.identity);
-            // Scale explosion visual based on upgrade
             if (radiusMultiplier > 1.0f) vfx.transform.localScale *= radiusMultiplier;
         }
 
+        // --- CALCULATE DAMAGE ---
+        // Default to Weapon Stats
+        float finalDamage = weaponDamage * damageMultiplier;
+        float finalRadius = weaponRadius * radiusMultiplier;
+        float finalForce = weaponForce;
+
+        // If TowerData exists, override with Tower Stats
         if (_data != null)
         {
-            float finalRadius = _data.explosionRadius * radiusMultiplier;
-            float finalDamage = _data.damage * damageMultiplier;
+            finalDamage = _data.damage * damageMultiplier;
+            finalRadius = _data.explosionRadius * radiusMultiplier;
+            finalForce = _data.explosionForce;
+        }
+        // ------------------------
 
-            Collider[] hits = Physics.OverlapSphere(transform.position, finalRadius);
-            foreach (Collider hit in hits)
+        Collider[] hits = Physics.OverlapSphere(transform.position, finalRadius);
+        foreach (Collider hit in hits)
+        {
+            if (hit.CompareTag("Enemy"))
             {
-                if (hit.CompareTag("Enemy"))
+                EnemyController enemy = hit.GetComponent<EnemyController>();
+                if (enemy != null)
                 {
-                    EnemyController enemy = hit.GetComponent<EnemyController>();
-                    if (enemy != null)
-                    {
-                        enemy.TakeExplosion(
-                            finalDamage, 
-                            _attacker, 
-                            transform.position, 
-                            _data.explosionForce, 
-                            finalRadius
-                        );
-                    }
+                    enemy.TakeExplosion(
+                        finalDamage, 
+                        _attacker, 
+                        transform.position, 
+                        finalForce, 
+                        finalRadius
+                    );
                 }
             }
         }

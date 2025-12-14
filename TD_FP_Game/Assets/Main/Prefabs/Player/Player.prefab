@@ -1911,6 +1911,7 @@ MonoBehaviour:
   inventory:
   - {fileID: 11400000, guid: d79667dd91425f84db1865f1867ecc0d, type: 2}
   - {fileID: 11400000, guid: c47cfe81f5ca04c4e80b27364dc6d624, type: 2}
+  - {fileID: 11400000, guid: 84c7d703898b8594f90983b3834e235a, type: 2}
   shotsFired: 0
   shotsHit: 0
 --- !u!114 &1083335414041249677
@@ -1932,7 +1933,7 @@ MonoBehaviour:
   playerInput: {fileID: 5571897489264707270}
   buildMenuUI: {fileID: 9061196000684852408}
   aimRay: {fileID: 7340868589745532452}
-  buildIndicatorPrefab: {fileID: 4376194662093663467, guid: 5ef1845950141e343b709bd75be0bdde, type: 3}
+  rangeRipplePrefab: {fileID: 1931509196706519677, guid: f352add25b7a04148bec412a3e5b0a57, type: 3}
   maxBuildDistance: 15
   _unbuildableAreaName: EnemyPath
   _navMeshSampleDistance: 1

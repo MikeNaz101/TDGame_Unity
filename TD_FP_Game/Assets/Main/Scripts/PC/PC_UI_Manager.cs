@@ -53,6 +53,10 @@ public class PC_UI_Manager : MonoBehaviour
     public TextMeshProUGUI btnText_SpecificRate;
     public TextMeshProUGUI btnText_SpecificMaxAmmo;
     public TextMeshProUGUI btnText_SpecificClip;
+    
+    [Tooltip("Assign the button for buying Guidance/Special upgrades here.")]
+    public Button btn_SpecialUpgrade;
+    public TextMeshProUGUI btnText_SpecialUpgrade;
 
     // --- INTERNAL STATE ---
     private ScrapCollectorBot _botScript;
@@ -311,10 +315,55 @@ public class PC_UI_Manager : MonoBehaviour
         var wData = UpgradeManager.Instance.GetWeaponData(_selectedWeaponName);
         if (wData == null) return;
 
+        // Standard Stats
         UpdateBtnText(wData.damagePath, btnText_SpecificDmg, "Damage");
         UpdateBtnText(wData.fireRatePath, btnText_SpecificRate, "Fire Rate");
         UpdateBtnText(wData.maxAmmoPath, btnText_SpecificMaxAmmo, "Max Ammo");
         UpdateBtnText(wData.clipSizePath, btnText_SpecificClip, "Clip Size");
+
+        // --- NEW: Handle Rocket Launcher Guidance ---
+        if (_selectedWeaponName == "RocketLauncher")
+        {
+            // 1. Show the button
+            if(btn_SpecialUpgrade) btn_SpecialUpgrade.gameObject.SetActive(true);
+
+            // 2. Update Text/Interactability
+            if (btnText_SpecialUpgrade)
+            {
+                if (wData.guidanceUnlocked)
+                {
+                    btnText_SpecialUpgrade.text = "Guidance System\nOWNED";
+                    if(btn_SpecialUpgrade) btn_SpecialUpgrade.interactable = false;
+                }
+                else
+                {
+                    btnText_SpecialUpgrade.text = $"Unlock Guidance\nCost: {wData.guidanceCost}";
+                    if(btn_SpecialUpgrade) btn_SpecialUpgrade.interactable = true;
+                }
+            }
+        }
+        else
+        {
+            // Hide the button for other weapons (Shotgun, Rifle, etc.)
+            if(btn_SpecialUpgrade) btn_SpecialUpgrade.gameObject.SetActive(false);
+        }
+        // --------------------------------------------
+    }
+    
+    public void OnBuy_SpecialUpgrade()
+    {
+        if (UpgradeManager.Instance == null) return;
+
+        // Try to buy "Guidance"
+        if (UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "Guidance")) 
+        { 
+            UpdateWeaponSpecificUI(); 
+            Type("Guidance Chipset Installed."); 
+        }
+        else 
+        { 
+            Type("Insufficient funds or already owned."); 
+        }
     }
 
     public void OnBuy_SpecificDmg()

@@ -35,6 +35,8 @@ public class UpgradeManager : MonoBehaviour
         public string weaponName; // ID
         public int unlockCost = 500;
         public bool isUnlocked = false;
+        public bool guidanceUnlocked = false;
+        public int guidanceCost = 1000;
 
         // Each weapon has its own upgrade paths
         public UpgradePath damagePath; 
@@ -148,6 +150,17 @@ public class UpgradeManager : MonoBehaviour
     {
         var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
         if (w == null || !w.isUnlocked) return false;
+        
+        if (statType == "Guidance")
+        {
+            if (!w.guidanceUnlocked && playerStats.SpendScrap(w.guidanceCost))
+            {
+                w.guidanceUnlocked = true;
+                Debug.Log($"Guidance System installed on {weaponName}");
+                return true;
+            }
+            return false;
+        }
 
         UpgradePath path = null;
         switch (statType)
@@ -216,5 +229,11 @@ public class UpgradeManager : MonoBehaviour
     private void UpdateAllActiveTowers()
     {
         foreach(var tower in TowerRegistry.ActiveTowers) tower.RefreshGlobalStats();
+    }
+    
+    public bool IsGuidanceUnlocked(string weaponName)
+    {
+        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        return w != null && w.guidanceUnlocked;
     }
 }

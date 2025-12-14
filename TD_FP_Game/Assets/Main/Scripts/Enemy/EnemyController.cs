@@ -46,7 +46,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     // --- RUNTIME STATE ---
     private float _currentHealth;
-    private bool _isDead = false;
+    public bool _isDead = false;
     private float _timeSinceLastAttack = 0f;
     private Collider _mainCollider;
     private Animator _animator;

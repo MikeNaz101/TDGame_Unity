@@ -14892,6 +14892,9 @@ MonoBehaviour:
   modelRotationOffset: {x: 0, y: 0, z: 0}
   flightLoopSound: {fileID: 8300000, guid: 836c2606aa90fa94a80796375b9b8cee, type: 3}
   explosionSound: {fileID: 8300000, guid: 0d713cd019147724bb38ac018912e946, type: 3}
+  weaponDamage: 50
+  weaponRadius: 5
+  weaponForce: 100
   speedMultiplier: 1
   radiusMultiplier: 1
   damageMultiplier: 1
