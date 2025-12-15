@@ -54,6 +54,10 @@ public class PC_UI_Manager : MonoBehaviour
     public TextMeshProUGUI btnText_SpecificMaxAmmo;
     public TextMeshProUGUI btnText_SpecificClip;
     
+    [Header("Ammo Purchase")]
+    public Button btn_BuyAmmo;
+    public int ammoCost = 50;
+    
     [Tooltip("Assign the button for buying Guidance/Special upgrades here.")]
     public Button btn_SpecialUpgrade;
     public TextMeshProUGUI btnText_SpecialUpgrade;
@@ -315,19 +319,19 @@ public class PC_UI_Manager : MonoBehaviour
         var wData = UpgradeManager.Instance.GetWeaponData(_selectedWeaponName);
         if (wData == null) return;
 
-        // Standard Stats
+        // 1. Standard Stats (Always Show)
         UpdateBtnText(wData.damagePath, btnText_SpecificDmg, "Damage");
         UpdateBtnText(wData.fireRatePath, btnText_SpecificRate, "Fire Rate");
         UpdateBtnText(wData.maxAmmoPath, btnText_SpecificMaxAmmo, "Max Ammo");
         UpdateBtnText(wData.clipSizePath, btnText_SpecificClip, "Clip Size");
 
-        // --- NEW: Handle Rocket Launcher Guidance ---
-        if (_selectedWeaponName == "RocketLauncher")
+        // 2. Special Upgrade Logic (Rocket Launcher ONLY)
+        // Make sure your WeaponData asset is named exactly "RocketLauncher"
+        if (_selectedWeaponName == "RocketLauncher") 
         {
-            // 1. Show the button
+            // SHOW the button
             if(btn_SpecialUpgrade) btn_SpecialUpgrade.gameObject.SetActive(true);
 
-            // 2. Update Text/Interactability
             if (btnText_SpecialUpgrade)
             {
                 if (wData.guidanceUnlocked)
@@ -344,10 +348,9 @@ public class PC_UI_Manager : MonoBehaviour
         }
         else
         {
-            // Hide the button for other weapons (Shotgun, Rifle, etc.)
+            // HIDE the button for everything else (Rifle, Shotgun, etc.)
             if(btn_SpecialUpgrade) btn_SpecialUpgrade.gameObject.SetActive(false);
         }
-        // --------------------------------------------
     }
     
     public void OnBuy_SpecialUpgrade()
@@ -392,6 +395,28 @@ public class PC_UI_Manager : MonoBehaviour
         if (UpgradeManager.Instance == null) return;
         if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "ClipSize")) { UpdateWeaponSpecificUI(); Type("Magazine expanded."); }
         else Type("Insufficient funds.");
+    }
+    
+    public void OnBuy_RefillAmmo()
+    {
+        // 1. Check money
+        if (_playerStats.scrapMetal < ammoCost)
+        {
+            Type("Insufficient Funds.");
+            return;
+        }
+
+        // 2. Access Weapon Controller
+        WeaponControllerHS weaponController = FindObjectOfType<WeaponControllerHS>();
+        if (weaponController != null)
+        {
+            // Optional: Check if we are holding the weapon we are looking at
+            // For simplicity, this refills the CURRENTLY EQUIPPED weapon's reserve
+
+            weaponController.RefillCurrentReserve(); 
+            _playerStats.SpendScrap(ammoCost);
+            Type("Ammunition Replicated.");
+        }
     }
 
     // --- BOT LOGIC ---

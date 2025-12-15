@@ -33,10 +33,27 @@ public class WeaponControllerHS : MonoBehaviour
     
     [Header("Lock-On Settings")]
     public float lockOnRange = 50f;
-    [Tooltip("Radius of the aim assist sphere check.")]
     public float lockOnRadius = 1.5f; 
-    public LayerMask enemyLayer; // Assign this in Inspector!
-    private EnemyController _currentLockTarget;
+    public LayerMask enemyLayer;
+    public float timeToLock = 2.0f; // --- NEW: Duration required
+    
+    [Header("Reticle Feedback")]
+    public Color defaultReticleColor = Color.white;
+    public Color acquiringReticleColor = Color.yellow; // --- NEW: In-progress color
+    public Color lockedReticleColor = Color.green;
+
+    // --- NEW: State Variables ---
+    private EnemyController _pendingTarget; // Enemy currently under crosshair
+    private EnemyController _finalLockedTarget; // Enemy fully locked (can shoot anywhere)
+    private float _currentLockTimer = 0f;
+    private UnityEngine.UI.Image _currentReticleImage;
+    //private EnemyController _currentLockTarget;
+    
+    // --- PUBLIC GETTERS FOR HUD ---
+    public int CurrentClip => currentAmmo;
+    public int MaxClip => GetUpgradedClipSize();
+    public int CurrentReserve => currentReserveAmmo;
+    public int MaxReserve => GetUpgradedMaxAmmo();
 
     // --- PRIVATE STATE ---
     private GameObject currentGunInstance;
@@ -263,9 +280,14 @@ public class WeaponControllerHS : MonoBehaviour
             if (rocket != null)
             {
                 rocket.damageMultiplier = damageMult;
-                // Pass the lock target we found in Update()
-                rocket.Initialize(null, _currentLockTarget, transform.root); 
+                // DEBUG 5: Confirm what is being passed
+                if (_finalLockedTarget != null) Debug.Log($"Shoot: Firing homing rocket at {_finalLockedTarget.name}");
+                else Debug.Log("Shoot: Firing dumb rocket (No lock).");
+                rocket.Initialize(null, _finalLockedTarget, transform.root); 
                 rocket.Launch();
+                
+                // --- Consume the lock (One shot per lock) ---
+                ResetLockState();
             }
 
             // Handle Standard Projectile Logic
@@ -429,22 +451,40 @@ public class WeaponControllerHS : MonoBehaviour
         }
         yield return null;
     }
+    
+    public void RefillCurrentReserve()
+    {
+        currentReserveAmmo = GetUpgradedMaxAmmo();
+    }
 
     IEnumerator Reload()
     {
         if (isReloading) yield break; 
         isReloading = true;
+
         if (currentWeapon.reloadSound != null) _audioSource.PlayOneShot(currentWeapon.reloadSound);
+        
         yield return new WaitForSeconds(currentWeapon.reloadTime);
         
         int maxClip = GetUpgradedClipSize();
-        int maxReserve = GetUpgradedMaxAmmo();
-
         int ammoNeeded = maxClip - currentAmmo;
-        // Simplified ammo logic: Just refill from infinite pool based on max capacity
-        // If you want finite reserve, logic goes here.
-        
-        currentAmmo = maxClip; // Full reload
+
+        // --- Check Infinite Logic ---
+        if (IsAmmoInfinite())
+        {
+            // FREE RELOAD: Fill clip, do NOT touch reserve
+            currentAmmo = maxClip;
+        }
+        else
+        {
+            // STANDARD RELOAD: Spend reserve
+            int ammoToReload = Mathf.Min(ammoNeeded, currentReserveAmmo);
+            if (ammoToReload > 0)
+            {
+                currentReserveAmmo -= ammoToReload; 
+                currentAmmo += ammoToReload;        
+            }
+        }
         
         isReloading = false;
     }
@@ -465,30 +505,139 @@ public class WeaponControllerHS : MonoBehaviour
     
     void HandleLockOn()
     {
-        _currentLockTarget = null;
-
-        // 1. Check if we have the upgrade
-        if (UpgradeManager.Instance == null || !UpgradeManager.Instance.IsGuidanceUnlocked(currentWeapon.weaponName))
+        // DEBUG 1: Check Basics
+        if (mainCamera == null) { Debug.LogError("LockOn: MainCamera is missing!"); return; }
+        
+        // 2. Requirement Check
+        bool isUnlocked = false;
+        if (UpgradeManager.Instance != null && UpgradeManager.Instance.IsGuidanceUnlocked(currentWeapon.weaponName))
         {
+            isUnlocked = true;
+        }
+
+        if (!isUnlocked) 
+        { 
+            // Only log this once to avoid spam, or check if you definitely bought it
+            // Debug.Log("LockOn: Upgrade locked."); 
+            ResetLockState(); 
+            return; 
+        }
+
+        // 3. Input Check
+        if (!inputScript.aim)
+        {
+            if (_currentLockTimer > 0 || _finalLockedTarget != null) Debug.Log("LockOn: Aim released. Resetting.");
+            ResetLockState();
             return;
         }
 
-        // 2. Raycast/SphereCast to find enemy
+        // 4. Check Final Lock
+        if (_finalLockedTarget != null)
+        {
+            if (_currentReticleImage != null) _currentReticleImage.color = lockedReticleColor;
+            
+            if (_finalLockedTarget._isDead || !_finalLockedTarget.gameObject.activeInHierarchy)
+            {
+                Debug.Log("LockOn: Locked target died/vanished. Resetting.");
+                ResetLockState();
+            }
+            return; // Already locked, nothing to do
+        }
+
+        // 5. SphereCast
         Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
         RaycastHit hit;
-        
-        // SphereCast is better than Raycast because it's "forgiving" (thick ray)
+        EnemyController hitEnemy = null;
+
         if (Physics.SphereCast(ray, lockOnRadius, out hit, lockOnRange, enemyLayer))
         {
-            EnemyController enemy = hit.collider.GetComponentInParent<EnemyController>();
-            if (enemy != null && !enemy._isDead) // Assume you have IsDead property or check health > 0
+             if (hit.transform.root != transform.root)
+             {
+                 hitEnemy = hit.collider.GetComponentInParent<EnemyController>();
+                 // DEBUG 2: Log what we hit
+                 // Debug.Log($"LockOn: Ray hit {hit.collider.name}");
+             }
+        }
+        else
+        {
+            // DEBUG 3: Log miss (Only enable if you suspect the ray is too short)
+            // Debug.Log("LockOn: Raycast missed everything.");
+        }
+
+        // 6. Logic Evaluation
+        if (hitEnemy != null && !hitEnemy._isDead)
+        {
+            if (hitEnemy == _pendingTarget)
             {
-                _currentLockTarget = enemy;
-                 
-                // Optional: Change Crosshair Color here to indicate lock
-                // Debug.DrawLine(shootPoint.position, enemy.transform.position, Color.red);
+                // Increment Timer
+                _currentLockTimer += Time.deltaTime;
+                
+                // DEBUG 4: Print Timer progress (Every 0.5s to avoid spam)
+                if (_currentLockTimer % 0.5f < Time.deltaTime) 
+                    Debug.Log($"LockOn: Acquiring... {_currentLockTimer:F1}/{timeToLock}");
+
+                if (_currentLockTimer >= timeToLock)
+                {
+                    // SUCCESS
+                    _finalLockedTarget = hitEnemy;
+                    _pendingTarget = null;
+                    if (_currentReticleImage != null) _currentReticleImage.color = lockedReticleColor;
+                    Debug.Log($"LockOn: TARGET LOCKED: {hitEnemy.name}");
+                }
+                else
+                {
+                    // PENDING
+                    if (_currentReticleImage != null) _currentReticleImage.color = acquiringReticleColor;
+                }
+            }
+            else
+            {
+                Debug.Log($"LockOn: New Target Found: {hitEnemy.name}. Timer Reset.");
+                _pendingTarget = hitEnemy;
+                _currentLockTimer = 0f;
+                if (_currentReticleImage != null) _currentReticleImage.color = defaultReticleColor;
             }
         }
+        else
+        {
+            if (_pendingTarget != null) Debug.Log("LockOn: Lost target. Resetting.");
+            _pendingTarget = null;
+            _currentLockTimer = 0f;
+            if (_currentReticleImage != null) _currentReticleImage.color = defaultReticleColor;
+        }
+    }
+
+    // Helper to clear everything
+    private void ResetLockState()
+    {
+        _pendingTarget = null;
+        _finalLockedTarget = null;
+        _currentLockTimer = 0f;
+        if (_currentReticleImage != null) _currentReticleImage.color = defaultReticleColor;
+    }
+    
+    // Checks if the weapon is marked as "Infinite Start" AND has no upgrades yet
+    private bool IsAmmoInfinite()
+    {
+        // 1. If it's not a starter weapon, it's never infinite
+        if (!currentWeapon.infiniteAtStart) return false;
+
+        // 2. Safety check for manager
+        if (UpgradeManager.Instance == null) return true; // Default to infinite if manager missing
+
+        // 3. Check if ANY upgrade has been purchased
+        var data = UpgradeManager.Instance.GetWeaponData(currentWeapon.weaponName);
+        if (data == null) return true; 
+
+        // If any stat is above Level 1, or Guidance is unlocked, we are upgraded
+        if (data.damagePath.currentLevel > 1) return false;
+        if (data.fireRatePath.currentLevel > 1) return false;
+        if (data.maxAmmoPath.currentLevel > 1) return false;
+        if (data.clipSizePath.currentLevel > 1) return false;
+        if (data.guidanceUnlocked) return false;
+
+        // 4. No upgrades found -> Ammo is infinite
+        return true;
     }
     
     public float GetAccuracy() { if (shotsFired == 0) return 0f; return (float)shotsHit / (float)shotsFired; }
@@ -507,7 +656,10 @@ public class WeaponControllerHS : MonoBehaviour
         currentGunInstance = Instantiate(currentWeapon.weaponPrefab, gunHolder);
         if (currentWeapon.adsReticlePrefab != null && adsReticleParent != null) {
             currentAdsReticleInstance = Instantiate(currentWeapon.adsReticlePrefab, adsReticleParent);
-            currentAdsReticleInstance.SetActive(false); 
+            currentAdsReticleInstance.SetActive(false);
+            
+            _currentReticleImage = currentAdsReticleInstance.GetComponent<UnityEngine.UI.Image>();
+            if (_currentReticleImage != null) _currentReticleImage.color = defaultReticleColor;
         } else currentAdsReticleInstance = null; 
 
         currentGunTracer = currentGunInstance.GetComponentInChildren<LineRenderer>();

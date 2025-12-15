@@ -1911,7 +1911,18 @@ MonoBehaviour:
   inventory:
   - {fileID: 11400000, guid: d79667dd91425f84db1865f1867ecc0d, type: 2}
   - {fileID: 11400000, guid: c47cfe81f5ca04c4e80b27364dc6d624, type: 2}
+  - {fileID: 11400000, guid: bc5437dc52ddea2469be67e9165837a3, type: 2}
   - {fileID: 11400000, guid: 84c7d703898b8594f90983b3834e235a, type: 2}
+  tracerPrefab: {fileID: 8017768528594047700, guid: 8c77a3e4d99c1e446970ac63000d5e8c, type: 3}
+  lockOnRange: 50
+  lockOnRadius: 1.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  timeToLock: 2
+  defaultReticleColor: {r: 1, g: 1, b: 1, a: 1}
+  acquiringReticleColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  lockedReticleColor: {r: 0, g: 1, b: 0, a: 1}
   shotsFired: 0
   shotsHit: 0
 --- !u!114 &1083335414041249677
@@ -4641,6 +4652,10 @@ PrefabInstance:
       propertyPath: playerStats
       value: 
       objectReference: {fileID: 3194229437561688140}
+    - target: {fileID: 3668067593634384731, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
+      propertyPath: weaponController
+      value: 
+      objectReference: {fileID: 890133321744519364}
     - target: {fileID: 4933100461474284739, guid: 99387a926da5f6f41b08a465be60b436, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -214.5

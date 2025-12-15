@@ -25,7 +25,7 @@ MonoBehaviour:
   reloadTime: 2
   recoilKickback: 0.5
   adsSpeed: 12
-  aimDownSightsPosition: {x: 0.2, y: 0.2, z: 0.4}
+  aimDownSightsPosition: {x: 0.2, y: 0.2, z: 0.3}
   shootSound: {fileID: 0}
   reloadSound: {fileID: 0}
   equipSound: {fileID: 0}

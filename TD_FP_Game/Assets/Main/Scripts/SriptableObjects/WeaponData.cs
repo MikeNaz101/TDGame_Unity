@@ -22,6 +22,7 @@ public class WeaponData : ScriptableObject
     public bool isAutomatic = true;
 
     [Header("Ammo & Reload")]
+    public bool infiniteAtStart = false;
     public int maxAmmo = 30;
     public int reserveAmmo = 90;
     public float reloadTime = 2.0f;

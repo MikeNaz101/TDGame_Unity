@@ -20,9 +20,10 @@ MonoBehaviour:
   damageType: 0
   fireRate: 0.25
   isAutomatic: 1
+  infiniteAtStart: 1
   maxAmmo: 30
   reserveAmmo: 29
-  reloadTime: 10
+  reloadTime: 2
   recoilKickback: 0.5
   adsSpeed: 8
   aimDownSightsPosition: {x: 0.25, y: -0.08, z: 0.4}
