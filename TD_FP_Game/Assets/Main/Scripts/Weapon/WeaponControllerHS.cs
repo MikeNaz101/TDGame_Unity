@@ -41,6 +41,10 @@ public class WeaponControllerHS : MonoBehaviour
     public Color defaultReticleColor = Color.white;
     public Color acquiringReticleColor = Color.yellow; // --- NEW: In-progress color
     public Color lockedReticleColor = Color.green;
+    
+    [Header("Animation")]
+    [Tooltip("Drag the FPS Arms (with the Animator) here.")]
+    public Animator armsAnimator;
 
     // --- NEW: State Variables ---
     private EnemyController _pendingTarget; // Enemy currently under crosshair
@@ -80,6 +84,7 @@ public class WeaponControllerHS : MonoBehaviour
     private LineRenderer currentGunTracer;
     private PlayerStats playerStats; 
     private AudioSource _audioSource;
+    private Animator currentGunAnimator;
 
     void Start()
     {
@@ -464,6 +469,15 @@ public class WeaponControllerHS : MonoBehaviour
 
         if (currentWeapon.reloadSound != null) _audioSource.PlayOneShot(currentWeapon.reloadSound);
         
+        if (armsAnimator != null)
+        {
+            armsAnimator.SetTrigger("Reload");
+        }
+        else
+        {
+            Debug.LogWarning("Arms Animator is missing! Assign it in WeaponControllerHS.");
+        }
+        
         yield return new WaitForSeconds(currentWeapon.reloadTime);
         
         int maxClip = GetUpgradedClipSize();
@@ -654,6 +668,12 @@ public class WeaponControllerHS : MonoBehaviour
         if (currentWeapon.equipSound != null) _audioSource.PlayOneShot(currentWeapon.equipSound);
 
         currentGunInstance = Instantiate(currentWeapon.weaponPrefab, gunHolder);
+        currentGunAnimator = currentGunInstance.GetComponentInChildren<Animator>();
+        
+        if (currentGunAnimator == null) 
+        {
+            Debug.LogWarning($"No Animator found on {currentWeapon.weaponName} or its children!");
+        }
         if (currentWeapon.adsReticlePrefab != null && adsReticleParent != null) {
             currentAdsReticleInstance = Instantiate(currentWeapon.adsReticlePrefab, adsReticleParent);
             currentAdsReticleInstance.SetActive(false);

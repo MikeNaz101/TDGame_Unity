@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AR_AssaultRifle_Data
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Pistol
-  weaponPrefab: {fileID: 1396857973655360118, guid: ee9c6e6555bcf0a498f8e747fdf73ce8, type: 3}
+  weaponPrefab: {fileID: 8235178005731274518, guid: 2be6b6d85292361448ec98933eb66c84, type: 3}
   adsReticlePrefab: {fileID: 8305691199734996223, guid: ecaf8c39d8992c94f94f5b8e8f2f66d7, type: 3}
   damage: 10
   range: 100
