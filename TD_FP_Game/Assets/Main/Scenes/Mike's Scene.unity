@@ -562,6 +562,22 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.0225
       objectReference: {fileID: 0}
+    - target: {fileID: 3194229437561688140, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: hitSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 095f6581cd3b8dc45ae7a9a393df21aa, type: 3}
+    - target: {fileID: 3194229437561688140, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: cameraShake
+      value: 
+      objectReference: {fileID: 394385705}
+    - target: {fileID: 3194229437561688140, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: hitParticlePrefab
+      value: 
+      objectReference: {fileID: 4553287630450876385, guid: 15483e51212e3d74886ea57291f4639a, type: 3}
+    - target: {fileID: 3194229437561688140, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: hitShakeIntensity
+      value: 1.41
+      objectReference: {fileID: 0}
     - target: {fileID: 3233774646481630640, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -697,6 +713,17 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 6908724278379209201, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
   m_PrefabInstance: {fileID: 394385701}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &394385705 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7170994607310426319, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+  m_PrefabInstance: {fileID: 394385701}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b958a573a254aa47a1a0a23073863fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraShake
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -8151,6 +8178,63 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -9088695878779348318, guid: d0a9bfb4b5f28174884e89dd76563ae8, type: 3}
+--- !u!1001 &5024852454293196721
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.4740062
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.523666
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 13.0276165
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2566198052173687949, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8777798436009876104, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
+      propertyPath: m_Name
+      value: MAC_SciFiSniperRifle
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
 --- !u!65 &5039052122965950213
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9998,3 +10082,4 @@ SceneRoots:
   - {fileID: 700313303}
   - {fileID: 232446294}
   - {fileID: 1118277448725030306}
+  - {fileID: 5024852454293196721}

@@ -7,16 +7,17 @@ using System.Collections.Generic;
 public class EnemyController : MonoBehaviour, IDamageable
 {
     // --- AI States ---
-    private enum EnemyState { Pursuing, Attacking, Ragdolled, SeekingCover, Dodging }
+    private enum EnemyState { Pursuing, Attacking, Ragdolled, SeekingCover, Dodging, Raging }
+    private bool _hasRaged = false;
     private EnemyState _state;
-
-    // --- EXISTING DATA ---
+    
     [Header("Data & Manager References")]
     public EnemyData enemyData;
     public WaveManager _waveManager;
     public Transform _playerTarget;
     public FieldOfView fov;
     public LayerMask obstacleLayer;
+    private AudioSource _audioSource;
     
     [Header("Fall Kill Settings")]
     public float fallKillThreshold = -20f;
@@ -84,6 +85,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         _animator = GetComponentInChildren<Animator>();
         _mainRigidbody = GetComponent<Rigidbody>();
         if(_meshRenderer == null) _meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
     }
 
     void Start()
@@ -135,6 +138,13 @@ public class EnemyController : MonoBehaviour, IDamageable
         {
             HandleFallDeath();
             return;
+        }
+        
+        if (_animator != null && _agent.enabled)
+        {
+            // Smoothly pass the NavMeshAgent's speed to the animator
+            // 0.1f is the damp time to make it look smooth
+            _animator.SetFloat("Speed", _agent.velocity.magnitude, 0.1f, Time.deltaTime);
         }
         
         _timeSinceLastAttack += Time.deltaTime;
@@ -246,6 +256,7 @@ public class EnemyController : MonoBehaviour, IDamageable
     private void RunAILogic()
     {
         if (_state == EnemyState.Ragdolled) return;
+        if (_state == EnemyState.Raging) return;
         if (!_agent.enabled || !_agent.isOnNavMesh) return;
 
         // Default Targeting Logic
@@ -362,8 +373,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     void TryAttack() 
     { 
         if (_currentTarget == null) return; 
-        if (_timeSinceLastAttack >= enemyData.attackCooldown) { 
-            
+        if (_timeSinceLastAttack >= enemyData.attackCooldown) 
+        { 
+            if (_animator != null)
+            {
+                _animator.SetTrigger("Attack");
+            }
             float dmg = enemyData.attackDamage;
             
             // Rank 4: Stronger (Attack Multiplier)
@@ -581,12 +596,80 @@ public class EnemyController : MonoBehaviour, IDamageable
 
         // --- 4. APPLY DAMAGE ---
         _currentHealth -= finalDamage;
+        
+        PlayHitEffects();
+        // Check if alive, haven't raged yet, and we have the data setup
+        if (_currentHealth > 0 && !_hasRaged && enemyData.rageDuration > 0)
+        {
+            StartCoroutine(PerformRageRoutine());
+        }
     
         // Distraction logic
         if (enemyData.canBeDistracted) _attackSource = attacker;
     
         // Death check
         if (_currentHealth <= 0f) Die(true);
+    }
+    
+    private void PlayHitEffects()
+    {
+        // 1. Particle Effect
+        if (enemyData.hitParticlePrefab != null)
+        {
+            // Spawn particle at the enemy's center (approx chest height)
+            Vector3 spawnPos = transform.position + Vector3.up * 1.5f; 
+            Instantiate(enemyData.hitParticlePrefab, spawnPos, Quaternion.identity);
+        }
+
+        // 2. Sound Effect
+        if (enemyData.hitSound != null)
+        {
+            // PlayClipAtPoint creates a temporary audio source that dies after playing
+            AudioSource.PlayClipAtPoint(enemyData.hitSound, transform.position);
+        }
+
+        // 3. Animation
+        if (_animator != null && !string.IsNullOrEmpty(enemyData.hitAnimationTrigger))
+        {
+            // Check if the parameter exists to avoid errors (optional but safer)
+            _animator.SetTrigger(enemyData.hitAnimationTrigger);
+        }
+    }
+    
+    private IEnumerator PerformRageRoutine()
+    {
+        _hasRaged = true;
+        _state = EnemyState.Raging; // Stops AI movement logic in Update()
+    
+        // Stop moving immediately
+        if (_agent.enabled) 
+        {
+            _agent.isStopped = true;
+            _agent.velocity = Vector3.zero; // Kill momentum
+        }
+
+        // Play Animation
+        if (_animator != null && !string.IsNullOrEmpty(enemyData.rageAnimationTrigger))
+        {
+            _animator.ResetTrigger("Hit"); // Cancel any flinch that might have just started
+            _animator.SetTrigger(enemyData.rageAnimationTrigger);
+        }
+
+        // Play Scream Sound
+        if (enemyData.rageSound != null && _audioSource != null)
+        {
+            _audioSource.PlayOneShot(enemyData.rageSound);
+        }
+
+        // Wait for the scream/animation to finish
+        yield return new WaitForSeconds(enemyData.rageDuration);
+
+        // Resume Chase
+        if (!_isDead)
+        {
+            _state = EnemyState.Pursuing;
+            if (_agent.enabled) _agent.isStopped = false;
+        }
     }
     
     // --- TakeExplosion (Resets state if already hit) ---
@@ -642,42 +725,64 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         if (_isDead) return;
         _isDead = true;
-        _state = EnemyState.Ragdolled;
+        _state = EnemyState.Ragdolled; // Stop AI logic
         
         if (_waveManager != null) _waveManager.EnemyDestroyed();
-        
+        if (_agent.enabled) _agent.enabled = false; 
+
+        // --- NEW: ANIMATION CHECK ---
+        // If we have an animator and a death animation set up, play it first!
+        if (_animator != null && !useRagdoll) // Usually don't play anims if we are ragdolling
+        {
+            StartCoroutine(PlayDeathAnimationThenExplode(useRagdoll));
+            return; // Exit here, let the coroutine handle the rest
+        }
+        // ----------------------------
+
+        // If no animation, just explode immediately like before
+        FinishDying(useRagdoll);
+    }
+
+    // --- NEW: COROUTINE TO DELAY EXPLOSION ---
+    private IEnumerator PlayDeathAnimationThenExplode(bool useRagdoll)
+    {
+        // 1. Trigger the animation
+        _animator.SetBool("IsDead", true);
+
+        // 2. Wait for the animation length (adjust 2.0f to match your clip length)
+        // You can also get this automatically, but a hardcoded value is safer for now.
+        yield return new WaitForSeconds(2.0f); 
+
+        // 3. Now actually blow up/destroy
+        FinishDying(useRagdoll);
+    }
+
+    // --- NEW: MOVED THE ORIGINAL LOGIC HERE ---
+    private void FinishDying(bool useRagdoll)
+    {
         // Spawn Scrap
         if (enemyData != null && enemyData.scrapMetalPrefab != null) 
             Instantiate(enemyData.scrapMetalPrefab, transform.position, Quaternion.identity);
-            
-        if (_agent.enabled) _agent.enabled = false; 
 
-        // Check capabilities
         bool hasRagdoll = useRagdoll && _ragdollRigidbodies != null && _ragdollRigidbodies.Length > 0;
         bool hasSimplePhysics = _mainRigidbody != null;
         bool hasParticles = enemyData != null && enemyData.deathParticlePrefab != null;
 
-        // --- PRIORITY 1: Ragdoll (Complex Physics) ---
         if (hasRagdoll)
         {
-            ActivateRagdoll();
+            ActivateRagdoll(); // This disables the animator, so we do it AFTER the animation
             Destroy(gameObject, 5f);
         }
-        // --- PRIORITY 2: Particles (Instant Death) ---
-        // We prioritize this over simple physics so "exploding" enemies vanish immediately
         else if (hasParticles)
         {
             Instantiate(enemyData.deathParticlePrefab, transform.position, Quaternion.identity);
-            Destroy(gameObject, 0.1f); // Destroy almost instantly
+            Destroy(gameObject, 0.1f); 
         }
-        // --- PRIORITY 3: Simple Physics (Flying Corpse) ---
-        // Only use this if we have NO ragdoll AND NO particles
         else if (hasSimplePhysics)
         {
             _mainRigidbody.isKinematic = false;
             Destroy(gameObject, 5f); 
         }
-        // --- PRIORITY 4: Fallback ---
         else
         {
             Destroy(gameObject, 0.1f);

@@ -16,8 +16,10 @@ MonoBehaviour:
   description: Smash goes Thor's Hammer
   towerIcon: {fileID: 21300110, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
   towerPrefab: {fileID: 4681492479723872057, guid: bbe56409f6c5f0e46a20a2032d9294f7, type: 3}
+  ghostPrefab: {fileID: 4681492479723872057, guid: 23ba92dfb315e2940a36da4674ebd3fa, type: 3}
   scrapCost: 100
   attackType: 0
+  damageType: 0
   projectilePrefab: {fileID: 0}
   damage: 200
   fireRate: 2

@@ -16,8 +16,10 @@ MonoBehaviour:
   description: A basic defensive unit.
   towerIcon: {fileID: 21300000, guid: cc22d7577cb43a843a562490334918cc, type: 3}
   towerPrefab: {fileID: 8628647844891827069, guid: 1b97f9401122a8d49802f920f4c9a865, type: 3}
+  ghostPrefab: {fileID: 8628647844891827069, guid: f27188ed3e6b15f4aab5a5fc7d914b0c, type: 3}
   scrapCost: 10
   attackType: 0
+  damageType: 0
   projectilePrefab: {fileID: 0}
   damage: 20
   fireRate: 0.5

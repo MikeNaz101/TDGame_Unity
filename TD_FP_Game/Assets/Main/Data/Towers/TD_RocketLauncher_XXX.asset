@@ -16,8 +16,10 @@ MonoBehaviour:
   description: ROCKETS!!!!!!!!!!!
   towerIcon: {fileID: 21300022, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
   towerPrefab: {fileID: 7916277489149036260, guid: 1608b5632f57f654a8aa7a1f981e444e, type: 3}
+  ghostPrefab: {fileID: 7916277489149036260, guid: 323b5606bf9047d47aa8d12aebeeb7a4, type: 3}
   scrapCost: 15
   attackType: 1
+  damageType: 0
   projectilePrefab: {fileID: 8564253943978648857, guid: 1b4dff3253e77024489941a75354a595, type: 3}
   damage: 25
   fireRate: 5
