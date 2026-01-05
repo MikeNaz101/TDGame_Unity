@@ -11,7 +11,16 @@ public class PC_UI_Manager : MonoBehaviour
     public GameObject PlayerUpgrade_Container; 
     public GameObject WeaponList_Container; 
     public GameObject WeaponSpecific_Container; 
+    
+    [Header("Audio Settings")]
+    public AudioSource voiceAudioSource; // Drag an AudioSource here (or the PC's speaker)
 
+    [Header("Voice Lines")]
+    public AudioClip welcomeVoiceLine;      // "Welcome back, Commander."
+    public AudioClip weaponsMenuVoiceLine;  // "Armory database accessed."
+    public AudioClip playerMenuVoiceLine;   // "Biometrics scanning..."
+    public AudioClip botMenuVoiceLine;      // "Drone diagnostics loaded."
+    
     [Header("Typewriter")]
     public TypeWriterEffect typewriter;
     [Tooltip("The MAIN text display for both the prompt and the welcome message.")]
@@ -84,6 +93,7 @@ public class PC_UI_Manager : MonoBehaviour
         {
             Debug.LogError("CRITICAL ERROR: UpgradeManager is missing from the scene! Please create an empty object and attach 'UpgradeManager.cs'.");
         }
+        if (voiceAudioSource == null) voiceAudioSource = GetComponent<AudioSource>();
     }
     
     public void StartPCInterface()
@@ -103,6 +113,7 @@ public class PC_UI_Manager : MonoBehaviour
     private IEnumerator StartupRoutine()
     {
         if(pcDisplay) pcDisplay.gameObject.SetActive(true);
+        PlayVoice(welcomeVoiceLine);
         if (typewriter != null && pcDisplay != null) 
         { 
             yield return typewriter.DisplayText(pcDisplay, pcWelcomeMessage); 
@@ -132,6 +143,15 @@ public class PC_UI_Manager : MonoBehaviour
             if (typewriter != null) typewriter.StopTyping();
         }
     }
+    
+    private void PlayVoice(AudioClip clip)
+    {
+        if (voiceAudioSource != null && clip != null)
+        {
+            voiceAudioSource.Stop(); // Stop any previous line so they don't overlap
+            voiceAudioSource.PlayOneShot(clip);
+        }
+    }
 
     // --- MAIN MENU BUTTONS ---
     
@@ -140,6 +160,7 @@ public class PC_UI_Manager : MonoBehaviour
         ShowScreen(PlayerUpgrade_Container); 
         UpdatePlayerUI();
         Type("Biometrics Loaded.");
+        PlayVoice(playerMenuVoiceLine);
     }
 
     public void OnMainMenu_WeaponsClicked() 
@@ -147,13 +168,15 @@ public class PC_UI_Manager : MonoBehaviour
         ShowScreen(WeaponList_Container); 
         UpdateWeaponListUI();
         Type("Armory Database Accessed.");
+        PlayVoice(weaponsMenuVoiceLine);
     }
 
     public void OnMainMenu_BotzClicked() 
     { 
         ShowScreen(BotUpgrade_Container); 
         RefreshBotUI();
-        Type("Bot Modification Module Loaded."); 
+        Type("Bot Modification Module Loaded.");
+        PlayVoice(botMenuVoiceLine);
     }
 
     public void OnMainMenu_MysteryClicked() 
