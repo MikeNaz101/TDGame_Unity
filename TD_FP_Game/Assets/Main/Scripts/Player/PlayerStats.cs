@@ -83,8 +83,26 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
     void Die()
     {
-        Debug.Log("Player has died! Implementing game over.");
-        gameObject.SetActive(false); 
+        // 1. Play Death Logic (Optional: Sound, Particles)
+        Debug.Log("Player has died!");
+
+        // 2. Prevent further damage
+        currentHealth = 0;
+
+        // 3. Trigger Game Over UI
+        if (Game_UI_Manager.Instance != null)
+        {
+            Game_UI_Manager.Instance.GameOver();
+        }
+        
+        // 4. Disable Player controls (optional, keeps camera from moving)
+        // We don't want to SetActive(false) the whole object because the camera is attached to it!
+        // Instead, just disable the movement script:
+        DoomMovement movement = GetComponent<DoomMovement>();
+        if (movement != null) movement.enabled = false;
+        
+        WeaponControllerHS weapon = GetComponentInChildren<WeaponControllerHS>();
+        if (weapon != null) weapon.enabled = false;
     }
 
     // --- RESOURCE HANDLERS ---

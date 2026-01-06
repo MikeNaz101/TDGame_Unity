@@ -582,6 +582,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6224509581190655157, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
+      propertyPath: m_text
+      value: Retry
+      objectReference: {fileID: 0}
     - target: {fileID: 6549788759549571226, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -7361,7 +7365,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5120130565708131967, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: m_Volume
-      value: 0.334
+      value: 0.337
       objectReference: {fileID: 0}
     - target: {fileID: 5120130565708131967, guid: ca856316edee16645a670c6a08a9866f, type: 3}
       propertyPath: MaxDistance

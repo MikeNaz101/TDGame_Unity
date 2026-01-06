@@ -61,9 +61,17 @@ public class Game_UI_Manager : MonoBehaviour
 
     public void GameOver()
     {
-        gameOverUI.SetActive(true);
+        isGameOver = true;
+        
+        // 1. Show the UI
+        if (gameOverUI != null) gameOverUI.SetActive(true);
+        
+        // 2. Unlock Cursor so player can click buttons
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
+        // 3. Pause the Game
+        Time.timeScale = 0f;
     }
 
 }
