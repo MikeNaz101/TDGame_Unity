@@ -3,8 +3,24 @@
   "WorkspaceRootPath": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\github\\tdgame_unity\\td_fp_game\\assets\\main\\scripts\\weapon\\projectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\main\\scripts\\weapon\\projectile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\github\\tdgame_unity\\td_fp_game\\assets\\main\\scripts\\enemy\\enemycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\main\\scripts\\enemy\\enemycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\github\\tdgame_unity\\td_fp_game\\assets\\main\\scripts\\tower\\towercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\main\\scripts\\tower\\towercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\github\\tdgame_unity\\td_fp_game\\assets\\main\\scripts\\sriptableobjects\\towerdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\main\\scripts\\sriptableobjects\\towerdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|c:\\users\\mike\\desktop\\github\\tdgame_unity\\td_fp_game\\assets\\main\\scripts\\tower\\towermanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C070166-2334-8572-98A4-D63D26F48E37}|Assembly-CSharp.csproj|solutionrelative:assets\\main\\scripts\\tower\\towermanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Jason\u0027s Stuff\\Scripts\\JTowerPlacingManager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
@@ -26,7 +42,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,20 +50,72 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "EnemyController.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\Enemy\\EnemyController.cs",
+              "RelativeDocumentMoniker": "Assets\\Main\\Scripts\\Enemy\\EnemyController.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\Enemy\\EnemyController.cs",
+              "RelativeToolTip": "Assets\\Main\\Scripts\\Enemy\\EnemyController.cs",
+              "ViewState": "AgIAAAYCAAAAAAAAAAAAAC8CAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-08T00:54:10.601Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Projectile.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\Weapon\\Projectile.cs",
+              "RelativeDocumentMoniker": "Assets\\Main\\Scripts\\Weapon\\Projectile.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\Weapon\\Projectile.cs",
+              "RelativeToolTip": "Assets\\Main\\Scripts\\Weapon\\Projectile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-08T00:53:47.362Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "TowerManager.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\Tower\\TowerManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Main\\Scripts\\Tower\\TowerManager.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\Tower\\TowerManager.cs",
+              "RelativeToolTip": "Assets\\Main\\Scripts\\Tower\\TowerManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACwAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-08T00:31:42.81Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TowerController.cs",
+              "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\Tower\\TowerController.cs",
+              "RelativeDocumentMoniker": "Assets\\Main\\Scripts\\Tower\\TowerController.cs",
+              "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\Tower\\TowerController.cs",
+              "RelativeToolTip": "Assets\\Main\\Scripts\\Tower\\TowerController.cs",
+              "ViewState": "AgIAAIYAAAAAAAAAAAAqwL4AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-08T00:30:50.73Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "TowerData.cs",
               "DocumentMoniker": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\SriptableObjects\\TowerData.cs",
               "RelativeDocumentMoniker": "Assets\\Main\\Scripts\\SriptableObjects\\TowerData.cs",
               "ToolTip": "C:\\Users\\Mike\\Desktop\\GitHub\\TDGame_Unity\\TD_FP_Game\\Assets\\Main\\Scripts\\SriptableObjects\\TowerData.cs",
               "RelativeToolTip": "Assets\\Main\\Scripts\\SriptableObjects\\TowerData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-08T00:29:45.774Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 6,
               "Title": "DoomMovement.cs",
               "DocumentMoniker": "C:\\Users\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Mike\u0027s Stuff\\Scripts\\DoomMovement.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Mike\u0027s Stuff\\Scripts\\DoomMovement.cs",
@@ -55,11 +123,12 @@
               "RelativeToolTip": "..\\..\\..\\..\\..\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Mike\u0027s Stuff\\Scripts\\DoomMovement.cs",
               "ViewState": "AgIAADcAAAAAAAAAAAAgwHQAAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T19:41:34.266Z"
+              "WhenOpened": "2025-11-02T19:41:34.266Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 5,
               "Title": "JTowerPlacingManager.cs",
               "DocumentMoniker": "C:\\Users\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Jason\u0027s Stuff\\Scripts\\JTowerPlacingManager.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Jason\u0027s Stuff\\Scripts\\JTowerPlacingManager.cs",
@@ -70,7 +139,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 7,
               "Title": "TowerPreview.cs",
               "DocumentMoniker": "C:\\Users\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Jason\u0027s Stuff\\Scripts\\TowerPreview.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Jason\u0027s Stuff\\Scripts\\TowerPreview.cs",
@@ -78,11 +147,12 @@
               "RelativeToolTip": "..\\..\\..\\..\\..\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Jason\u0027s Stuff\\Scripts\\TowerPreview.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T19:14:34.666Z"
+              "WhenOpened": "2025-11-02T19:14:34.666Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 8,
               "Title": "StarterAssetsInputs.cs",
               "DocumentMoniker": "C:\\Users\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Mike\u0027s Stuff\\Scripts\\StarterAssetsInputs.cs",
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Mike\u0027s Stuff\\Scripts\\StarterAssetsInputs.cs",
@@ -90,7 +160,8 @@
               "RelativeToolTip": "..\\..\\..\\..\\..\\Jason\\Desktop\\Game Dev\\Unity\\TDGame_Unity\\TD_FP_Game\\Assets\\Mike\u0027s Stuff\\Scripts\\StarterAssetsInputs.cs",
               "ViewState": "AgIAADQAAAAAAAAAAAAgwFkAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-02T18:42:18.899Z"
+              "WhenOpened": "2025-11-02T18:42:18.899Z",
+              "EditorCaption": ""
             }
           ]
         }
