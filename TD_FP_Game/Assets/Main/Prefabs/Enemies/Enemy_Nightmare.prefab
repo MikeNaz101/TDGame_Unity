@@ -7070,7 +7070,7 @@ MonoBehaviour:
   fov: {fileID: 6901562443971005008}
   obstacleLayer:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 10240
   fallKillThreshold: -20
   pelvisRigidbody: {fileID: 0}
   _ragdollRigidbodies: []
@@ -7080,6 +7080,7 @@ MonoBehaviour:
   _pathCheckInterval: 1
   _currentRankLevel: -1
   _meshRenderer: {fileID: 0}
+  _isDead: 0
 --- !u!54 &5967329410397846920
 Rigidbody:
   m_ObjectHideFlags: 0

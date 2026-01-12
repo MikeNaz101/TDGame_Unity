@@ -44,9 +44,8 @@ public class BossWaveManager : MonoBehaviour
                 Debug.Log($"SPAWNING BOSS: {bossData.rank}");
 
                 // Use a random spawn point from the WaveManager
-                Transform spawnPoint = waveManager.spawnPoints[Random.Range(0, waveManager.spawnPoints.Length)];
-                
-                GameObject boss = Instantiate(bossData.bossPrefab, spawnPoint.position, Quaternion.identity);
+                Vector3 spawnPos = waveManager.GetRandomSpawnPoint();
+                GameObject boss = Instantiate(bossData.bossPrefab, spawnPos, Quaternion.identity);
                 
                 // Configure the commander
                 EnemyCommander cmd = boss.GetComponent<EnemyCommander>();

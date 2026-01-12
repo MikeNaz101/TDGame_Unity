@@ -19,3 +19,7 @@ MonoBehaviour:
     count: 10
     spawnInterval: 0.5
     spawnPauseInterval: 3
+  - enemyType: {fileID: 11400000, guid: 0408420f359b1c44f8e41d58917dc45d, type: 2}
+    count: 10
+    spawnInterval: 0.5
+    spawnPauseInterval: 3

@@ -16,15 +16,22 @@ MonoBehaviour:
   canBeDistracted: 1
   baseScale: 0.5
   enemyName: Stalker
-  enemyPrefab: {fileID: 5358199103257218831, guid: 1a6ce89e787adff46b0fcf10cddbd7ff, type: 3}
-  baseHealth: 200
+  enemyPrefab: {fileID: 4055710020467566707, guid: 04e3346823f758e4bba963b93fd0b80e, type: 3}
   attackDamage: 25
   attackCooldown: 2.5
+  baseHealth: 200
+  armorType: 2
   moveSpeed: 8
   hearingRange: 30
   visionRange: 15
   patrolWaitTime: 2
   scrapMetalPrefab: {fileID: 3609530775625676480, guid: 012bf2f65129f7c4db77522b829b50b2, type: 3}
+  hitParticlePrefab: {fileID: 4553287630450876385, guid: 15483e51212e3d74886ea57291f4639a, type: 3}
+  hitSound: {fileID: 8300000, guid: 799989a6036e8b742acc1351bd88c390, type: 3}
+  hitAnimationTrigger: Hit
+  rageSound: {fileID: 8300000, guid: ee28b08905fea95489eeb1ba93ade652, type: 3}
+  rageAnimationTrigger: Rage
+  rageDuration: 2
   deathParticlePrefab: {fileID: 4593184484909914552, guid: 2e1e9506f5904a64b81744324fb7cd50, type: 3}
   isSpawner: 0
   spawnerTimeLimit: 60
