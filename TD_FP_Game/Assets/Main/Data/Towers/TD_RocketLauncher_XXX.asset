@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6dcc75fa6bc694bb16d405aefadc6e, type: 3}
+  m_Name: TD_RocketLauncher_XXX
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  towerName: Rocket Launcher Tower XXX
+  description: ROCKETS!!!!!!!!!!!
+  towerIcon: {fileID: 21300022, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  towerPrefab: {fileID: 7916277489149036260, guid: 1608b5632f57f654a8aa7a1f981e444e, type: 3}
+  ghostPrefab: {fileID: 7916277489149036260, guid: 323b5606bf9047d47aa8d12aebeeb7a4, type: 3}
+  scrapCost: 15
+  attackType: 1
+  damageType: 0
+  projectilePrefab: {fileID: 8564253943978648857, guid: 1b4dff3253e77024489941a75354a595, type: 3}
+  damage: 25
+  fireRate: 5
+  range: 8
+  isExplosive: 1
+  explosionRadius: 4
+  explosionForce: 25
+  impactParticlePrefab: {fileID: 4593184484909914552, guid: 2e1e9506f5904a64b81744324fb7cd50, type: 3}
+  shootSound: {fileID: 0}
+  healthPerSecond: 0
+  scrapPerSecond: 0
+  fireRateBuff: 1
+  damageBuff: 1
+  enemySpeedDebuff: 1
+  upgradePaths: []

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 29a7d654db337de4da3a461463f0a6a7
+timeCreated: 1539311509
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/Rockets/Rocket_LOD0.prefab
+  uploadId: 290411

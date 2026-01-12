@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4ce2252deb9ff049bc095a7214974d5, type: 3}
   m_Name: SR_SniperRifle_Data
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Sniper Rifle
+  weaponName: Sniper
   weaponPrefab: {fileID: 124194, guid: f05a2b9d2a6e5dd4b8241a31203d8b13, type: 3}
   adsReticlePrefab: {fileID: 6765210739813428312, guid: 169407042f5c9c644828ea08e163eeb2, type: 3}
   damage: 100
   range: 200
+  damageType: 0
   fireRate: 0.25
   isAutomatic: 0
   maxAmmo: 20
@@ -24,7 +25,12 @@ MonoBehaviour:
   reloadTime: 2
   recoilKickback: 0.99
   adsSpeed: 8
-  aimDownSightsPosition: {x: 0, y: 0, z: 0}
+  aimDownSightsPosition: {x: 0.014, y: -0.025, z: 0.13}
   shootSound: {fileID: 8300000, guid: 614cd7dc9daa6b84286af1e08ac67172, type: 3}
   reloadSound: {fileID: 8300000, guid: ca22f850fb7e36d429a85576bebd0015, type: 3}
   equipSound: {fileID: 8300000, guid: edade11325ed6b64c8c8e17293a4861f, type: 3}
+  pellets: 1
+  spreadAngle: 0
+  fullHitBonus: 1.5
+  projectilePrefab: {fileID: 0}
+  launchForce: 20

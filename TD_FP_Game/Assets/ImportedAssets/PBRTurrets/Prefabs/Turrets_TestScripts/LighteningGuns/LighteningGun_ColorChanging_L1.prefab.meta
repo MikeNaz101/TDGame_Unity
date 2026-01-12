@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 71423b1bd0ace364fbbd551930840f99
+timeCreated: 1542406703
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/LighteningGuns/LighteningGun_ColorChanging_L1.prefab
+  uploadId: 290411

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4ce2252deb9ff049bc095a7214974d5, type: 3}
+  m_Name: RocketLauncher_Data
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  weaponName: RocketLauncher
+  weaponPrefab: {fileID: 7775151541112102890, guid: 82c6b096a1ace174c84d29ad1a44a5e3, type: 3}
+  adsReticlePrefab: {fileID: 6765210739813428312, guid: 169407042f5c9c644828ea08e163eeb2, type: 3}
+  damage: 50
+  range: 8
+  damageType: 0
+  fireRate: 1
+  isAutomatic: 0
+  maxAmmo: 2
+  reserveAmmo: 6
+  reloadTime: 5
+  recoilKickback: 0.79
+  adsSpeed: 0.7
+  aimDownSightsPosition: {x: 0.05, y: -0.101, z: 0}
+  shootSound: {fileID: 0}
+  reloadSound: {fileID: 0}
+  equipSound: {fileID: 0}
+  pellets: 15
+  spreadAngle: 40
+  fullHitBonus: 1.5
+  projectilePrefab: {fileID: 8564253943978648857, guid: 1b4dff3253e77024489941a75354a595, type: 3}
+  launchForce: 20

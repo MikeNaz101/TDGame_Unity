@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3f31f17abdd55f141b9b886d25da483c
+timeCreated: 1543026894
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/Nuke/Materials/ParticleRing.mat
+  uploadId: 290411

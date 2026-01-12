@@ -132,7 +132,8 @@ public class Projectile : MonoBehaviour
     {
         if (enemy != null)
         {
-            enemy.TakeDamage(towerData.damage * damageMultiplier, attacker);
+            //enemy.TakeDamage(towerData.damage * damageMultiplier, attacker);
+            enemy.TakeDamage(towerData.damage * damageMultiplier, attacker, towerData.damageType);
         }
     }
 

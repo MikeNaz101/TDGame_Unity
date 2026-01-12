@@ -25,9 +25,12 @@ public class EnemyData : ScriptableObject
     public GameObject enemyPrefab; 
 
     [Header("Combat Stats")]
-    public float baseHealth = 50f;
     public float attackDamage = 10f;
     public float attackCooldown = 1.5f;
+    
+    [Header("Combat Stats")]
+    public float baseHealth = 50f;
+    public ArmorType armorType = ArmorType.Unarmored;
 
     [Header("Movement & AI")]
     public float moveSpeed = 3.5f;
@@ -40,6 +43,22 @@ public class EnemyData : ScriptableObject
 
     [Header("Economy")]
     public GameObject scrapMetalPrefab;
+    
+    [Header("Hit Effects")]
+    [Tooltip("Particle to spawn when this enemy takes damage (e.g. Blood splat).")]
+    public GameObject hitParticlePrefab;
+    [Tooltip("Sound to play when hit.")]
+    public AudioClip hitSound;
+    [Tooltip("Name of the Trigger parameter in the Animator Controller.")]
+    public string hitAnimationTrigger = "Hit";
+    
+    [Header("Rage Settings")]
+    [Tooltip("Sound to play when the enemy enters rage mode.")]
+    public AudioClip rageSound;
+    [Tooltip("Name of the Trigger parameter in the Animator for the Rage animation.")]
+    public string rageAnimationTrigger = "Rage";
+    [Tooltip("How long the enemy stands still screaming before chasing.")]
+    public float rageDuration = 2.0f;
     
     [Header("VFX")]
     [Tooltip("The particle effect to play when the enemy dies (if not ragdolling).")]

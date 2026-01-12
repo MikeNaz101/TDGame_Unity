@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a20627eba477b3d4c8a7edf6d34d65c0
+timeCreated: 1548241379
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Environment/Bridge_Ramp.prefab
+  uploadId: 290411

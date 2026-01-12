@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b6dcc75fa6bc694bb16d405aefadc6e, type: 3}
+  m_Name: FlameThrower XxX
+  m_EditorClassIdentifier: Assembly-CSharp::TowerData
+  towerName: FlameThrowerXXX
+  description: Spawner of Hell Fire!
+  towerIcon: {fileID: 21300128, guid: 09e4c6a7d75923945afe43953ef58ad2, type: 3}
+  towerPrefab: {fileID: 5475272149610925407, guid: d29ff7f1ab40c944097ec72a1ebb8b58, type: 3}
+  scrapCost: 10
+  attackType: 0
+  projectilePrefab: {fileID: 8764043878647920493, guid: c4ed38c72957f2241ad144a1614956d9, type: 3}
+  damage: 25
+  fireRate: 0
+  range: 10
+  isExplosive: 0
+  explosionRadius: 3
+  explosionForce: 500
+  impactParticlePrefab: {fileID: 8172849020266659018, guid: 2af5562ce69fc2d448481a1587a352a5, type: 3}
+  shootSound: {fileID: 8300000, guid: 7b78d79efe3a57c4489d2344ca495272, type: 3}
+  healthPerSecond: 0
+  scrapPerSecond: 0
+  fireRateBuff: 1
+  damageBuff: 1
+  enemySpeedDebuff: 1
+  upgradePaths:
+  - pathName: Hell Spawn
+    upgrades:
+    - {fileID: 11400000, guid: 39b49483de632ac428f7d100ca658055, type: 2}
+    - {fileID: 11400000, guid: f8a7c7d0d1e18f7418f7f2bcba0d034b, type: 2}

@@ -49,6 +49,8 @@ public class DoomMovement : MonoBehaviour
     private Vector3 _currentVelocity;
     private float _verticalVelocity;
     private float _cameraPitch = 0.0f;
+    private float _baseMoveSpeed;
+    private float _baseSprintSpeed;
 
     // --- UNITY LIFECYCLE ---
 
@@ -76,11 +78,24 @@ public class DoomMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
+    
+    private void Awake() 
+    {
+        // Store initial values in Awake
+        _baseMoveSpeed = moveSpeed;
+        _baseSprintSpeed = sprintSpeed;
+    }
 
     private void Update()
     {
         HandleLook();
         HandleMovement();
+    }
+    
+    public void ApplySpeedUpgrade(float multiplier)
+    {
+        moveSpeed = _baseMoveSpeed * multiplier;
+        sprintSpeed = _baseSprintSpeed * multiplier;
     }
 
     // --- INPUT HANDLERS ---

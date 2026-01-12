@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8c6a5322a908c434ea43a57efc430101
+timeCreated: 1541101667
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/Flamethrowers/Flamethrower_CammoArmy_L3.prefab
+  uploadId: 290411

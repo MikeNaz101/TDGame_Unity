@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9f36f63a284596c43b1b12b7d0169520
+timeCreated: 1542492371
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/GatelingGuns/GatelingGun_DigitalSnow_L1.prefab
+  uploadId: 290411

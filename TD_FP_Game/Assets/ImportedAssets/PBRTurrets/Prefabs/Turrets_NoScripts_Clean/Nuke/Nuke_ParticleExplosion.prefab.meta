@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5e38ad3159277b145b7a33c4bf48a9f3
+timeCreated: 1543314677
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_NoScripts_Clean/Nuke/Nuke_ParticleExplosion.prefab
+  uploadId: 290411

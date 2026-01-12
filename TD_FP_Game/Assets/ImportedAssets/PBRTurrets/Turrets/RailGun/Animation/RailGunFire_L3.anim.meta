@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3adaea47014b63b4e89274825990a68a
+timeCreated: 1538621017
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/RailGun/Animation/RailGunFire_L3.anim
+  uploadId: 290411

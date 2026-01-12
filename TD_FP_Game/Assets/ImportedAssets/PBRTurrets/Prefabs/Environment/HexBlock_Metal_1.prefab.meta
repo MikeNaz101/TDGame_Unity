@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6d44a0057c9dffa448def5d073b40d69
+timeCreated: 1541362453
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Environment/HexBlock_Metal_1.prefab
+  uploadId: 290411

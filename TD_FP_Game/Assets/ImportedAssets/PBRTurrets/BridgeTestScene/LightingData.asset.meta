@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8e281897c23ff05479cd8d7181cf678c
+timeCreated: 1548542241
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 25800000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/BridgeTestScene/LightingData.asset
+  uploadId: 290411

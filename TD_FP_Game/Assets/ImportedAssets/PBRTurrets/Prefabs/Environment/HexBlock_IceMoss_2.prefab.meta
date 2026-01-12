@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 34879b9105cfd3f42ba68a068624e202
+timeCreated: 1542620679
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Environment/HexBlock_IceMoss_2.prefab
+  uploadId: 290411

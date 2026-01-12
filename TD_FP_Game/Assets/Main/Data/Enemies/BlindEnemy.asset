@@ -16,15 +16,22 @@ MonoBehaviour:
   canBeDistracted: 1
   baseScale: 1
   enemyName: Blind Roamer
-  enemyPrefab: {fileID: 5358199103257218831, guid: 76dddc366d3e67647a6d4a096c58a85c, type: 3}
-  baseHealth: 150
+  enemyPrefab: {fileID: 7730827853856435075, guid: a3bc2c233459c4c499a5ee58e52be91c, type: 3}
   attackDamage: 15
   attackCooldown: 2
+  baseHealth: 150
+  armorType: 0
   moveSpeed: 4
   hearingRange: 40
   visionRange: 15
   patrolWaitTime: 2
   scrapMetalPrefab: {fileID: 3609530775625676480, guid: 012bf2f65129f7c4db77522b829b50b2, type: 3}
+  hitParticlePrefab: {fileID: 4553287630450876385, guid: 15483e51212e3d74886ea57291f4639a, type: 3}
+  hitSound: {fileID: 8300000, guid: 799989a6036e8b742acc1351bd88c390, type: 3}
+  hitAnimationTrigger: Hit
+  rageSound: {fileID: 8300000, guid: 5772c843a55e9474393f602740fbf910, type: 3}
+  rageAnimationTrigger: Rage
+  rageDuration: 2
   deathParticlePrefab: {fileID: 2433282508537954060, guid: 3ef3ae421f71c5c4e97fe12dc2fc6312, type: 3}
   isSpawner: 0
   spawnerTimeLimit: 60

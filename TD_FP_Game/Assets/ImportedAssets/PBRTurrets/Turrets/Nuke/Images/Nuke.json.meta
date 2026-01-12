@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: eb8023d5252402644a3a3fe38bdc80c0
+timeCreated: 1547586698
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/Nuke/Images/Nuke.json
+  uploadId: 290411

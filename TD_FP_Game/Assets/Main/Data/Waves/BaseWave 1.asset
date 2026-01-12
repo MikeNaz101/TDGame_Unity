@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: BaseWave 1
   m_EditorClassIdentifier: Assembly-CSharp::WaveConfig
   waveName: Wave 2
-  preparationTime: 10
+  preparationTime: 20
   enemyGroups:
-  - enemyType: {fileID: 11400000, guid: fce8e708c977454449ed06ef0ca80cb1, type: 2}
-    count: 3
+  - enemyType: {fileID: 11400000, guid: 79eecfbccec43f049b3bf876339482eb, type: 2}
+    count: 10
     spawnInterval: 0.5
     spawnPauseInterval: 3
-  - enemyType: {fileID: 11400000, guid: fce8e708c977454449ed06ef0ca80cb1, type: 2}
-    count: 3
+  - enemyType: {fileID: 11400000, guid: 0408420f359b1c44f8e41d58917dc45d, type: 2}
+    count: 10
     spawnInterval: 0.5
     spawnPauseInterval: 3

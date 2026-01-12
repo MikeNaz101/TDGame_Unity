@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 50406ef6b6ea14343aee82703b023c48
+timeCreated: 1537904067
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/RocketLauncher/Scripts/RocketLauncher.cs
+  uploadId: 290411

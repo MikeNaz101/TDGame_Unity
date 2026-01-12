@@ -1,0 +1,3142 @@
+{
+    "SessionName": "Test_Session",
+    "Timestamp": "12/10/2025 1:01:43 AM",
+    "RecordedFrames": [
+        {
+            "FrameID": 839,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 840,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 841,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 842,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 843,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 844,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 845,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 846,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 847,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 848,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 849,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 850,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 851,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 852,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 853,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 854,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 855,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 856,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 857,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 858,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 859,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 860,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 861,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 862,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 863,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 864,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 865,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 866,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 867,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 868,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 869,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 870,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 871,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 872,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 873,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 874,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 875,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 876,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 877,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 878,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 879,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 880,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 881,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 882,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 883,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 884,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 885,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 886,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 887,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 888,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 889,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 890,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 891,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 892,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 893,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 894,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 895,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 896,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 897,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 898,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 899,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 900,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 901,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 902,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 903,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 904,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 905,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 906,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 907,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 908,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 909,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 910,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 911,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 912,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 913,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 914,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 915,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 916,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 917,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 918,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 919,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 920,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 921,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 922,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 923,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 924,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 925,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 926,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 927,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 928,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 929,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 930,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 931,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 932,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 933,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 934,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 935,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 936,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 937,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 938,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 939,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 940,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 941,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 942,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 943,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 944,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 945,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 946,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 947,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 948,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 949,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 950,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 951,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 952,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 953,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 954,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 955,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 956,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 957,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 958,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 959,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 960,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 961,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 962,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 963,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 964,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 965,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 966,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 967,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 968,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": -1638,
+            "LookY": 0
+        },
+        {
+            "FrameID": 969,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": -1638,
+            "LookY": 0
+        },
+        {
+            "FrameID": 970,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": -1638,
+            "LookY": 0
+        },
+        {
+            "FrameID": 971,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 972,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 973,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 974,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 975,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 976,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 977,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 978,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 979,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 980,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 981,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 982,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 983,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 984,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 985,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 986,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 987,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 988,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 989,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 990,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 991,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 992,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": -1638,
+            "LookY": 0
+        },
+        {
+            "FrameID": 993,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": -1638,
+            "LookY": 0
+        },
+        {
+            "FrameID": 994,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": -1638,
+            "LookY": 0
+        },
+        {
+            "FrameID": 995,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": -1638,
+            "LookY": 0
+        },
+        {
+            "FrameID": 996,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 997,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 998,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 999,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1000,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1001,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1002,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1003,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1004,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1005,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1006,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1007,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1008,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1009,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1010,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1011,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1012,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1013,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1014,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1015,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1016,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1017,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1018,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1019,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1020,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1021,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1022,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1023,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1024,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1025,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1026,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1027,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1028,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1029,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1030,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1031,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1032,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1033,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1034,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1035,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1036,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1037,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1038,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1039,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1040,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1041,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1042,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1043,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1044,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1045,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1046,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1047,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1048,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1049,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1050,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1051,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1052,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": -1638
+        },
+        {
+            "FrameID": 1053,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1054,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1055,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1056,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1057,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1058,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1059,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1060,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1061,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1062,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1063,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1064,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1065,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1066,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1067,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1068,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1069,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1070,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1071,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1072,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1073,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1074,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1075,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1076,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1077,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1078,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1079,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1080,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1081,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1082,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1083,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1084,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1085,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1086,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1087,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1088,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1089,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1090,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1091,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1092,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1093,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1094,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1095,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1096,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1097,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1098,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1099,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1100,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1101,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1102,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1103,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1104,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1105,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1106,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1107,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1108,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1109,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1110,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1111,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1112,
+            "ButtonMask": 0,
+            "MoveX": 32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1113,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1114,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1115,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1116,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1117,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1118,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1119,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1120,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1121,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1122,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1123,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1124,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": -32767,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1125,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1126,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1127,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1128,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1129,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1130,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1131,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1132,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1133,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1134,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1135,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1136,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1137,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1138,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1139,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1140,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1141,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1142,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1143,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1144,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1145,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1146,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1147,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1148,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1149,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1150,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1151,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1152,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1153,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1154,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1155,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1156,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1157,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1158,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1159,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1160,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1161,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1162,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1163,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1164,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1165,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1166,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1167,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1168,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1169,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1170,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1171,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1172,
+            "ButtonMask": 1,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1173,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1174,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1175,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1176,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1177,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1178,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1179,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1180,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1181,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1182,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1183,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1184,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1185,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1186,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1187,
+            "ButtonMask": 0,
+            "MoveX": -32767,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1188,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1189,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1190,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1191,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1192,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1193,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1194,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1195,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1196,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1197,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1198,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1199,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1200,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1201,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1202,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1203,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1204,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1205,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1206,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1207,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1208,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1209,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1210,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1211,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1212,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1213,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1214,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1215,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1216,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1217,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1218,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1219,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1220,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1221,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1222,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1223,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1224,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1225,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1226,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1227,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1228,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1229,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        },
+        {
+            "FrameID": 1230,
+            "ButtonMask": 0,
+            "MoveX": 0,
+            "MoveY": 0,
+            "LookX": 0,
+            "LookY": 0
+        }
+    ]
+}

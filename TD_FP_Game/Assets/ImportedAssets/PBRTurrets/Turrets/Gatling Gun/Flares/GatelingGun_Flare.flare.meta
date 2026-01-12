@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 35fd26a0b11cccc4da7d79a7a486261c
+timeCreated: 1538332080
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 12100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/Gatling Gun/Flares/GatelingGun_Flare.flare
+  uploadId: 290411

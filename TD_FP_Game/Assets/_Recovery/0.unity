@@ -737,17 +737,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &576324121 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 890133321744519364, guid: 203073f8dd5108c4381e26fa560ba749, type: 3}
-  m_PrefabInstance: {fileID: 394385701}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f0f5a95a931d364daa67070bbd91b69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponControllerHC
 --- !u!1 &653354469
 GameObject:
   m_ObjectHideFlags: 0
@@ -1307,12 +1296,18 @@ MonoBehaviour:
   _waveManager: {fileID: 0}
   _playerTarget: {fileID: 0}
   fov: {fileID: 0}
-  _ragdollRigidbodies: []
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 0
+  fallKillThreshold: -20
+  pelvisRigidbody: {fileID: 0}
+  _ragdollRigidbodies: []
+  ragdollMinTime: 0.5
   _agent: {fileID: 0}
   _attackThreshold: 2.5
+  _pathCheckInterval: 1
+  _currentRankLevel: -1
+  _meshRenderer: {fileID: 0}
 --- !u!195 &1047237946
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1931,10 +1926,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3942da7f894f74242a25a55ff44451fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MLAgent
-  playerWeaponController: {fileID: 576324121}
-  shotsRequired: 5
-  highAccuracyThreshold: 0.75
-  lowAccuracyThreshold: 0.5
 --- !u!1 &2007806298
 GameObject:
   m_ObjectHideFlags: 0
@@ -8347,6 +8338,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CoreHealth
   maxHealth: 1000
+  requiredDoorsDestroyed: 1
+  securityScanRadius: 10
 --- !u!65 &6877416241303318001
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8548,6 +8541,15 @@ MonoBehaviour:
   playerStats: {fileID: 5570603580508221585}
   collectionDistance: 1.5
   detectionRange: 30
+  baseSpeed: 5
+  fallThreshold: -20
+  stuckCheckInterval: 3
+  minMoveDistance: 0.5
+  carryCapacity: 1
+  canFly: 0
+  canHeal: 0
+  healAmount: 10
+  healCooldown: 5
 --- !u!1 &7345414623803433868
 GameObject:
   m_ObjectHideFlags: 0

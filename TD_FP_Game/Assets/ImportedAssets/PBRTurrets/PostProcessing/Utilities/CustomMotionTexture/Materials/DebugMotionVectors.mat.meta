@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d7daeefbca4f14360bac0e1df1bdacd4
+timeCreated: 1479896287
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/PostProcessing/Utilities/CustomMotionTexture/Materials/DebugMotionVectors.mat
+  uploadId: 290411

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 49fe19c66a4a82440909420a9bcd4b28
+timeCreated: 1542492363
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/Flamethrowers/Flamethrower_DigitalSnow_L3.prefab
+  uploadId: 290411

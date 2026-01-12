@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c1ea40e0175e21447af28e2c4f130872
+timeCreated: 1538081553
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Turrets/Gatling Gun/Particles/Point light.prefab
+  uploadId: 290411

@@ -12,10 +12,15 @@ public class WaveManager : MonoBehaviour
     [Header("Spawn Points")]
     [Tooltip("List of transforms where enemies can spawn.")]
     public Transform[] spawnPoints;
+    [Tooltip("How far from the spawn point center enemies can appear.")]
+    public float spawnRadius = 4.0f;
 
     [Header("Core Reference")]
     [Tooltip("The central core/base the enemies are targeting.")]
     public Transform coreTarget; // Still needed for context, but EnemyController finds its own target
+    
+    [Header("Boss Integration")]
+    public BossWaveManager bossWaveManager;
 
     private int currentWaveIndex = 0;
     private int enemiesRemaining = 0;
@@ -43,8 +48,9 @@ public class WaveManager : MonoBehaviour
             // 1. Preparation Phase
             Debug.Log("Starting Preparation for " + currentWave.waveName);
             yield return new WaitForSeconds(currentWave.preparationTime);
-
+            
             // 2. Spawn Phase
+            bossWaveManager.CheckForBossSpawn(currentWaveIndex + 1); // +1 because index starts at 0
             yield return StartCoroutine(SpawnWave(currentWave));
             
             // 3. Cleanup/Waiting Phase
@@ -109,14 +115,24 @@ public class WaveManager : MonoBehaviour
     }
 
     // Helper method to get a random spawn point
-    Vector3 GetRandomSpawnPoint()
+    public Vector3 GetRandomSpawnPoint()
     {
         if (spawnPoints.Length == 0)
         {
             Debug.LogError("Spawn points are not assigned!");
             return Vector3.zero;
         }
+
+        // 1. Pick a random spawn transform
         Transform selectedPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-        return selectedPoint.position;
+        
+        // 2. Generate a random offset circle (X and Z only)
+        Vector2 randomCircle = Random.insideUnitCircle * spawnRadius;
+        
+        // 3. Create the 3D offset (Keeping Y at 0 so they don't spawn in the air/ground)
+        Vector3 randomOffset = new Vector3(randomCircle.x, 0, randomCircle.y);
+
+        // 4. Return final position
+        return selectedPoint.position + randomOffset;
     }
 }

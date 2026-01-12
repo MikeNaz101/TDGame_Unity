@@ -12,19 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4ce2252deb9ff049bc095a7214974d5, type: 3}
   m_Name: AR_AssaultRifle_Data
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Assault Rifle
-  weaponPrefab: {fileID: 1396857973655360118, guid: ee9c6e6555bcf0a498f8e747fdf73ce8, type: 3}
+  weaponName: Pistol
+  weaponPrefab: {fileID: 8777798436009876104, guid: 933ed98d34263d24eb813980c7f1e7aa, type: 3}
   adsReticlePrefab: {fileID: 8305691199734996223, guid: ecaf8c39d8992c94f94f5b8e8f2f66d7, type: 3}
   damage: 10
   range: 100
+  damageType: 0
   fireRate: 0.25
   isAutomatic: 1
+  infiniteAtStart: 1
   maxAmmo: 30
   reserveAmmo: 29
-  reloadTime: 10
+  reloadTime: 2
   recoilKickback: 0.5
   adsSpeed: 8
-  aimDownSightsPosition: {x: 0, y: 0, z: 0}
+  aimDownSightsPosition: {x: 0.25, y: -0.08, z: 0.4}
   shootSound: {fileID: 8300000, guid: 8794ef618587109438c2f691e83cb0cc, type: 3}
   reloadSound: {fileID: 8300000, guid: 44a28a2b5ee275e4ca542d36ce0a4b1c, type: 3}
   equipSound: {fileID: 8300000, guid: edade11325ed6b64c8c8e17293a4861f, type: 3}
+  pellets: 1
+  spreadAngle: 0
+  fullHitBonus: 1.5
+  projectilePrefab: {fileID: 0}
+  launchForce: 20

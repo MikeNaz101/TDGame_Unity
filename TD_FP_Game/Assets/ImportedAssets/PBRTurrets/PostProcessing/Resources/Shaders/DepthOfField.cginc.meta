@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ddc2c19b8a216d748a357ffe32ba4dc1
+timeCreated: 1472211508
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/PostProcessing/Resources/Shaders/DepthOfField.cginc
+  uploadId: 290411

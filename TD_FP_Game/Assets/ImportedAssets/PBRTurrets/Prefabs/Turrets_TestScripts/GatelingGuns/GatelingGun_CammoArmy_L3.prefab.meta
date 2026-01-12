@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b96b719d9915b524e83828ca9b9faae9
+timeCreated: 1539739013
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/GatelingGuns/GatelingGun_CammoArmy_L3.prefab
+  uploadId: 290411

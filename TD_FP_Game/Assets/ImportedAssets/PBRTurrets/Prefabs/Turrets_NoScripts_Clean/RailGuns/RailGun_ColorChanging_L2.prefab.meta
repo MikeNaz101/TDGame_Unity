@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ddf4901ff52d0a848b6fb4196b5b8bd2
+timeCreated: 1547578837
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_NoScripts_Clean/RailGuns/RailGun_ColorChanging_L2.prefab
+  uploadId: 290411

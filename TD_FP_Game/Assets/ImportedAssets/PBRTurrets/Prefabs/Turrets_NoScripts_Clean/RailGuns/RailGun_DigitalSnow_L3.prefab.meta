@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 000f23504935fcf428638a1f504bbc6f
+timeCreated: 1542492402
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_NoScripts_Clean/RailGuns/RailGun_DigitalSnow_L3.prefab
+  uploadId: 290411

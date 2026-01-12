@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d09c8de006677f84dbeaa1ab7eabcadb
+timeCreated: 1543606333
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_NoScripts_Clean/Nuke/Nuke_Base_CammoArmy.prefab
+  uploadId: 290411

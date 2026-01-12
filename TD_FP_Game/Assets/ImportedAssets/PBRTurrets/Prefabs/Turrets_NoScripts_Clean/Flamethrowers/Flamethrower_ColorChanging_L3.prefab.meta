@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6cad254408a7d0441b5b10eca2748f65
+timeCreated: 1547578730
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_NoScripts_Clean/Flamethrowers/Flamethrower_ColorChanging_L3.prefab
+  uploadId: 290411

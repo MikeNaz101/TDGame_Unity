@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0970948eb170581469ce25595f505b05
+timeCreated: 1543168450
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_TestScripts/Nuke/Nuke_LOD0_ColorChanging.prefab
+  uploadId: 290411

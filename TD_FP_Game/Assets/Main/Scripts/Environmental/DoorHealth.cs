@@ -1,11 +1,13 @@
 using UnityEngine;
 
-// Make sure the object is tagged "Door" and has a NavMeshObstacle component.
 [RequireComponent(typeof(UnityEngine.AI.NavMeshObstacle))]
 public class DoorHealth : MonoBehaviour, IDamageable
 {
+    // --- NEW: GLOBAL TRACKING ---
+    public static int DestroyedDoorCount = 0;
+    // ----------------------------
+
     [Header("Door Stats")]
-    [Tooltip("The total health of the door.")]
     public float maxHealth = 200f;
 
     private float currentHealth;
@@ -19,7 +21,7 @@ public class DoorHealth : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
-        Debug.Log($"Door at {transform.position} took {amount} damage, {currentHealth} health remaining.");
+        // Debug.Log($"Door at {transform.position} took {amount} damage.");
 
         if (currentHealth <= 0)
         {
@@ -29,8 +31,10 @@ public class DoorHealth : MonoBehaviour, IDamageable
 
     private void Die()
     {
-        // When the door is destroyed, it unblocks the NavMesh path.
-        Debug.Log("Door destroyed!");
+        // Increment the global counter
+        DestroyedDoorCount++;
+        Debug.Log($"Door Destroyed! Total Destroyed: {DestroyedDoorCount}");
+        
         Destroy(gameObject);
     }
 }

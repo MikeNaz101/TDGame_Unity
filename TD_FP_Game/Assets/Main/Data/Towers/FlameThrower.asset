@@ -18,7 +18,7 @@ MonoBehaviour:
   towerPrefab: {fileID: 4376194662093663467, guid: 692ce84a82395b44995068c79dcb05e7, type: 3}
   scrapCost: 10
   attackType: 0
-  projectilePrefab: {fileID: 0}
+  projectilePrefab: {fileID: 8764043878647920493, guid: c4ed38c72957f2241ad144a1614956d9, type: 3}
   damage: 25
   fireRate: 0
   range: 5
@@ -32,3 +32,8 @@ MonoBehaviour:
   fireRateBuff: 1
   damageBuff: 1
   enemySpeedDebuff: 1
+  upgradePaths:
+  - pathName: Hell Spawn
+    upgrades:
+    - {fileID: 11400000, guid: 39b49483de632ac428f7d100ca658055, type: 2}
+    - {fileID: 11400000, guid: f8a7c7d0d1e18f7418f7f2bcba0d034b, type: 2}

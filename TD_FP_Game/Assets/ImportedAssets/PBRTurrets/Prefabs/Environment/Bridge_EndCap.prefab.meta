@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5f62b5eedb6b3d741ae58ffbd42b77e5
+timeCreated: 1548187747
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Environment/Bridge_EndCap.prefab
+  uploadId: 290411

@@ -11,21 +11,27 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public Transform transform => base.transform;
 
     [Header("Resources")]
-    public int scrapMetal = 0; // Public field for the collected resource
+    public int scrapMetal = 0; 
 
     [Header("Game References")]
-    public TowerManager towerManager; // Assigned in Inspector
+    public TowerManager towerManager;
+    public CameraShake cameraShake;
+    
+    [Header("Hit Effects")]
+    public GameObject hitParticlePrefab;
+    public AudioClip hitSound;
+    [Tooltip("Intensity of the shake when hurt (different from explosion).")]
+    public float hitShakeIntensity = 0.8f; 
+    [Tooltip("How long the hit shake lasts.")]
+    public float hitShakeDuration = 0.2f;
 
     void Start()
     {
         currentHealth = maxHealth;
         currentEnergy = maxEnergy;
 
-        // Find Tower Manager automatically if not set
-        if (towerManager == null)
-        {
-            towerManager = FindObjectOfType<TowerManager>();
-        }
+        if (towerManager == null) towerManager = Object.FindFirstObjectByType<TowerManager>();
+        if (cameraShake == null) cameraShake = Object.FindFirstObjectByType<CameraShake>();
     }
 
     // --- DAMAGE & HEALTH ---
@@ -33,9 +39,36 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
+        PlayHitEffects();
+        Debug.Log($"Player took {amount} damage. Health: {currentHealth}");
         if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+    
+    private void PlayHitEffects()
+    {
+        // 1. Camera Shake (Distinct Jolt)
+        if (cameraShake != null)
+        {
+            // We reuse the existing Shake method but with specific "Hurt" values
+            cameraShake.Shake(hitShakeIntensity, hitShakeDuration);
+        }
+
+        // 2. Audio
+        if (hitSound != null)
+        {
+            // Play at camera position so it sounds "in your head"
+            AudioSource.PlayClipAtPoint(hitSound, transform.position);
+        }
+
+        // 3. Particle (e.g., Screen Blood or Sparks)
+        if (hitParticlePrefab != null)
+        {
+            // Instantiate slightly in front of the camera if it's a world particle
+            // OR simply instantiate it if it's a UI canvas prefab
+            Instantiate(hitParticlePrefab, transform.position + transform.forward * 0.5f, transform.rotation);
         }
     }
     
@@ -50,9 +83,26 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
     void Die()
     {
-        // TODO: Implement game over or player respawn logic
-        Debug.Log("Player has died! Implementing game over.");
-        gameObject.SetActive(false); 
+        // 1. Play Death Logic (Optional: Sound, Particles)
+        Debug.Log("Player has died!");
+
+        // 2. Prevent further damage
+        currentHealth = 0;
+
+        // 3. Trigger Game Over UI
+        if (Game_UI_Manager.Instance != null)
+        {
+            Game_UI_Manager.Instance.GameOver();
+        }
+        
+        // 4. Disable Player controls (optional, keeps camera from moving)
+        // We don't want to SetActive(false) the whole object because the camera is attached to it!
+        // Instead, just disable the movement script:
+        DoomMovement movement = GetComponent<DoomMovement>();
+        if (movement != null) movement.enabled = false;
+        
+        WeaponControllerHS weapon = GetComponentInChildren<WeaponControllerHS>();
+        if (weapon != null) weapon.enabled = false;
     }
 
     // --- RESOURCE HANDLERS ---
@@ -60,35 +110,36 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public void AddScrap(int amount)
     {
         scrapMetal += amount;
-        Debug.Log("Scrap Metal: " + scrapMetal);
+        // Debug.Log("Scrap Metal: " + scrapMetal);
     }
 
-    // --- TOWER BUILDING LOGIC (Called by WeaponController) ---
-    // Attempts to build a tower at the specified location if the player has enough resources.
+    // --- NEW: SPENDING LOGIC ---
+    public bool SpendScrap(int amount)
+    {
+        if (scrapMetal >= amount)
+        {
+            scrapMetal -= amount;
+            return true; // Purchase successful
+        }
+        return false; // Not enough money
+    }
+
+    // --- TOWER BUILDING LOGIC ---
     public bool TryBuildTower(int towerIndex, Vector3 position)
     {
-        if (towerManager == null)
-        {
-            Debug.LogError("Tower Manager is not assigned. Cannot build tower.");
-            return false;
-        }
+        if (towerManager == null) return false;
 
-        // 1. Get the cost of the selected tower
         int cost = towerManager.GetTowerCost(towerIndex);
 
-        // 2. Check resource requirement
-        if (scrapMetal >= cost)
+        if (SpendScrap(cost)) // Use the new method
         {
-            // 3. Subtract cost and build
-            scrapMetal -= cost;
             towerManager.BuildTower(towerIndex, position);
-            Debug.Log($"Built tower {towerIndex} for {cost} scrap. Remaining scrap: {scrapMetal}");
+            Debug.Log($"Built tower {towerIndex} for {cost} scrap.");
             return true;
         }
         else
         {
             Debug.LogWarning($"Not enough scrap metal! Need {cost}, have {scrapMetal}.");
-            // Optionally play a sound or show a UI notification for failure
             return false;
         }
     }

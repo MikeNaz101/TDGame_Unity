@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ac95f8e7ead58b74381dd1f45389f22f
+timeCreated: 1547578850
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 129871
+  packageName: Huge Sci Fi Turret Pack - Tower Defense Kit
+  packageVersion: 1.0.8
+  assetPath: Assets/PBRTurrets/Prefabs/Turrets_NoScripts_Clean/Rockets/RocketLauncher_ColorChanging_L1.prefab
+  uploadId: 290411

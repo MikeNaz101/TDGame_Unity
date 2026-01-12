@@ -4,39 +4,55 @@ using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, IDamageable
 {
     // --- AI States ---
-    private enum EnemyState { Pursuing, Attacking, Ragdolled }
+    private enum EnemyState { Pursuing, Attacking, Ragdolled, SeekingCover, Dodging, Raging }
+    private bool _hasRaged = false;
     private EnemyState _state;
-
-    // --- SETUP & DATA ---
+    
     [Header("Data & Manager References")]
     public EnemyData enemyData;
     public WaveManager _waveManager;
     public Transform _playerTarget;
     public FieldOfView fov;
     public LayerMask obstacleLayer;
+    private AudioSource _audioSource;
+    
+    [Header("Fall Kill Settings")]
+    public float fallKillThreshold = -20f;
 
     [Header("Ragdoll")]
-    [Tooltip("The central, main rigidbody of the ragdoll (e.g., the Hips or Pelvis).")]
     public Rigidbody pelvisRigidbody;
-    [Tooltip("All rigidbodies for the ragdoll.")]
     public Rigidbody[] _ragdollRigidbodies;
-    [Tooltip("Minimum time to stay on ground before checking for rest.")]
-    public float ragdollMinTime = 0.5f; // Short buffer
+    public float ragdollMinTime = 0.5f;
 
     [Header("AI & Navigation")]
     [SerializeField] private NavMeshAgent _agent;
     [SerializeField] private float _attackThreshold = 2.5f;
+    [Tooltip("How often to check if the path to the core is blocked.")]
+    [SerializeField] private float _pathCheckInterval = 1.0f;
+
+    // --- NEW: Rank & Enhancements ---
+    [Header("Military Rank Enhancements")]
+    [SerializeField] private MilitaryRank _currentRankLevel = MilitaryRank.None;
+    [SerializeField] private SkinnedMeshRenderer _meshRenderer; // For Ghost Mode transparency
+    
+    // Buff State Tracking
+    private bool _hasBuffedHealth = false;
+    private float _regenTimer = 0f;
+    private float _dodgeCooldown = 0f;
+    private float _coverCooldown = 0f;
+    private bool _isGhostMode = false;
 
     // --- RUNTIME STATE ---
     private float _currentHealth;
-    private bool _isDead = false;
+    public bool _isDead = false;
     private float _timeSinceLastAttack = 0f;
     private Collider _mainCollider;
     private Animator _animator;
     private Rigidbody _mainRigidbody;
+    private bool _isWeakened = false;
     
     public float CurrentHealth => _currentHealth;
     public static List<EnemyController> ActiveEnemies = new List<EnemyController>();
@@ -47,35 +63,41 @@ public class EnemyController : MonoBehaviour
     private Transform _soundInvestigationPos;
     private Transform _attackSource;
     private float _sensorCooldown = 0f;
-    public enum AIStance { Standard, Aggressive, Evasive }
-    private AIStance _currentStance = AIStance.Standard;
+    private float _pathCheckTimer = 0f;
+    
+    // Stance / Movement defaults
     private float _originalMoveSpeed;
     private float _originalStoppingDistance;
+    
+    // Spawner/Queen Logic
     private float _spawnerTimeAlive = 0f;
     private float _timeSinceLastGrowth = 0f;
     private float _timeSinceLastSpawn;
-    private float _wanderTimer;
 
     private const float SENSOR_UPDATE_RATE = 0.5f;
-    private const float WANDER_UPDATE_RATE = 3.0f;
-    private const float WANDER_DISTANCE = 10f;
-    private const float ATTACK_RANGE_BUFFER = 1f;
 
-    #region --- Unity Lifecycle & Initialization ---
+    #region --- Unity Lifecycle ---
 
     void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
         _mainCollider = GetComponent<Collider>();
         _animator = GetComponentInChildren<Animator>();
-        _mainRigidbody = GetComponent<Rigidbody>(); 
+        _mainRigidbody = GetComponent<Rigidbody>();
+        if(_meshRenderer == null) _meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null) _audioSource = gameObject.AddComponent<AudioSource>();
     }
 
     void Start()
     {
         if (enemyData == null) { Debug.LogError("EnemyData is NULL!", this); return; }
         if (_waveManager == null) _waveManager = FindObjectOfType<WaveManager>();
+        
+        // Find Player
         if (_playerTarget == null) { GameObject p = GameObject.FindGameObjectWithTag("Player"); if (p != null) _playerTarget = p.transform; }
+        
+        // Find Core
         GameObject coreObj = GameObject.FindGameObjectWithTag("Core");
         if (coreObj != null) _coreTarget = coreObj.transform;
         
@@ -90,12 +112,15 @@ public class EnemyController : MonoBehaviour
         
         _originalMoveSpeed = enemyData.moveSpeed;
         _originalStoppingDistance = _agent.stoppingDistance;
+        
         if (!ActiveEnemies.Contains(this)) ActiveEnemies.Add(this);
+        
         if (_coreTarget != null) _currentTarget = _coreTarget.GetComponent<IDamageable>();
         _state = EnemyState.Pursuing;
+        
         _timeSinceLastAttack = enemyData.attackCooldown;
+        
         if (enemyData.canBeDistracted) EnemyAIAudioEvents.OnGunshotReported += HandleGunshot;
-        if (enemyData.isSpawner) { _spawnerTimeAlive = enemyData.spawnerTimeLimit; _timeSinceLastSpawn = enemyData.spawnInterval; }
     }
 
     void OnDestroy()
@@ -107,83 +132,548 @@ public class EnemyController : MonoBehaviour
     void Update()
     {
         if (_isDead) return;
+        
+        // --- NEW: FALL CHECK ---
+        if (transform.position.y < fallKillThreshold)
+        {
+            HandleFallDeath();
+            return;
+        }
+        
+        if (_animator != null && _agent.enabled)
+        {
+            // Smoothly pass the NavMeshAgent's speed to the animator
+            // 0.1f is the damp time to make it look smooth
+            _animator.SetFloat("Speed", _agent.velocity.magnitude, 0.1f, Time.deltaTime);
+        }
+        
         _timeSinceLastAttack += Time.deltaTime;
         _sensorCooldown -= Time.deltaTime;
+        
+        // Spawner Logic
         if (enemyData.isSpawner) UpdateSpawnerLogic();
+
+        // --- RANK LOGIC UPDATES ---
+        HandleRankAbilities();
+        
         RunAILogic();
     }
 
     #endregion
 
-    #region --- AI Logic Methods ---
+    #region --- Rank & Promotion Logic ---
+
+    /// <summary>
+    /// Called by a Commander unit to unlock abilities on this unit.
+    /// </summary>
+    public void ReceivePromotion(MilitaryRank commanderRank)
+    {
+        // We only upgrade if the commander is higher rank than our current level
+        if (commanderRank > _currentRankLevel)
+        {
+            _currentRankLevel = commanderRank;
+            ApplyRankStats();
+        }
+    }
+
+    private void ApplyRankStats()
+    {
+        // Rank 0: Quicker
+        if (_currentRankLevel >= MilitaryRank.Specialist)
+        {
+            _agent.speed = _originalMoveSpeed * 1.5f;
+        }
+
+        // Rank 1: Stronger (Health)
+        if (_currentRankLevel >= MilitaryRank.Corporal && !_hasBuffedHealth)
+        {
+            float healthBuff = enemyData.baseHealth * 0.5f; // +50% HP
+            _currentHealth += healthBuff;
+            _hasBuffedHealth = true;
+        }
+        
+        // Rank 7: Ghost Mode (Instant)
+        if (_currentRankLevel >= MilitaryRank.CommandSergeantMajor)
+        {
+            SetTransparency(0.2f);
+            _isGhostMode = true;
+        }
+    }
+
+    private void HandleRankAbilities()
+    {
+        // Rank 3: Regen
+        if (_currentRankLevel >= MilitaryRank.StaffSergeant)
+        {
+            _regenTimer += Time.deltaTime;
+            if (_regenTimer >= 1.0f)
+            {
+                // Full strength: 5 HP/sec. Weakened: 2.5 HP/sec.
+                float healAmount = _isWeakened ? 2.5f : 5f;
+                
+                if (_currentHealth < enemyData.baseHealth) 
+                    _currentHealth += healAmount; 
+                    
+                _regenTimer = 0f;
+            }
+        }
+
+        // Cooldowns (Rank 2 & 5) - Penalties applied in usage logic if desired, 
+        // but usually speed/dmg/health are the noticeable ones.
+        if (_dodgeCooldown > 0) _dodgeCooldown -= Time.deltaTime;
+        if (_coverCooldown > 0) _coverCooldown -= Time.deltaTime;
+    }
+    
+    // Called by the Commander when they die. Halves effects.
+    public void ApplyCommanderDeathPenalty()
+    {
+        if (_isWeakened) return; // Already weakened
+        _isWeakened = true;
+        Debug.Log($"{name} has been weakened by Commander death!");
+
+        // 1. Speed: Halve the boost
+        // Original boost was 1.5x (+50%). New boost is 1.25x (+25%).
+        if (_currentRankLevel >= MilitaryRank.Specialist)
+        {
+            float baseSpeed = enemyData.moveSpeed; // Assuming data holds the original
+            _agent.speed = baseSpeed * 1.25f; 
+        }
+        
+        // 2. Transparency: Make them more visible (0.2 -> 0.6)
+        if (_currentRankLevel >= MilitaryRank.SergeantMajor)
+        {
+            SetTransparency(0.6f);
+        }
+        
+        // 3. Health: We don't remove health (that feels unfair/buggy), 
+        // but we stop future regen in the Update loop.
+    }
+
+    #endregion
+
+    #region --- AI Logic ---
     
     private void RunAILogic()
     {
-        if (_state == EnemyState.Ragdolled) return; // Do nothing while flying/falling
+        if (_state == EnemyState.Ragdolled) return;
+        if (_state == EnemyState.Raging) return;
         if (!_agent.enabled || !_agent.isOnNavMesh) return;
 
+        // Default Targeting Logic
         if ((_currentTarget as UnityEngine.Object) == null || _currentTarget.transform == null || !_currentTarget.transform.gameObject.activeInHierarchy)
         {
-            _currentTarget = _coreTarget.GetComponent<IDamageable>();
+            if (_coreTarget != null) _currentTarget = _coreTarget.GetComponent<IDamageable>();
             _state = EnemyState.Pursuing;
             if (_currentTarget == null) return;
         }
 
         if (_sensorCooldown <= 0f) { UpdateSensors(); _sensorCooldown = SENSOR_UPDATE_RATE; }
 
+        // --- PRIORITY CHECKS FOR SMART AI ---
+
+        // Rank 2: Smarter (Dodge Gaze)
+        if (_currentRankLevel >= MilitaryRank.Sergeant && _state != EnemyState.Dodging && _dodgeCooldown <= 0f)
+        {
+            if (CheckIfPlayerIsLooking())
+            {
+                StartCoroutine(PerformDodge());
+                return;
+            }
+        }
+
+        // Rank 5: Smarter (Cover Seeking)
+        if (_currentRankLevel >= MilitaryRank.FirstSergeant && _state != EnemyState.SeekingCover && _coverCooldown <= 0f)
+        {
+             // If we are targeting the player (not the core) and visible, try to hide
+             if (_currentTarget.transform == _playerTarget && CheckLineOfSight(_playerTarget))
+             {
+                 Vector3 coverPos = FindBestCoverSpot();
+                 if (coverPos != Vector3.zero)
+                 {
+                     StartCoroutine(SeekCoverRoutine(coverPos));
+                     return;
+                 }
+             }
+        }
+
+        // Standard States
         switch (_state)
         {
             case EnemyState.Pursuing: UpdatePursueState(); break;
             case EnemyState.Attacking: UpdateAttackState(); break;
+            case EnemyState.Dodging: break; // Handled by coroutine
+            case EnemyState.SeekingCover: break; // Handled by coroutine
             case EnemyState.Ragdolled: break;
         }
     }
     
-    // ... (Copy standard AI methods: UpdateSensors, UpdatePursueState, etc.) ...
     private void UpdateSensors() {
         if (enemyData.canBeDistracted) {
             if (_attackSource != null) { SetNewTarget(_attackSource.GetComponent<IDamageable>()); _attackSource = null; return; }
             if (fov != null && _playerTarget != null && fov.IsTargetVisible(_playerTarget)) { _lastKnownPlayerPos = _playerTarget; SetNewTarget(_playerTarget.GetComponent<IDamageable>()); return; }
-            if (_soundInvestigationPos != null) { if (_agent.destination != _soundInvestigationPos.position) _agent.SetDestination(_soundInvestigationPos.position); _soundInvestigationPos = null; return; }
-            if (_lastKnownPlayerPos != null) { if (Vector3.Distance(transform.position, _lastKnownPlayerPos.position) < _agent.stoppingDistance + 1f) _lastKnownPlayerPos = null; }
         }
-        if (_currentTarget.transform == _coreTarget) { if (CheckForDoorObstacle(out DoorHealth door)) { SetNewTarget(door); return; } }
-        if (_currentTarget.transform != _playerTarget) { SetNewTarget(_coreTarget.GetComponent<IDamageable>()); }
+        if (_currentTarget.transform != _playerTarget && _coreTarget != null) { SetNewTarget(_coreTarget.GetComponent<IDamageable>()); }
     }
-    private void UpdatePursueState() { 
+
+    private void UpdatePursueState() 
+    { 
         _agent.isStopped = false;
+        
+        // --- BLOCKED PATH CHECK ---
+        if (_currentTarget.transform == _coreTarget)
+        {
+            _pathCheckTimer += Time.deltaTime;
+            if (_pathCheckTimer > _pathCheckInterval)
+            {
+                _pathCheckTimer = 0f;
+                
+                if (!_agent.pathPending && (_agent.pathStatus == NavMeshPathStatus.PathPartial || _agent.pathStatus == NavMeshPathStatus.PathInvalid))
+                {
+                    GameObject bestDoor = FindBestDoor();
+                    if (bestDoor != null)
+                    {
+                        SetNewTarget(bestDoor.GetComponent<IDamageable>());
+                        Debug.Log($"Path to Core blocked. {name} switching target to Door: {bestDoor.name}");
+                    }
+                }
+            }
+        }
+        
         if (Vector3.Distance(transform.position, _currentTarget.transform.position) <= _agent.stoppingDistance) { _state = EnemyState.Attacking; return; }
-        if (_currentStance == AIStance.Evasive && !enemyData.isSpawner) { _wanderTimer -= Time.deltaTime; if (_wanderTimer <= 0f || _agent.remainingDistance < _agent.stoppingDistance + 1f) { Vector3 dodgePoint = GetEvasiveManeuverPoint(_currentTarget.transform.position); _agent.SetDestination(dodgePoint); _wanderTimer = WANDER_UPDATE_RATE; } }
-        else if (_currentStance == AIStance.Aggressive || enemyData.movementType == EnemyData.AIMovementType.Direct) { _agent.SetDestination(_currentTarget.transform.position); }
-        else if (enemyData.movementType == EnemyData.AIMovementType.Wander) { _wanderTimer -= Time.deltaTime; if (_wanderTimer <= 0f || _agent.remainingDistance < 1f) { Vector3 randomPoint = GetStandardWanderPoint(_currentTarget.transform.position); _agent.SetDestination(randomPoint); _wanderTimer = WANDER_UPDATE_RATE; } }
+        _agent.SetDestination(_currentTarget.transform.position);
     }
-    private void UpdateAttackState() { 
-        if (Vector3.Distance(transform.position, _currentTarget.transform.position) > _agent.stoppingDistance + ATTACK_RANGE_BUFFER) { _state = EnemyState.Pursuing; return; }
-        _agent.isStopped = true; RotateTowards(_currentTarget.transform.position);
-        if (_timeSinceLastAttack >= enemyData.attackCooldown) { TryAttack(); }
-    }
-    private void UpdateSpawnerLogic() { 
-        if (enemyData.canGrow) { _timeSinceLastGrowth += Time.deltaTime; if (_timeSinceLastGrowth >= enemyData.growthInterval) { Grow(); _timeSinceLastGrowth = 0f; } }
-        if (enemyData.spawnerTimeLimit > 0) { _spawnerTimeAlive -= Time.deltaTime; if (_spawnerTimeAlive <= 0f) return; }
-        _timeSinceLastSpawn += Time.deltaTime; if (_timeSinceLastSpawn >= enemyData.spawnInterval) { SpawnMinion(); _timeSinceLastSpawn = 0f; }
-    }
-    public void SetAIStance(AIStance newStance) { if (_currentStance == newStance) return; _currentStance = newStance; switch (newStance) { case AIStance.Aggressive: _agent.speed = _originalMoveSpeed * 1.5f; _agent.stoppingDistance = _originalStoppingDistance * 0.75f; break; case AIStance.Evasive: _agent.speed = _originalMoveSpeed; _agent.stoppingDistance = _originalStoppingDistance; break; case AIStance.Standard: default: _agent.speed = _originalMoveSpeed; _agent.stoppingDistance = _originalStoppingDistance; break; } }
-    public void ApplySpeedModification(float speedMultiplier) { if (_agent != null) _agent.speed = _originalMoveSpeed * speedMultiplier; }
-    void TryAttack() { if (_currentTarget == null) return; if (_timeSinceLastAttack >= enemyData.attackCooldown) { _currentTarget.TakeDamage(enemyData.attackDamage); _timeSinceLastAttack = 0f; } }
-    private bool CheckForDoorObstacle(out DoorHealth door) { if (_agent.velocity.magnitude < 0.1f && !_agent.pathPending && _agent.remainingDistance > _agent.stoppingDistance) { Vector3 scanPos = transform.position + transform.forward * (_agent.stoppingDistance - 0.5f); Collider[] hits = Physics.OverlapBox(scanPos, new Vector3(2f, 2f, 2f), transform.rotation, obstacleLayer); foreach (Collider hit in hits) { if (hit.CompareTag("Door")) { if (hit.TryGetComponent<DoorHealth>(out door)) return true; } } } door = null; return false; }
-    private Vector3 GetStandardWanderPoint(Vector3 targetPosition) { Vector3 dirToTarget = (targetPosition - transform.position).normalized; Vector3 randomDir = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized; Vector3 wanderDir = (dirToTarget * 0.7f + randomDir * 0.3f).normalized; Vector3 targetPoint = transform.position + wanderDir * WANDER_DISTANCE; if (NavMesh.SamplePosition(targetPoint, out NavMeshHit hit, 5f, _agent.areaMask)) return hit.position; return targetPosition; }
-    private Vector3 GetEvasiveManeuverPoint(Vector3 targetPosition) { Vector3 dirToTarget = (targetPosition - transform.position).normalized; Vector3 sideDir = Vector3.Cross(dirToTarget, Vector3.up).normalized; sideDir *= (Random.Range(0, 2) * 2 - 1); float dodgeSideDistance = 5f; float dodgeForwardDistance = 4f; Vector3 targetPoint = transform.position + (sideDir * dodgeSideDistance) + (dirToTarget * dodgeForwardDistance); if (NavMesh.SamplePosition(targetPoint, out NavMeshHit hit, 5f, _agent.areaMask)) return hit.position; return targetPosition; }
-    void Grow() { if (transform.localScale.x >= enemyData.maxGrowthSize) return; float newScale = Mathf.Min(transform.localScale.x * enemyData.growthRate, enemyData.maxGrowthSize); transform.localScale = new Vector3(newScale, newScale, newScale); }
-    void SpawnMinion() { if (enemyData.spawnPrefabs == null || enemyData.spawnPrefabs.Count == 0) return; Vector3 randomPos = transform.position + (Random.insideUnitSphere * 3f); randomPos.y = transform.position.y; GameObject prefabToSpawn = enemyData.spawnPrefabs[Random.Range(0, enemyData.spawnPrefabs.Count)]; Instantiate(prefabToSpawn, randomPos, Quaternion.identity); }
     
+    // --- UPDATED: RANDOM DOOR SELECTION ---
+    private GameObject FindBestDoor()
+    {
+        // 1. Find all doors in the scene
+        GameObject[] doors = GameObject.FindGameObjectsWithTag("Door");
+        
+        if (doors.Length == 0) return null;
+
+        // 2. Filter out doors that might be null or destroyed (just in case)
+        // and pick a RANDOM one from the list.
+        // This ensures enemies spread out to different doors.
+        GameObject randomDoor = doors[Random.Range(0, doors.Length)];
+
+        return randomDoor;
+    }
+    // --------------------------------------
+
+    private void UpdateAttackState() { 
+        if (Vector3.Distance(transform.position, _currentTarget.transform.position) > _agent.stoppingDistance + 1.5f) { _state = EnemyState.Pursuing; return; }
+        _agent.isStopped = true; 
+        RotateTowards(_currentTarget.transform.position);
+        if (_timeSinceLastAttack >= enemyData.attackCooldown)
+        {
+            TryAttack();
+        }
+    }
+
+    void TryAttack() 
+    { 
+        if (_currentTarget == null) return; 
+        if (_timeSinceLastAttack >= enemyData.attackCooldown) 
+        { 
+            if (_animator != null)
+            {
+                _animator.SetTrigger("Attack");
+            }
+            float dmg = enemyData.attackDamage;
+            
+            // Rank 4: Stronger (Attack Multiplier)
+            if (_currentRankLevel >= MilitaryRank.MasterSergeant)
+            {
+                // Full: 2x damage. Weakened: 1.5x damage.
+                float multiplier = _isWeakened ? 1.5f : 2.0f;
+                dmg *= multiplier;
+            }
+
+            _currentTarget.TakeDamage(dmg); 
+            _timeSinceLastAttack = 0f; 
+        } 
+    }
+
     #endregion
 
-    #region --- Event Handlers (Hearing, Damage) ---
+    #region --- Smart AI Behaviors (Rank Specific) ---
 
-    void HandleGunshot(Vector3 soundPosition) { if (_isDead || !enemyData.canBeDistracted) return; float distance = Vector3.Distance(transform.position, soundPosition); if (distance <= enemyData.hearingRange) { if (_currentTarget.transform != _playerTarget) { GameObject soundPosObj = new GameObject($"SoundInvestigate_@{soundPosition}"); soundPosObj.transform.position = soundPosition; _soundInvestigationPos = soundPosObj.transform; _lastKnownPlayerPos = null; Destroy(soundPosObj, 5f); } } }
-    public void TakeDamage(float amount, Transform attacker) { if (_isDead) return; _currentHealth -= amount; if (enemyData.canBeDistracted) _attackSource = attacker; if (_currentHealth <= 0f) Die(true); }
+    private bool CheckIfPlayerIsLooking()
+    {
+        if (_playerTarget == null) return false;
+        
+        // Calculate Dot Product
+        Vector3 toEnemy = (transform.position - _playerTarget.position).normalized;
+        Vector3 playerLook = _playerTarget.forward;
+        
+        // If Dot > 0.8, player is looking roughly at us
+        if (Vector3.Dot(playerLook, toEnemy) > 0.8f)
+        {
+            // Check distance (don't dodge if miles away)
+            if (Vector3.Distance(transform.position, _playerTarget.position) < 20f)
+                return true;
+        }
+        return false;
+    }
+
+    private IEnumerator PerformDodge()
+    {
+        _state = EnemyState.Dodging;
+        _agent.isStopped = true;
+        
+        // Dodge perpendicular to player look direction
+        Vector3 toPlayer = (_playerTarget.position - transform.position).normalized;
+        Vector3 dodgeDir = Vector3.Cross(toPlayer, Vector3.up); // Left or Right
+        if (Random.value > 0.5f) dodgeDir = -dodgeDir;
+
+        // Dash
+        float dashTime = 0.3f;
+        float dashSpeed = 20f;
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = startPos + (dodgeDir * 5f);
+
+        float t = 0;
+        while(t < dashTime)
+        {
+            t += Time.deltaTime;
+            // Simple transform move for instant reaction, assuming NavMeshAgent handles correction next frame
+            _agent.Move(dodgeDir * dashSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        _dodgeCooldown = 4.0f; // Don't dodge again for 4 seconds
+        _state = EnemyState.Pursuing;
+        _agent.isStopped = false;
+    }
+
+    private Vector3 FindBestCoverSpot()
+    {
+        // Simple cover finding: Raycast towards random obstacles
+        // Realistically, this should query a CoverManager, but here is a localized logic:
+        
+        int checks = 5;
+        for(int i=0; i<checks; i++)
+        {
+            Vector3 randomDir = Random.insideUnitSphere * 10f;
+            randomDir.y = 0;
+            Vector3 checkPos = transform.position + randomDir;
+            
+            if (NavMesh.SamplePosition(checkPos, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            {
+                // Check if this spot is hidden from player
+                Vector3 dirToPlayer = (_playerTarget.position - hit.position).normalized;
+                if (Physics.Raycast(hit.position + Vector3.up, dirToPlayer, out RaycastHit rayHit, 50f, obstacleLayer))
+                {
+                    // We hit an obstacle before the player, so this is cover
+                    return hit.position;
+                }
+            }
+        }
+        return Vector3.zero;
+    }
+
+    private IEnumerator SeekCoverRoutine(Vector3 coverPos)
+    {
+        _state = EnemyState.SeekingCover;
+        _agent.SetDestination(coverPos);
+        
+        float timeout = 3f;
+        while(timeout > 0 && _agent.remainingDistance > 1f)
+        {
+            timeout -= Time.deltaTime;
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(1.0f); // Wait in cover
+        
+        _coverCooldown = 8.0f; // Don't seek cover again for a while
+        _state = EnemyState.Pursuing;
+    }
+
+    private void SetTransparency(float alpha)
+    {
+        if (_meshRenderer != null)
+        {
+            foreach(Material mat in _meshRenderer.materials)
+            {
+                // Standard Shader manipulation
+                if (mat.HasProperty("_Color"))
+                {
+                    Color c = mat.color;
+                    c.a = alpha;
+                    mat.color = c;
+                    
+                    // Standard Shader setup for transparency
+                    mat.SetFloat("_Mode", 3); // Transparent
+                    mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    mat.SetInt("_ZWrite", 0);
+                    mat.DisableKeyword("_ALPHATEST_ON");
+                    mat.EnableKeyword("_ALPHABLEND_ON");
+                    mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                    mat.renderQueue = 3000;
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region --- Damage & Death ---
+    
+    private void HandleFallDeath()
+    {
+        if (_isDead) return;
+        _isDead = true;
+
+        // 1. Tell WaveManager we are gone
+        if (_waveManager != null) _waveManager.EnemyDestroyed();
+
+        // 2. Spawn Scrap at Bot's Home Base
+        if (enemyData != null && enemyData.scrapMetalPrefab != null)
+        {
+            Vector3 spawnPos = new Vector3(0, 5f, 0); // Default fallback
+            
+            ScrapCollectorBot bot = FindObjectOfType<ScrapCollectorBot>();
+            if (bot != null)
+            {
+                // Spawn 5 units ABOVE the bot's home
+                spawnPos = bot.GetHomePosition() + Vector3.up * 5f;
+            }
+            
+            Instantiate(enemyData.scrapMetalPrefab, spawnPos, Quaternion.identity);
+        }
+
+        // 3. Destroy Self
+        Destroy(gameObject);
+    }
+    
+    public void TakeDamage(float amount)
+    {
+        // Call the main method with "null" for attacker and "Physical" as the default type
+        TakeDamage(amount, null, DamageType.Physical);
+    }
+    
+    // Replace your duplicate TakeDamage methods with this ONE complete method:
+    public void TakeDamage(float amount, Transform attacker, DamageType damageType)
+    {
+        if (_isDead) return;
+
+        // --- 1. GHOST MODE CHECK (Rank 7) ---
+        if (_currentRankLevel >= MilitaryRank.CommandSergeantMajor)
+        {
+            // Ghost Mode is immune to Physical attacks (Bullets/Explosions), 
+            // but vulnerable to Elemental attacks (Fire/Energy/etc.)
+            if (damageType == DamageType.Physical) 
+            {
+                if (!_isWeakened)
+                {
+                    Debug.Log("Enemy is in Ghost Mode! Immune.");
+                    return; // Total Immunity
+                }
+                else
+                {
+                    // If the commander died, they are weakened (take 50% damage)
+                    amount *= 0.5f;
+                }
+            }
+        }
+
+        // --- 2. TRANSPARENCY CHECK (Rank 6) ---
+        // Make them visible for a moment if hit
+        if (_currentRankLevel >= MilitaryRank.SergeantMajor && !_isWeakened)
+        {
+            SetTransparency(0.3f);
+        }
+
+        // --- 3. ARMOR CALCULATION ---
+        float multiplier = DamageMultiplier.GetMultiplier(damageType, enemyData.armorType);
+        float finalDamage = amount * multiplier;
+
+        // Optional: Visual logs for weakness/resistance
+        if (multiplier > 1.0f) Debug.Log("Critical Hit! Weakness Exploited!");
+        if (multiplier < 1.0f) Debug.Log("Resisted!");
+
+        // --- 4. APPLY DAMAGE ---
+        _currentHealth -= finalDamage;
+        
+        PlayHitEffects();
+        // Check if alive, haven't raged yet, and we have the data setup
+        if (_currentHealth > 0 && !_hasRaged && enemyData.rageDuration > 0)
+        {
+            StartCoroutine(PerformRageRoutine());
+        }
+    
+        // Distraction logic
+        if (enemyData.canBeDistracted) _attackSource = attacker;
+    
+        // Death check
+        if (_currentHealth <= 0f) Die(true);
+    }
+    
+    private void PlayHitEffects()
+    {
+        // 1. Particle Effect
+        if (enemyData.hitParticlePrefab != null)
+        {
+            // Spawn particle at the enemy's center (approx chest height)
+            Vector3 spawnPos = transform.position + Vector3.up * 1.5f; 
+            Instantiate(enemyData.hitParticlePrefab, spawnPos, Quaternion.identity);
+        }
+
+        // 2. Sound Effect
+        if (enemyData.hitSound != null)
+        {
+            // PlayClipAtPoint creates a temporary audio source that dies after playing
+            AudioSource.PlayClipAtPoint(enemyData.hitSound, transform.position);
+        }
+
+        // 3. Animation
+        if (_animator != null && !string.IsNullOrEmpty(enemyData.hitAnimationTrigger))
+        {
+            // Check if the parameter exists to avoid errors (optional but safer)
+            _animator.SetTrigger(enemyData.hitAnimationTrigger);
+        }
+    }
+    
+    private IEnumerator PerformRageRoutine()
+    {
+        _hasRaged = true;
+        _state = EnemyState.Raging; // Stops AI movement logic in Update()
+    
+        // Stop moving immediately
+        if (_agent.enabled) 
+        {
+            _agent.isStopped = true;
+            _agent.velocity = Vector3.zero; // Kill momentum
+        }
+
+        // Play Animation
+        if (_animator != null && !string.IsNullOrEmpty(enemyData.rageAnimationTrigger))
+        {
+            _animator.ResetTrigger("Hit"); // Cancel any flinch that might have just started
+            _animator.SetTrigger(enemyData.rageAnimationTrigger);
+        }
+
+        // Play Scream Sound
+        if (enemyData.rageSound != null && _audioSource != null)
+        {
+            _audioSource.PlayOneShot(enemyData.rageSound);
+        }
+
+        // Wait for the scream/animation to finish
+        yield return new WaitForSeconds(enemyData.rageDuration);
+
+        // Resume Chase
+        if (!_isDead)
+        {
+            _state = EnemyState.Pursuing;
+            if (_agent.enabled) _agent.isStopped = false;
+        }
+    }
     
     // --- TakeExplosion (Resets state if already hit) ---
+    // Update TakeExplosion to use Explosive type
     public void TakeExplosion(float damage, Transform attacker, Vector3 explosionPosition, float explosionForce, float explosionRadius, float upwardModifier = 3.0f)
     {
         if (_isDead) return;
@@ -216,6 +706,7 @@ public class EnemyController : MonoBehaviour
             } else {
                 if (_mainRigidbody != null) {
                     _mainRigidbody.isKinematic = false;
+                    TakeDamage(damage, attacker, DamageType.Explosive);
                     _mainRigidbody.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardModifier, ForceMode.Impulse);
                 }
             }
@@ -234,42 +725,64 @@ public class EnemyController : MonoBehaviour
     {
         if (_isDead) return;
         _isDead = true;
-        _state = EnemyState.Ragdolled;
+        _state = EnemyState.Ragdolled; // Stop AI logic
         
         if (_waveManager != null) _waveManager.EnemyDestroyed();
-        
+        if (_agent.enabled) _agent.enabled = false; 
+
+        // --- NEW: ANIMATION CHECK ---
+        // If we have an animator and a death animation set up, play it first!
+        if (_animator != null && !useRagdoll) // Usually don't play anims if we are ragdolling
+        {
+            StartCoroutine(PlayDeathAnimationThenExplode(useRagdoll));
+            return; // Exit here, let the coroutine handle the rest
+        }
+        // ----------------------------
+
+        // If no animation, just explode immediately like before
+        FinishDying(useRagdoll);
+    }
+
+    // --- NEW: COROUTINE TO DELAY EXPLOSION ---
+    private IEnumerator PlayDeathAnimationThenExplode(bool useRagdoll)
+    {
+        // 1. Trigger the animation
+        _animator.SetBool("IsDead", true);
+
+        // 2. Wait for the animation length (adjust 2.0f to match your clip length)
+        // You can also get this automatically, but a hardcoded value is safer for now.
+        yield return new WaitForSeconds(2.0f); 
+
+        // 3. Now actually blow up/destroy
+        FinishDying(useRagdoll);
+    }
+
+    // --- NEW: MOVED THE ORIGINAL LOGIC HERE ---
+    private void FinishDying(bool useRagdoll)
+    {
         // Spawn Scrap
         if (enemyData != null && enemyData.scrapMetalPrefab != null) 
             Instantiate(enemyData.scrapMetalPrefab, transform.position, Quaternion.identity);
-            
-        if (_agent.enabled) _agent.enabled = false; 
 
-        // Check capabilities
         bool hasRagdoll = useRagdoll && _ragdollRigidbodies != null && _ragdollRigidbodies.Length > 0;
         bool hasSimplePhysics = _mainRigidbody != null;
         bool hasParticles = enemyData != null && enemyData.deathParticlePrefab != null;
 
-        // --- PRIORITY 1: Ragdoll (Complex Physics) ---
         if (hasRagdoll)
         {
-            ActivateRagdoll();
+            ActivateRagdoll(); // This disables the animator, so we do it AFTER the animation
             Destroy(gameObject, 5f);
         }
-        // --- PRIORITY 2: Particles (Instant Death) ---
-        // We prioritize this over simple physics so "exploding" enemies vanish immediately
         else if (hasParticles)
         {
             Instantiate(enemyData.deathParticlePrefab, transform.position, Quaternion.identity);
-            Destroy(gameObject, 0.1f); // Destroy almost instantly
+            Destroy(gameObject, 0.1f); 
         }
-        // --- PRIORITY 3: Simple Physics (Flying Corpse) ---
-        // Only use this if we have NO ragdoll AND NO particles
         else if (hasSimplePhysics)
         {
             _mainRigidbody.isKinematic = false;
             Destroy(gameObject, 5f); 
         }
-        // --- PRIORITY 4: Fallback ---
         else
         {
             Destroy(gameObject, 0.1f);
@@ -279,6 +792,45 @@ public class EnemyController : MonoBehaviour
     #endregion
 
     #region --- Utility & Ragdoll Methods ---
+    
+    // --- ANTI-CLIP PUNISHMENT ---
+    // Teleports the enemy away and ragdolls them. Used when they glitch through doors.
+    public void PunishTrespasser()
+    {
+        if (_isDead) return;
+
+        // 1. Calculate Teleport Position (20 units X/Z, 10 units Y)
+        Vector3 randomOffset;
+        if (Random.value > 0.5f)
+            randomOffset = new Vector3(20f * (Random.value > 0.5f ? 1 : -1), 10f, 0f);
+        else
+            randomOffset = new Vector3(0f, 10f, 20f * (Random.value > 0.5f ? 1 : -1));
+
+        Vector3 punishPos = transform.position + randomOffset;
+
+        Debug.LogWarning($"{name} cheated! Teleporting to {punishPos}");
+
+        // 2. Teleport (Must use Warp for NavMeshAgents)
+        if (_agent != null)
+        {
+            _agent.Warp(punishPos);
+        }
+        else
+        {
+            transform.position = punishPos;
+        }
+
+        // 3. Apply "Explosion" effect (Ragdoll + Force)
+        // We simulate an explosion right below their feet to launch them
+        TakeExplosion(
+            10f, // 0 Damage (or add damage if you want to hurt them)
+            null, // No specific attacker
+            punishPos + Vector3.down, // Explosion origin (below feet)
+            5f, // Force
+            5f,  // Radius
+            2.0f // Upward modifier
+        );
+    }
 
     // --- UPDATED: Robust Ground Check for both Ragdolls and Boxes ---
     private IEnumerator MonitorRagdollState(bool isRagdoll)
@@ -355,6 +907,103 @@ public class EnemyController : MonoBehaviour
     private void SetRagdollActive(bool isActive) {
         if (_ragdollRigidbodies == null || _ragdollRigidbodies.Length == 0) return;
         foreach (Rigidbody rb in _ragdollRigidbodies) { if (rb != null) rb.isKinematic = !isActive; }
+    }
+    
+    void HandleGunshot(Vector3 soundPosition) 
+    { 
+        // 1. Basic checks
+        if (_isDead || enemyData == null || !enemyData.canBeDistracted) return; 
+
+        // 2. Check distance
+        float distance = Vector3.Distance(transform.position, soundPosition); 
+        if (distance <= enemyData.hearingRange) 
+        { 
+            // 3. Investigate the sound
+            // We set the destination directly to the sound
+            if (_agent.enabled && _agent.isOnNavMesh)
+            {
+                _agent.SetDestination(soundPosition);
+            }
+        } 
+    }
+    
+    private bool CheckLineOfSight(Transform target)
+    {
+        if (target == null) return false;
+
+        // Define "Eye" positions (approx. 1.5m up from pivot)
+        Vector3 startPos = transform.position + Vector3.up * 1.5f; 
+        Vector3 targetPos = target.position + Vector3.up * 1.5f;
+        
+        Vector3 direction = (targetPos - startPos).normalized;
+        float distance = Vector3.Distance(startPos, targetPos);
+
+        // Cast a ray. If it hits an obstacle, we DON'T have line of sight.
+        if (Physics.Raycast(startPos, direction, distance, obstacleLayer))
+        {
+            return false; // Blocked by a wall
+        }
+
+        return true; // Path is clear
+    }
+    
+    private void UpdateSpawnerLogic() 
+    { 
+        // 1. Handle Growth (getting bigger over time)
+        if (enemyData.canGrow) 
+        { 
+            _timeSinceLastGrowth += Time.deltaTime; 
+            if (_timeSinceLastGrowth >= enemyData.growthInterval) 
+            { 
+                Grow(); 
+                _timeSinceLastGrowth = 0f; 
+            } 
+        }
+
+        // 2. Handle Time Limit (if the spawner dies of old age)
+        if (enemyData.spawnerTimeLimit > 0) 
+        { 
+            _spawnerTimeAlive -= Time.deltaTime; 
+            if (_spawnerTimeAlive <= 0f) return; 
+        }
+
+        // 3. Handle Spawning Minions
+        _timeSinceLastSpawn += Time.deltaTime; 
+        if (_timeSinceLastSpawn >= enemyData.spawnInterval) 
+        { 
+            SpawnMinion(); 
+            _timeSinceLastSpawn = 0f; 
+        }
+    }
+
+    void Grow() 
+    { 
+        if (transform.localScale.x >= enemyData.maxGrowthSize) return; 
+        
+        float newScale = Mathf.Min(transform.localScale.x * enemyData.growthRate, enemyData.maxGrowthSize); 
+        transform.localScale = new Vector3(newScale, newScale, newScale); 
+    }
+
+    void SpawnMinion() 
+    { 
+        if (enemyData.spawnPrefabs == null || enemyData.spawnPrefabs.Count == 0) return; 
+        
+        // Pick a random spot near the spawner
+        Vector3 randomPos = transform.position + (Random.insideUnitSphere * 3f); 
+        randomPos.y = transform.position.y; 
+        
+        // Pick a random minion prefab
+        GameObject prefabToSpawn = enemyData.spawnPrefabs[Random.Range(0, enemyData.spawnPrefabs.Count)]; 
+        Instantiate(prefabToSpawn, randomPos, Quaternion.identity); 
+    }
+    
+    public void ApplySpeedModification(float speedMultiplier) 
+    { 
+        if (_agent != null) 
+        {
+            // Multiply our base speed by the slow factor (e.g., 0.5)
+            _agent.speed = _originalMoveSpeed * speedMultiplier; 
+        }
     }
     private void RotateTowards(Vector3 targetPosition) { Vector3 direction = (targetPosition - transform.position).normalized; direction.y = 0; if (direction != Vector3.zero) { Quaternion lookRotation = Quaternion.LookRotation(direction); transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f); } }
     
