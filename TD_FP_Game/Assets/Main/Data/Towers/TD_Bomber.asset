@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b6dcc75fa6bc694bb16d405aefadc6e, type: 3}
-  m_Name: BaseTower 1
+  m_Name: TD_Bomber
   m_EditorClassIdentifier: Assembly-CSharp::TowerData
   towerName: Bomb Tower
   description: Shoots Explosive Ammo.
@@ -25,5 +25,10 @@ MonoBehaviour:
   isExplosive: 1
   explosionRadius: 3
   explosionForce: 500
-  impactParticlePrefab: {fileID: 8194992990867289339, guid: 99bc28c0d45f51c4fbac01080b73edc7, type: 3}
+  impactParticlePrefab: {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5, type: 3}
   shootSound: {fileID: 8300000, guid: 5390c5db551430b4e90da4dbcd63f1b1, type: 3}
+  healthPerSecond: 0
+  scrapPerSecond: 0
+  fireRateBuff: 1
+  damageBuff: 1
+  enemySpeedDebuff: 1

@@ -130,12 +130,13 @@ MonoBehaviour:
   enemyData: {fileID: 11400000, guid: 92a5b4ae7a978cb48a6874a5c512954d, type: 2}
   _waveManager: {fileID: 0}
   _playerTarget: {fileID: 0}
-  fov: {fileID: 0}
-  _ragdollRigidbodies:
-  - {fileID: 270624691207787136}
+  fov: {fileID: 2177361450705446643}
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 2048
+  pelvisRigidbody: {fileID: 0}
+  _ragdollRigidbodies: []
+  ragdollMinTime: 0.5
   _agent: {fileID: -6515164946048859877}
   _attackThreshold: 2.5
 --- !u!54 &270624691207787136
@@ -221,7 +222,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4913093429646078107, guid: 9996929f2a2d62948815443753ac4234, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.406
+      value: -0.05
       objectReference: {fileID: 0}
     - target: {fileID: 4913093429646078107, guid: 9996929f2a2d62948815443753ac4234, type: 3}
       propertyPath: m_LocalPosition.z
@@ -265,3 +266,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4913093429646078107, guid: 9996929f2a2d62948815443753ac4234, type: 3}
   m_PrefabInstance: {fileID: 6645605705984241848}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2177361450705446643 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4759853568118396491, guid: 9996929f2a2d62948815443753ac4234, type: 3}
+  m_PrefabInstance: {fileID: 6645605705984241848}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b2b5a6c7de968c4ea116c358dc0c180, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FieldOfView

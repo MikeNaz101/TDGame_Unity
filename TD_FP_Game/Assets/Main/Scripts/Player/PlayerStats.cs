@@ -38,6 +38,15 @@ public class PlayerStats : MonoBehaviour, IDamageable
             Die();
         }
     }
+    
+    public void Heal(float amount)
+    {
+        currentHealth += amount;
+        if (currentHealth > maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
+    }
 
     void Die()
     {
