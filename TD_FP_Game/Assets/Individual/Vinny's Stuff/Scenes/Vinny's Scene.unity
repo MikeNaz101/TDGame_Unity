@@ -520,7 +520,9 @@ MonoBehaviour:
   - {fileID: 1741716388}
   - {fileID: 1464548665}
   - {fileID: 1351104330}
+  spawnRadius: 4
   coreTarget: {fileID: 6874041550782128805}
+  bossWaveManager: {fileID: 0}
 --- !u!114 &385071024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -854,13 +856,20 @@ MonoBehaviour:
   enemyData: {fileID: 0}
   _waveManager: {fileID: 0}
   _playerTarget: {fileID: 0}
-  patrolRoute: {fileID: 0}
   fov: {fileID: 0}
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  fallKillThreshold: -20
+  pelvisRigidbody: {fileID: 0}
   _ragdollRigidbodies: []
+  ragdollMinTime: 0.5
   _agent: {fileID: 0}
-  _state: 0
   _attackThreshold: 2.5
-  _attackCooldown: 1.5
+  _pathCheckInterval: 1
+  _currentRankLevel: -1
+  _meshRenderer: {fileID: 0}
+  _isDead: 0
 --- !u!195 &1047237946
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1128,8 +1137,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HUDManager
   playerStats: {fileID: 1843079848}
+  weaponController: {fileID: 0}
   scrapText: {fileID: 1925913847}
   healthSlider: {fileID: 1694504774}
+  ammoText: {fileID: 0}
 --- !u!114 &1330401131
 MonoBehaviour:
   m_ObjectHideFlags: 0
