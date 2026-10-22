@@ -1,12 +1,9 @@
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections;
-using System.Linq;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class ScrapCollectorBot : MonoBehaviour
 {
-    // Simple state machine for the bot's behavior
     private enum BotState { Idle, Fetching, Returning }
 
     [Header("References")]
@@ -16,63 +13,60 @@ public class ScrapCollectorBot : MonoBehaviour
     [Header("Tuning")]
     [Tooltip("How close the bot needs to get to scrap to pick it up.")]
     public float collectionDistance = 1.5f;
-    [Tooltip("How far the bot will scan for scrap from its home position.")]
+    [Tooltip("How far the bot will scan for scrap from its current position.")]
     public float detectionRange = 30f;
+    [Tooltip("How often (seconds) the bot re-scans for scrap while idle.")]
+    public float scanInterval = 0.5f;
+    [Tooltip("Give up on a piece of scrap if it takes longer than this to reach.")]
+    public float fetchTimeout = 15f;
+
+    [Header("Feedback (optional)")]
+    public AudioSource audioSource;
+    public AudioClip collectSound;
+
+    public int Collected { get; private set; }
 
     private NavMeshAgent agent;
-    private Vector3 homePosition; // The spot it returns to
+    private Vector3 homePosition;
     private BotState state = BotState.Idle;
     private Transform currentScrapTarget;
+    private float _scanTimer;
+    private float _fetchTimer;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         homePosition = transform.position;
 
-        // Auto-find PlayerStats if it wasn't assigned in the Inspector
-        if (playerStats == null)
-        {
-            playerStats = FindObjectOfType<PlayerStats>();
-        }
-
-        if (playerStats == null)
-        {
-            Debug.LogError("Scrap Bot can't find PlayerStats! Scrap will not be collected.");
-        }
+        if (playerStats == null) playerStats = PlayerStats.Instance != null ? PlayerStats.Instance : FindFirstObjectByType<PlayerStats>();
+        if (playerStats == null) Debug.LogError("Scrap Bot can't find PlayerStats! Scrap will not be collected.", this);
     }
 
     void Update()
     {
-        // Run the logic for the bot's current state
+        if (!agent.enabled || !agent.isOnNavMesh) return;
+
         switch (state)
         {
-            case BotState.Idle:
-                UpdateIdle();
-                break;
-            case BotState.Fetching:
-                UpdateFetching();
-                break;
-            case BotState.Returning:
-                UpdateReturning();
-                break;
+            case BotState.Idle:      UpdateIdle(); break;
+            case BotState.Fetching:  UpdateFetching(); break;
+            case BotState.Returning: UpdateReturning(); break;
         }
     }
 
     void UpdateIdle()
     {
-        // Make sure the bot is stopped
-        if (agent.hasPath)
-        {
-            agent.ResetPath();
-        }
+        _scanTimer -= Time.deltaTime;
+        if (_scanTimer > 0f) return;
+        _scanTimer = scanInterval;
 
-        // Look for the nearest piece of scrap
         Transform nearestScrap = FindNearestScrap();
         if (nearestScrap != null)
         {
-            // Found scrap! Go get it.
             currentScrapTarget = nearestScrap;
+            agent.isStopped = false;
             agent.SetDestination(currentScrapTarget.position);
+            _fetchTimer = 0f;
             state = BotState.Fetching;
         }
     }
@@ -81,83 +75,84 @@ public class ScrapCollectorBot : MonoBehaviour
     {
         if (currentScrapTarget == null)
         {
-            // The scrap must have been picked up by the player first. Go home.
+            // Picked up by the player (or expired) before we got there.
             state = BotState.Returning;
             return;
         }
 
-        // Check if we've reached the scrap
-        if (Vector3.Distance(transform.position, currentScrapTarget.position) <= collectionDistance)
+        _fetchTimer += Time.deltaTime;
+        if (_fetchTimer > fetchTimeout)
         {
-            // We're close enough, collect it.
-            CollectScrap(currentScrapTarget.gameObject);
+            currentScrapTarget = null;
+            state = BotState.Returning;
+            return;
+        }
+
+        // Scrap can be pulled around by the player magnet; keep the destination fresh.
+        if ((agent.destination - currentScrapTarget.position).sqrMagnitude > 1f)
+        {
+            agent.SetDestination(currentScrapTarget.position);
+        }
+
+        if ((transform.position - currentScrapTarget.position).sqrMagnitude <= collectionDistance * collectionDistance)
+        {
+            CollectScrap(currentScrapTarget.GetComponent<ScrapMetalPickup>());
         }
     }
 
     void UpdateReturning()
     {
-        // Set destination to home, if we aren't already heading there
-        if (!agent.hasPath || agent.destination != homePosition)
+        if (!agent.hasPath || (agent.destination - homePosition).sqrMagnitude > 0.25f)
         {
+            agent.isStopped = false;
             agent.SetDestination(homePosition);
         }
 
-        // Check if we've arrived home
-        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f)
         {
-            state = BotState.Idle; // We're home. Go back to idle.
+            agent.ResetPath();
+            state = BotState.Idle;
+            _scanTimer = 0f;
         }
     }
 
-    void CollectScrap(GameObject scrapObject)
+    void CollectScrap(ScrapMetalPickup scrap)
     {
-        if (scrapObject == null) return;
-
-        ScrapMetalPickup scrap = scrapObject.GetComponent<ScrapMetalPickup>();
-        
-        // Add scrap to the player
-        if (scrap != null && playerStats != null)
+        if (scrap != null && scrap.TryTake())
         {
-            playerStats.AddScrap(scrap.value);
+            if (playerStats != null) playerStats.AddScrap(scrap.value);
+            Collected++;
+            if (audioSource != null && collectSound != null) audioSource.PlayOneShot(collectSound);
         }
 
-        // Destroy the scrap object
-        Destroy(scrapObject); // This triggers OnDestroy()
-
-        // Go home
         currentScrapTarget = null;
         state = BotState.Returning;
     }
 
     Transform FindNearestScrap()
     {
-        // Clean the list of any scrap that might have been destroyed by other means
-        ScrapMetalPickup.AvailableScrap.RemoveAll(item => item == null);
+        var list = ScrapMetalPickup.AvailableScrap;
+        list.RemoveAll(item => item == null);
 
         Transform nearest = null;
-        float minDistance = Mathf.Infinity;
+        float bestSqr = detectionRange * detectionRange;
+        Vector3 pos = transform.position;
 
-        // Loop through all available scrap
-        foreach (Transform scrap in ScrapMetalPickup.AvailableScrap)
+        for (int i = 0; i < list.Count; i++)
         {
-            float distance = Vector3.Distance(transform.position, scrap.position);
-            
-            // Check if it's in range and the closest one we've found so far
-            if (distance <= detectionRange && distance < minDistance)
+            float sqr = (list[i].position - pos).sqrMagnitude;
+            if (sqr < bestSqr)
             {
-                minDistance = distance;
-                nearest = scrap;
+                bestSqr = sqr;
+                nearest = list[i];
             }
         }
         return nearest;
     }
 
-    // Public method called by ScrapMetalPickup.cs if the bot's trigger hits it
+    /// <summary>Called by ScrapMetalPickup if the bot's trigger touches a pickup.</summary>
     public void NotifyCollection(ScrapMetalPickup scrap)
     {
-        if (scrap != null)
-        {
-             CollectScrap(scrap.gameObject);
-        }
+        if (scrap != null) CollectScrap(scrap);
     }
 }

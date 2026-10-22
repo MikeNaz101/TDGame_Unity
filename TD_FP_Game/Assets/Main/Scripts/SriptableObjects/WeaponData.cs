@@ -15,8 +15,11 @@ public class WeaponData : ScriptableObject
     [Header("Hitscan & Damage")]
     public float damage = 10f;
     public float range = 100f;
-    
+    [Tooltip("Damage multiplier for headshots (needs a collider whose name contains 'head' on the enemy). 1 = disabled.")]
+    public float headshotMultiplier = 1f;
+
     [Header("Fire Rate & Type")]
+    [Tooltip("Seconds between shots.")]
     public float fireRate = 0.1f;
     public bool isAutomatic = true;
 
@@ -30,12 +33,16 @@ public class WeaponData : ScriptableObject
     public float adsSpeed = 12f;
     public Vector3 aimDownSightsPosition = new Vector3(0, -0.1f, 0.1f);
 
-    // --- NEW AUDIO FIELDS ---
     [Header("Audio")]
-    [Tooltip("The sound played when the weapon is fired.")]
     public AudioClip shootSound;
-    [Tooltip("The sound played when the weapon is reloaded.")]
     public AudioClip reloadSound;
-    [Tooltip("The sound played when the weapon is equipped.")]
     public AudioClip equipSound;
+
+    [Header("Effects (optional)")]
+    [Tooltip("Spawned at the hit point when a shot lands on an enemy.")]
+    public GameObject enemyImpactEffect;
+    [Tooltip("Spawned at the hit point when a shot lands on the environment.")]
+    public GameObject environmentImpactEffect;
+    [Tooltip("Seconds the tracer line stays visible after a shot.")]
+    public float tracerDuration = 0.05f;
 }

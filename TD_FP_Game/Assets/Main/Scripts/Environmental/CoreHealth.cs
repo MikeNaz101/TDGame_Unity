@@ -1,34 +1,79 @@
+using System;
 using UnityEngine;
 
 public class CoreHealth : MonoBehaviour, IDamageable
 {
+    public static CoreHealth Instance { get; private set; }
+
     [Header("Core Stats")]
     [Tooltip("The total health of the Core.")]
     public float maxHealth = 1000f;
 
-    private float currentHealth;
-    public Transform transform => base.transform;
+    [Header("Feedback (optional)")]
+    public AudioSource audioSource;
+    public AudioClip damagedSound;
+    public GameObject destroyedEffect;
+
+    public float CurrentHealth { get; private set; }
+    public bool IsDestroyed { get; private set; }
+
+    /// <summary>current, max</summary>
+    public event Action<float, float> OnHealthChanged;
+    public event Action OnDestroyed;
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
 
     void Start()
     {
-        currentHealth = maxHealth;
+        CurrentHealth = maxHealth;
+        OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
     }
 
     public void TakeDamage(float amount)
     {
-        currentHealth -= amount;
-        Debug.Log($"CORE TOOK {amount} DAMAGE! {currentHealth} HEALTH REMAINING!");
+        if (IsDestroyed || amount <= 0f) return;
 
-        if (currentHealth <= 0)
+        CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
+        if (audioSource != null && damagedSound != null) audioSource.PlayOneShot(damagedSound);
+        OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
+
+        if (CurrentHealth <= 0f)
         {
             Die();
         }
     }
 
+    public void Repair(float amount)
+    {
+        if (IsDestroyed || amount <= 0f) return;
+        CurrentHealth = Mathf.Min(maxHealth, CurrentHealth + amount);
+        OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
+    }
+
     private void Die()
     {
-        // Game Over
-        Debug.LogError("GAME OVER: The Core has been destroyed!");
-        Time.timeScale = 0; 
+        if (IsDestroyed) return;
+        IsDestroyed = true;
+
+        if (destroyedEffect != null) Instantiate(destroyedEffect, transform.position, Quaternion.identity);
+        OnDestroyed?.Invoke();
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.GameOver("The Core was destroyed.");
+        }
+        else
+        {
+            Debug.LogError("GAME OVER: The Core has been destroyed!");
+            Time.timeScale = 0f;
+        }
     }
 }

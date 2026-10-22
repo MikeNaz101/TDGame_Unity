@@ -79,6 +79,9 @@ public class DoomMovement : MonoBehaviour
 
     private void Update()
     {
+        // Don't spin the camera around while the game-over screen is up (look input isn't time scaled).
+        if (GameManager.Instance != null && GameManager.Instance.IsGameOver) return;
+
         HandleLook();
         HandleMovement();
     }

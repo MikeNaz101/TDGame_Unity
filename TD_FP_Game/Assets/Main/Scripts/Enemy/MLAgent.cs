@@ -1,65 +1,69 @@
 using UnityEngine;
 
 /// <summary>
-/// Manages the adaptive AI difficulty by checking player accuracy
-/// and adjusting enemy behavior (stance).
+/// Adaptive difficulty: watches the player's accuracy and switches every active enemy's stance.
 /// </summary>
 public class MLAgent : MonoBehaviour
 {
     [Header("References")]
-    [Tooltip("Drag the Player object's WeaponControllerHS script here.")]
+    [Tooltip("The player's WeaponControllerHS script. Found automatically if empty.")]
     public WeaponControllerHS playerWeaponController;
 
     [Header("Tuning")]
     [Tooltip("How many shots the player must fire before we check accuracy.")]
     public int shotsRequired = 10;
-    
+    [Tooltip("How often (seconds) to evaluate.")]
+    public float evaluationInterval = 0.5f;
+
     [Space(10)]
     [Tooltip("Accuracy ABOVE this value triggers Evasive stance.")]
-    [Range(0.1f, 1.0f)]
-    public float highAccuracyThreshold = 0.75f; // 75%
-    
+    [Range(0.1f, 1.0f)] public float highAccuracyThreshold = 0.75f;
     [Tooltip("Accuracy BELOW this value triggers Aggressive stance.")]
-    [Range(0.1f, 1.0f)]
-    public float lowAccuracyThreshold = 0.25f; // 25%
+    [Range(0.1f, 1.0f)] public float lowAccuracyThreshold = 0.25f;
+
+    public EnemyController.AIStance CurrentStance { get; private set; } = EnemyController.AIStance.Standard;
+    public float LastAccuracy { get; private set; }
+
+    private float _timer;
+    private bool _warned;
+
+    void Start()
+    {
+        if (playerWeaponController == null) playerWeaponController = FindFirstObjectByType<WeaponControllerHS>();
+    }
 
     void Update()
     {
         if (playerWeaponController == null)
         {
-            Debug.LogWarning("MLAgent is missing a reference to the PlayerWeaponController!");
+            if (!_warned)
+            {
+                Debug.LogWarning("MLAgent is missing a reference to the WeaponControllerHS!", this);
+                _warned = true;
+            }
             return;
         }
 
-        // 1. Check if the player has fired enough shots
-        if (playerWeaponController.shotsFired >= shotsRequired)
+        _timer -= Time.deltaTime;
+        if (_timer > 0f) return;
+        _timer = evaluationInterval;
+
+        if (playerWeaponController.shotsFired < shotsRequired) return;
+
+        LastAccuracy = playerWeaponController.GetAccuracy();
+
+        EnemyController.AIStance newStance = EnemyController.AIStance.Standard;
+        if (LastAccuracy >= highAccuracyThreshold) newStance = EnemyController.AIStance.Evasive;
+        else if (LastAccuracy <= lowAccuracyThreshold) newStance = EnemyController.AIStance.Aggressive;
+
+        CurrentStance = newStance;
+        var enemies = EnemyController.ActiveEnemies;
+        for (int i = 0; i < enemies.Count; i++)
         {
-            // 2. Calculate accuracy
-            float accuracy = playerWeaponController.GetAccuracy();
-
-            // 3. Determine the new AI stance
-            EnemyController.AIStance newStance = EnemyController.AIStance.Standard;
-            if (accuracy >= highAccuracyThreshold)
-            {
-                // Player is doing well, make enemies harder
-                newStance = EnemyController.AIStance.Evasive; 
-            }
-            else if (accuracy <= lowAccuracyThreshold)
-            {
-                // Player is struggling, make enemies easier (more predictable/closer)
-                newStance = EnemyController.AIStance.Aggressive; 
-            }
-
-            // 4. Apply the new stance to all active enemies
-            foreach (EnemyController enemy in EnemyController.ActiveEnemies)
-            {
-                // The enemy script handles null/destroyed objects by removing itself
-                enemy.SetAIStance(newStance);
-            }
-
-            // 5. Reset the counters
-            playerWeaponController.shotsFired = 0;
-            playerWeaponController.shotsHit = 0;
+            if (enemies[i] != null) enemies[i].SetAIStance(newStance);
         }
+
+        playerWeaponController.shotsFired = 0;
+        playerWeaponController.shotsHit = 0;
     }
 }

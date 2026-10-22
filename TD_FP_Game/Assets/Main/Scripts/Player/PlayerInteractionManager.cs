@@ -55,7 +55,7 @@ public class PlayerInteractionManager : MonoBehaviour
         if (inputScript == null) inputScript = GetComponent<StarterAssetsInputs>();
         if (doomMovement == null) doomMovement = GetComponent<DoomMovement>();
         if (weaponController == null) weaponController = GetComponentInChildren<WeaponControllerHS>();
-        if (eventSystem == null) eventSystem = FindObjectOfType<EventSystem>();
+        if (eventSystem == null) eventSystem = FindFirstObjectByType<EventSystem>();
         
         // Auto-find raycaster from the canvas
         if (pcGraphicRaycaster == null && pcScreenCanvas != null)
