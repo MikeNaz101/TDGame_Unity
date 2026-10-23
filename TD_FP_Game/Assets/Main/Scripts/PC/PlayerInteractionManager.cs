@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using StarterAssets;
 using Unity.Cinemachine;
 using TMPro;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 /// <summary>
 /// This script manages the player's state (e.g., "Playing" vs. "Interacting with PC").
@@ -31,6 +34,10 @@ public class PlayerInteractionManager : MonoBehaviour
     public RectTransform customCursor;
     public RectTransform pcCanvasRect;
     public float cursorSpeed = 1f;
+    [Tooltip("Flip vertical cursor movement if it feels upside down.")]
+    public bool invertCursorY = false;
+    [Tooltip("How far one scroll-wheel notch scrolls lists on the PC.")]
+    public float scrollSensitivity = 1f;
     
     [Header("PC Event System")]
     public GraphicRaycaster pcGraphicRaycaster;
@@ -42,6 +49,13 @@ public class PlayerInteractionManager : MonoBehaviour
     
     private PointerEventData pointerEventData;
     private List<RaycastResult> raycastResults;
+    private GameObject hoveredObject;
+    private Selectable hoveredSelectable;
+
+    private PC_DesktopShell Shell => pcUIManager != null ? pcUIManager.Shell : null;
+
+    /// <summary>True while the player is locked into the PC screen.</summary>
+    public bool IsInteracting => isInteracting;
     
     void Start()
     {
@@ -70,54 +84,140 @@ public class PlayerInteractionManager : MonoBehaviour
 
     void Update()
     {
-        if (isInteracting)
+        if (!isInteracting) return;
+
+        var shell = Shell;
+        MoveCursor(shell);
+
+        GameObject hit = RaycastUnderCursor();
+        UpdateHover(hit, shell);
+
+        if (inputScript.fire)
         {
-            if (customCursor != null)
-            {
-                Vector2 mouseDelta = inputScript.look * cursorSpeed;
-                cursorPosition.x -= mouseDelta.y;
-                cursorPosition.y -= mouseDelta.x; 
+            inputScript.fire = false;
 
-                if (pcCanvasRect != null)
-                {
-                    Rect canvasRect = pcCanvasRect.rect;
-                    cursorPosition.x = Mathf.Clamp(cursorPosition.x, canvasRect.xMin, canvasRect.xMax);
-                    cursorPosition.y = Mathf.Clamp(cursorPosition.y, canvasRect.yMin, canvasRect.yMax);
-                }
-                customCursor.anchoredPosition = cursorPosition;
+            if (pcUIManager != null && pcUIManager.IsStartingUp)
+            {
+                // Clicking during boot / welcome skips ahead, like tapping a key on a real PC.
+                pcUIManager.SkipStartup();
             }
-
-            if (inputScript.fire)
+            else if (hit != null)
             {
-                inputScript.fire = false;
-                
-                if (pcGraphicRaycaster != null && eventSystem != null)
-                {
-                    //pointerEventData.position = customCursor.position;
-                    // 1. Convert the 3D world position of our cursor into a 2D screen position
-                    // We can get the camera reference from the weaponController.
-                    Vector2 screenPos = weaponController.mainCamera.WorldToScreenPoint(customCursor.position);
-
-                    // 2. Use that new 'screenPos' for the raycast
-                    pointerEventData.position = screenPos;
-                    raycastResults.Clear();
-                    pcGraphicRaycaster.Raycast(pointerEventData, raycastResults);
-
-                    if (raycastResults.Count > 0)
-                    {
-                        GameObject hitObject = raycastResults[0].gameObject;
-                        ExecuteEvents.Execute(hitObject, pointerEventData, ExecuteEvents.pointerClickHandler);
-                        Debug.Log("Clicked on: " + hitObject.name);
-                    }
-                }
-            }
-            if (inputScript.interact || inputScript.build) 
-            {
-                inputScript.interact = false;
-                inputScript.build = false; 
-                EndPCInteraction();
+                Click(hit, shell);
             }
         }
+
+        if (Mathf.Abs(inputScript.menuScroll) > 0.01f && hit != null)
+        {
+            pointerEventData.scrollDelta = new Vector2(0f, inputScript.menuScroll * scrollSensitivity);
+            GameObject scrollHandler = ExecuteEvents.GetEventHandler<IScrollHandler>(hit);
+            if (scrollHandler != null) ExecuteEvents.Execute(scrollHandler, pointerEventData, ExecuteEvents.scrollHandler);
+            inputScript.menuScroll = 0f;
+        }
+
+        bool escape = false;
+#if ENABLE_INPUT_SYSTEM
+        escape = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
+#endif
+        if (inputScript.interact || inputScript.build || escape) 
+        {
+            inputScript.interact = false;
+            inputScript.build = false; 
+            EndPCInteraction();
+        }
+    }
+
+    private void MoveCursor(PC_DesktopShell shell)
+    {
+        if (customCursor == null) return;
+        Vector2 mouseDelta = inputScript.look * cursorSpeed;
+
+        if (shell != null && customCursor.parent == shell.CursorLayer)
+        {
+            // Desktop space: x is right and y is up on the monitor, whatever the canvas rotation.
+            cursorPosition.x += mouseDelta.x;
+            cursorPosition.y += invertCursorY ? mouseDelta.y : -mouseDelta.y;
+            cursorPosition = shell.ClampToDesktop(cursorPosition);
+        }
+        else
+        {
+            cursorPosition.x -= mouseDelta.y;
+            cursorPosition.y -= mouseDelta.x; 
+
+            if (pcCanvasRect != null)
+            {
+                Rect canvasRect = pcCanvasRect.rect;
+                cursorPosition.x = Mathf.Clamp(cursorPosition.x, canvasRect.xMin, canvasRect.xMax);
+                cursorPosition.y = Mathf.Clamp(cursorPosition.y, canvasRect.yMin, canvasRect.yMax);
+            }
+        }
+        customCursor.anchoredPosition = cursorPosition;
+    }
+
+    private GameObject RaycastUnderCursor()
+    {
+        if (pcGraphicRaycaster == null || eventSystem == null || customCursor == null) return null;
+
+        Camera cam = weaponController != null && weaponController.mainCamera != null ? weaponController.mainCamera : Camera.main;
+        if (cam == null) return null;
+
+        // Convert the 3D world position of our cursor's tip into a 2D screen position for the raycast.
+        pointerEventData.position = cam.WorldToScreenPoint(customCursor.position);
+        raycastResults.Clear();
+        pcGraphicRaycaster.Raycast(pointerEventData, raycastResults);
+        return raycastResults.Count > 0 ? raycastResults[0].gameObject : null;
+    }
+
+    private void UpdateHover(GameObject hit, PC_DesktopShell shell)
+    {
+        GameObject newHover = hit != null ? ExecuteEvents.GetEventHandler<IPointerEnterHandler>(hit) : null;
+        if (newHover == hoveredObject) return;
+
+        // Send real enter/exit events so buttons show their highlight colours.
+        if (hoveredObject != null) ExecuteEvents.Execute(hoveredObject, pointerEventData, ExecuteEvents.pointerExitHandler);
+        hoveredObject = newHover;
+        pointerEventData.pointerEnter = newHover;
+        if (hoveredObject != null) ExecuteEvents.Execute(hoveredObject, pointerEventData, ExecuteEvents.pointerEnterHandler);
+
+        hoveredSelectable = hoveredObject != null ? hoveredObject.GetComponentInParent<Selectable>() : null;
+        if (shell != null) shell.OnHoverChanged(hoveredSelectable);
+    }
+
+    private void Click(GameObject hit, PC_DesktopShell shell)
+    {
+        // The topmost hit is often a button's label, so bubble up to whatever handles the click.
+        GameObject clickHandler = ExecuteEvents.GetEventHandler<IPointerClickHandler>(hit);
+        if (clickHandler == null) return;
+
+        var selectable = clickHandler.GetComponent<Selectable>();
+        if (selectable != null && !selectable.IsInteractable()) return;
+
+        pointerEventData.pointerPress = clickHandler;
+        pointerEventData.rawPointerPress = hit;
+        pointerEventData.pointerPressRaycast = raycastResults[0];
+        pointerEventData.eligibleForClick = true;
+        pointerEventData.clickCount = 1;
+        pointerEventData.clickTime = Time.unscaledTime;
+
+        ExecuteEvents.Execute(clickHandler, pointerEventData, ExecuteEvents.pointerDownHandler);
+        ExecuteEvents.Execute(clickHandler, pointerEventData, ExecuteEvents.pointerUpHandler);
+        if (shell != null) shell.OnClicked(clickHandler);
+        ExecuteEvents.Execute(clickHandler, pointerEventData, ExecuteEvents.pointerClickHandler);
+
+        pointerEventData.pointerPress = null;
+        pointerEventData.eligibleForClick = false;
+        // Don't leave the button stuck in its "selected" colour after the click.
+        if (eventSystem != null && eventSystem.currentSelectedGameObject == clickHandler) eventSystem.SetSelectedGameObject(null);
+    }
+
+    private void ClearHover()
+    {
+        if (hoveredObject != null && pointerEventData != null)
+        {
+            ExecuteEvents.Execute(hoveredObject, pointerEventData, ExecuteEvents.pointerExitHandler);
+        }
+        hoveredObject = null;
+        hoveredSelectable = null;
     }
 
     /// <summary>
@@ -139,10 +239,13 @@ public class PlayerInteractionManager : MonoBehaviour
         inputScript.cursorLocked = true;
         if (customCursor != null)
         {
+            var shell = Shell;
+            if (shell != null) shell.AdoptCursor(customCursor);
             cursorPosition = Vector2.zero;
             customCursor.anchoredPosition = cursorPosition;
             customCursor.gameObject.SetActive(true);
         }
+        ClearHover();
         
         // Swap UI
         if (playerHudCanvas != null) playerHudCanvas.SetActive(false);
@@ -167,6 +270,7 @@ public class PlayerInteractionManager : MonoBehaviour
     public void EndPCInteraction()
     {
         isInteracting = false;
+        ClearHover();
         
         // Tell the PC to stop all coroutines and typewriter effects
         if (pcUIManager != null)
