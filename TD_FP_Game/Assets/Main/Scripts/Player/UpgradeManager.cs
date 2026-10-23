@@ -115,6 +115,10 @@ public class UpgradeManager : MonoBehaviour
                 GlobalTowerDamageMult += 0.20f;
                 UpdateAllActiveTowers();
                 break;
+            case "TowerRange":
+                GlobalTowerRangeMult += 0.10f;
+                UpdateAllActiveTowers();
+                break;
         }
     }
 
@@ -122,19 +126,19 @@ public class UpgradeManager : MonoBehaviour
 
     public bool IsWeaponUnlocked(string weaponName)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         return w != null && w.isUnlocked;
     }
 
     public int GetWeaponUnlockCost(string weaponName)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         return w != null ? w.unlockCost : 0;
     }
 
     public bool TryUnlockWeapon(string weaponName)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         if (w == null || w.isUnlocked) return false;
 
         if (playerStats.SpendScrap(w.unlockCost))
@@ -148,7 +152,7 @@ public class UpgradeManager : MonoBehaviour
 
     public bool TryBuyWeaponStat(string weaponName, string statType)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         if (w == null || !w.isUnlocked) return false;
         
         if (statType == "Guidance")
@@ -191,7 +195,7 @@ public class UpgradeManager : MonoBehaviour
 
     public float GetWeaponDamageMult(string weaponName)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         if (w == null) return 1f;
         // Formula: +20% per level
         return 1f + (0.20f * (w.damagePath.currentLevel - 1));
@@ -199,7 +203,7 @@ public class UpgradeManager : MonoBehaviour
 
     public float GetWeaponFireRateMult(string weaponName)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         if (w == null) return 1f;
         // Formula: +10% speed per level
         return 1f + (0.10f * (w.fireRatePath.currentLevel - 1));
@@ -207,7 +211,7 @@ public class UpgradeManager : MonoBehaviour
 
     public float GetWeaponMaxAmmoMult(string weaponName)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         if (w == null) return 1f;
         // Formula: +20% max ammo per level
         return 1f + (0.20f * (w.maxAmmoPath.currentLevel - 1));
@@ -215,7 +219,7 @@ public class UpgradeManager : MonoBehaviour
 
     public float GetWeaponClipSizeMult(string weaponName)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         if (w == null) return 1f;
         // Formula: +20% clip size per level
         return 1f + (0.20f * (w.clipSizePath.currentLevel - 1));
@@ -223,7 +227,28 @@ public class UpgradeManager : MonoBehaviour
     
     public WeaponUpgradeData GetWeaponData(string weaponName)
     {
-        return weaponUpgrades.Find(x => x.weaponName == weaponName);
+        return FindWeapon(weaponName);
+    }
+
+    // Weapon stats are read several times per shot and every frame by the HUD.
+    // A dictionary avoids a linear search plus a lambda allocation on each call.
+    private Dictionary<string, WeaponUpgradeData> _weaponLookup;
+    private int _weaponLookupSourceCount = -1;
+
+    private WeaponUpgradeData FindWeapon(string weaponName)
+    {
+        if (string.IsNullOrEmpty(weaponName)) return null;
+        if (_weaponLookup == null || _weaponLookupSourceCount != weaponUpgrades.Count)
+        {
+            _weaponLookupSourceCount = weaponUpgrades.Count;
+            _weaponLookup = new Dictionary<string, WeaponUpgradeData>(weaponUpgrades.Count);
+            foreach (var w in weaponUpgrades)
+            {
+                if (w != null && !string.IsNullOrEmpty(w.weaponName)) _weaponLookup[w.weaponName] = w;
+            }
+        }
+        _weaponLookup.TryGetValue(weaponName, out var data);
+        return data;
     }
 
     private void UpdateAllActiveTowers()
@@ -233,7 +258,7 @@ public class UpgradeManager : MonoBehaviour
     
     public bool IsGuidanceUnlocked(string weaponName)
     {
-        var w = weaponUpgrades.Find(x => x.weaponName == weaponName);
+        var w = FindWeapon(weaponName);
         return w != null && w.guidanceUnlocked;
     }
 }

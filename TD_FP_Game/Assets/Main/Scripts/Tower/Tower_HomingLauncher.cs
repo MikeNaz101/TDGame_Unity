@@ -7,7 +7,7 @@ public class Tower_HomingLauncher : TowerController
     public bool rotateTowardsTarget = false;
 
     [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = true;
+    [SerializeField] private bool showDebugLogs = false;
 
     // --- UPGRADE STATS ---
     private float _rocketSpeedMult = 1f;
@@ -50,7 +50,7 @@ public class Tower_HomingLauncher : TowerController
             // Fire immediately if target exists
             Shoot();
             // Calculate cooldown using base fire rate and multipliers
-            _fireCooldown = _towerData.fireRate / _fireRateMultiplier;
+            _fireCooldown = CurrentFireInterval;
         }
     }
 
@@ -70,6 +70,7 @@ public class Tower_HomingLauncher : TowerController
         {
             _audioSource.PlayOneShot(_towerData.shootSound);
         }
+        PlayFireFeedback();
 
         if (_towerData.projectilePrefab == null) return;
 
@@ -85,7 +86,7 @@ public class Tower_HomingLauncher : TowerController
         if (missile != null)
         {
             // Calculate total damage multiplier (Base Upgrades * Global Upgrades)
-            float totalDamageMult = _damageMultiplier * _globalDamageMult;
+            float totalDamageMult = DamageMultiplier;
 
             // Pass stats to the missile
             missile.speedMultiplier = _rocketSpeedMult;

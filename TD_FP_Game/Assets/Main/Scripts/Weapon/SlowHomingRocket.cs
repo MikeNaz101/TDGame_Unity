@@ -30,6 +30,7 @@ public class SlowHomingRocket : MonoBehaviour
     private Transform _target;
     private Transform _attacker; 
     private bool _isLaunched = false;
+    private bool _hasExploded = false;
     private Vector3 _lastKnownTargetPos;
     private AudioSource _audioSource;
 
@@ -51,6 +52,14 @@ public class SlowHomingRocket : MonoBehaviour
         if (engineParticles != null) engineParticles.SetActive(false);
     }
 
+    /// <summary>Point the rocket at a new target before (or after) launch.</summary>
+    public void Retarget(EnemyController target)
+    {
+        if (target == null) return;
+        _target = target.transform;
+        _lastKnownTargetPos = _target.position + Vector3.up;
+    }
+
     public void Launch()
     {
         _isLaunched = true;
@@ -69,7 +78,7 @@ public class SlowHomingRocket : MonoBehaviour
         }
         // ------------------------------
 
-        Invoke("TimeOutExplosion", lifetime);
+        Invoke(nameof(TimeOutExplosion), lifetime);
     }
 
     void Update()
@@ -110,7 +119,7 @@ public class SlowHomingRocket : MonoBehaviour
     {
         if (!_isLaunched) return; 
 
-        if (other.CompareTag("Enemy") || other.gameObject.layer == LayerMask.NameToLayer("Default"))
+        if (other.CompareTag("Enemy") || other.gameObject.layer == ExplosionUtility.DefaultLayer)
         {
             Explode();
         }
@@ -123,7 +132,9 @@ public class SlowHomingRocket : MonoBehaviour
 
     void Explode()
     {
-        CancelInvoke("TimeOutExplosion"); 
+        if (_hasExploded) return;
+        _hasExploded = true;
+        CancelInvoke(nameof(TimeOutExplosion)); 
 
         // Play Sound
         if (explosionSound != null) AudioSource.PlayClipAtPoint(explosionSound, transform.position);
@@ -150,24 +161,7 @@ public class SlowHomingRocket : MonoBehaviour
         }
         // ------------------------
 
-        Collider[] hits = Physics.OverlapSphere(transform.position, finalRadius);
-        foreach (Collider hit in hits)
-        {
-            if (hit.CompareTag("Enemy"))
-            {
-                EnemyController enemy = hit.GetComponent<EnemyController>();
-                if (enemy != null)
-                {
-                    enemy.TakeExplosion(
-                        finalDamage, 
-                        _attacker, 
-                        transform.position, 
-                        finalForce, 
-                        finalRadius
-                    );
-                }
-            }
-        }
+        ExplosionUtility.DamageEnemiesInRadius(transform.position, finalRadius, finalDamage, _attacker, finalForce);
 
         Destroy(gameObject);
     }

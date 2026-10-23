@@ -66,9 +66,10 @@ public class Tower_RocketLauncher : TowerController
             {
                 rocketScript.Initialize(_towerData, _currentTarget, transform);
                 
-                // Apply Upgrades
+                // Apply Upgrades (damage used to be left at 1x, so damage upgrades did nothing)
                 rocketScript.moveSpeed *= _rocketSpeedMult; 
-                rocketScript.radiusMultiplier = _blastRadiusMult; // Ensure this exists in SlowHomingRocket if needed
+                rocketScript.radiusMultiplier = _blastRadiusMult;
+                rocketScript.damageMultiplier = DamageMultiplier;
 
                 // 3. Wait
                 yield return new WaitForSeconds(prepareTime);
@@ -76,8 +77,11 @@ public class Tower_RocketLauncher : TowerController
                 // 4. Launch
                 if (rocketObj != null)
                 {
+                    // Re-aim at whoever we're targeting now; the original target may have died while loading.
+                    if (IsValidTarget(_currentTarget)) rocketScript.Retarget(_currentTarget);
                     rocketObj.transform.SetParent(null);
                     rocketScript.Launch();
+                    PlayFireFeedback();
                     
                     // --- PLAY LAUNCH SOUND ---
                     if (launchSound != null && _audioSource != null)
@@ -90,7 +94,7 @@ public class Tower_RocketLauncher : TowerController
         }
 
         // 5. Cooldown
-        float baseRate = _towerData.fireRate / _fireRateMultiplier;
+        float baseRate = CurrentFireInterval;
         float remainingCooldown = Mathf.Max(0f, baseRate - prepareTime);
         _fireCooldown = remainingCooldown;
         yield return new WaitForSeconds(remainingCooldown);

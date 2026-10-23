@@ -21,6 +21,11 @@ public class Tower_Flamethrower : TowerController
     public float burnDuration = 0f; // 0 = No burn, >0 = Seconds
     public float burnDamage = 5f;   // Damage per second for the burn
 
+    [Header("Performance")]
+    [Tooltip("Flame damage is dealt in ticks instead of every frame. Same DPS, far fewer hit events.")]
+    [SerializeField] private float damageTickInterval = 0.2f;
+    private float _tickTimer = 0f;
+
     // State Machine
     private enum FlameState { Ready, Firing, Recharging }
     private FlameState _flameState = FlameState.Ready;
@@ -67,7 +72,16 @@ public class Tower_Flamethrower : TowerController
 
     protected override void Update()
     {
-        if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
+        UpdateRecoil();
+
+        // Cool down even with no target in range (it used to freeze until an enemy showed up)
+        if (_flameState == FlameState.Recharging)
+        {
+            _timer -= Time.deltaTime;
+            if (_timer <= 0f) _flameState = FlameState.Ready;
+        }
+
+        if (!IsValidTarget(_currentTarget))
         {
             UpdateTarget();
             if (_currentTarget == null)
@@ -94,7 +108,12 @@ public class Tower_Flamethrower : TowerController
 
             case FlameState.Firing:
                 _timer -= Time.deltaTime;
-                ApplyFlameDamage(); // Deal damage every frame while firing
+                _tickTimer -= Time.deltaTime;
+                if (_tickTimer <= 0f)
+                {
+                    _tickTimer += damageTickInterval;
+                    ApplyFlameDamage(damageTickInterval);
+                }
                 
                 if (_timer <= 0f)
                 {
@@ -103,12 +122,7 @@ public class Tower_Flamethrower : TowerController
                 break;
 
             case FlameState.Recharging:
-                _timer -= Time.deltaTime;
-                if (_timer <= 0f)
-                {
-                    _flameState = FlameState.Ready;
-                }
-                break;
+                break; // handled above
         }
     }
 
@@ -116,6 +130,7 @@ public class Tower_Flamethrower : TowerController
     {
         _flameState = FlameState.Firing;
         _timer = fireDuration;
+        _tickTimer = 0f;
 
         if (allFlameParticles != null)
         {
@@ -153,37 +168,29 @@ public class Tower_Flamethrower : TowerController
         if (_audioSource.isPlaying) _audioSource.Stop();
     }
 
-    private void ApplyFlameDamage()
+    private void ApplyFlameDamage(float tickDuration)
     {
-        // Calculate Damage per second
-        // Base Damage * Upgrade Mult * Global Mult
-        float dps = _towerData.damage * _damageMultiplier * _globalDamageMult;
-        
-        // We iterate backwards to safely handle removals if an enemy dies
+        // Damage per second: Base Damage * all multipliers (upgrades, global, radar buffs)
+        float tickDamage = CurrentDamage * tickDuration;
+        float maxRange = CurrentRange;
+        float maxRangeSqr = maxRange * maxRange;
+        float halfAngle = flameAngle * 0.5f;
+        Vector3 origin = _shootPoint.position;
+        Vector3 forward = _shootPoint.forward;
+
+        CleanEnemyList();
+
+        // Iterate backwards: an enemy can die (and be removed) mid-loop
         for (int i = _enemiesInRange.Count - 1; i >= 0; i--)
         {
+            if (i >= _enemiesInRange.Count) continue;
             EnemyController enemy = _enemiesInRange[i];
-            
-            if (enemy == null || !enemy.gameObject.activeInHierarchy)
+            if (!IsValidTarget(enemy)) continue;
+
+            Vector3 toEnemy = GetAimPoint(enemy) - origin;
+            if (toEnemy.sqrMagnitude <= maxRangeSqr && Vector3.Angle(forward, toEnemy) <= halfAngle)
             {
-                _enemiesInRange.RemoveAt(i);
-                continue;
-            }
-
-            // Check Cone Area
-            Vector3 dirToEnemy = (enemy.transform.position - _shootPoint.position).normalized;
-            float angle = Vector3.Angle(_shootPoint.forward, dirToEnemy);
-            float dist = Vector3.Distance(_shootPoint.position, enemy.transform.position);
-
-            // Get current range (Base * Multipliers)
-            // We can read the sphere collider radius since Base class updates it
-            float currentMaxRange = GetComponent<SphereCollider>().radius; 
-
-            if (dist <= currentMaxRange && angle <= (flameAngle / 2f))
-            {
-                // Deal Direct Fire Damage
-                //enemy.TakeDamage(dps * Time.deltaTime, transform);
-                enemy.TakeDamage(dps * Time.deltaTime, transform, DamageType.Fire);
+                enemy.TakeDamage(tickDamage, transform, DamageType.Fire);
 
                 // Apply Burn DoT if unlocked
                 if (burnDuration > 0)
@@ -205,7 +212,7 @@ public class Tower_Flamethrower : TowerController
         
         // Refresh/Apply duration
         // Burn damage scales with your tower's damage upgrades too
-        burn.StartBurn(burnDuration, burnDamage * _damageMultiplier * _globalDamageMult);
+        burn.StartBurn(burnDuration, burnDamage * DamageMultiplier, transform);
     }
 
     // --- Override base methods we don't use ---
@@ -218,34 +225,38 @@ public class Tower_Flamethrower : TowerController
 // This sits on the ENEMY and hurts them over time
 public class BurnDebuff : MonoBehaviour
 {
+    private const float TICK_INTERVAL = 0.25f;
+
     private float _timer;
     private float _dps;
+    private float _tickTimer;
+    private Transform _attacker;
     private EnemyController _target;
 
-    public void StartBurn(float duration, float damagePerSecond)
+    public void StartBurn(float duration, float damagePerSecond, Transform attacker = null)
     {
         _timer = duration;
-        _dps = damagePerSecond;
+        // Re-applying refreshes the duration and keeps the strongest burn.
+        _dps = Mathf.Max(_dps, damagePerSecond);
+        _attacker = attacker;
         if (_target == null) _target = GetComponent<EnemyController>();
     }
 
     void Update()
     {
-        if (_timer > 0)
-        {
-            _timer -= Time.deltaTime;
-            if (_target != null && _target.gameObject.activeInHierarchy)
-            {
-                _target.TakeDamage(_dps * Time.deltaTime);
-            }
-            else
-            {
-                Destroy(this);
-            }
-        }
-        else
+        if (_timer <= 0f || _target == null || _target._isDead || !_target.gameObject.activeInHierarchy)
         {
             Destroy(this);
+            return;
+        }
+
+        _timer -= Time.deltaTime;
+        _tickTimer += Time.deltaTime;
+        if (_tickTimer >= TICK_INTERVAL)
+        {
+            // Burn is fire damage, so armor/weakness rules apply (it used to count as Physical).
+            _target.TakeDamage(_dps * _tickTimer, _attacker, DamageType.Fire);
+            _tickTimer = 0f;
         }
     }
 }

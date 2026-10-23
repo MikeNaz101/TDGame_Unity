@@ -32,10 +32,6 @@ public class Projectile : MonoBehaviour
         {
             _rb.linearVelocity = transform.forward * projectileSpeed;
         }
-        else
-        {
-            Debug.LogWarning("Projectile has no Rigidbody. Falling back to Transform movement.");
-        }
         
         Destroy(gameObject, fuseTime + 5f);
     }
@@ -78,7 +74,7 @@ public class Projectile : MonoBehaviour
         bool isEnemy = otherObj.CompareTag("Enemy");
         
         // Check layers safely
-        bool isEnvironment = otherObj.layer == LayerMask.NameToLayer("Default"); // Adjust if your walls are on a different layer
+        bool isEnvironment = otherObj.layer == ExplosionUtility.DefaultLayer; // Adjust if your walls are on a different layer
 
         if (towerData == null)
         {
@@ -105,7 +101,7 @@ public class Projectile : MonoBehaviour
             if (isEnemy)
             {
                 _hasImpacted = true;
-                HandleDirectHit(otherObj.GetComponent<EnemyController>());
+                HandleDirectHit(otherObj.GetComponentInParent<EnemyController>());
                 Destroy(gameObject);
             }
             else if (isEnvironment)
@@ -132,32 +128,17 @@ public class Projectile : MonoBehaviour
     {
         if (enemy != null)
         {
-            //enemy.TakeDamage(towerData.damage * damageMultiplier, attacker);
             enemy.TakeDamage(towerData.damage * damageMultiplier, attacker, towerData.damageType);
         }
     }
 
     void HandleExplosion(Vector3 explosionCenter)
     {
-        Collider[] hits = Physics.OverlapSphere(explosionCenter, towerData.explosionRadius);
-
-        foreach (Collider hit in hits)
-        {
-            // Check for tag to avoid friendly fire or hitting yourself
-            if (hit.CompareTag("Enemy"))
-            {
-                EnemyController enemy = hit.GetComponent<EnemyController>();
-                if (enemy != null)
-                {
-                    enemy.TakeExplosion(
-                        towerData.damage * damageMultiplier,
-                        attacker,
-                        explosionCenter,
-                        towerData.explosionForce,
-                        towerData.explosionRadius
-                    );
-                }
-            }
-        }
+        ExplosionUtility.DamageEnemiesInRadius(
+            explosionCenter,
+            towerData.explosionRadius,
+            towerData.damage * damageMultiplier,
+            attacker,
+            towerData.explosionForce);
     }
 }

@@ -88,7 +88,7 @@ public class HomingProjectile : MonoBehaviour
     void MoveTowardsTarget(float speed)
     {
         Vector3 targetPos;
-        if (_targetEnemy != null && _targetEnemy.gameObject.activeInHierarchy)
+        if (_targetEnemy != null && !_targetEnemy._isDead && _targetEnemy.gameObject.activeInHierarchy)
         {
             targetPos = _targetEnemy.transform.position + Vector3.up;
             _lastKnownPosition = targetPos;
@@ -107,7 +107,7 @@ public class HomingProjectile : MonoBehaviour
     {
         if (_hasExploded) return;
 
-        if (other.CompareTag("Enemy") || other.gameObject.layer == LayerMask.NameToLayer("Default"))
+        if (other.CompareTag("Enemy") || other.gameObject.layer == ExplosionUtility.DefaultLayer)
         {
             Explode(transform.position);
         }
@@ -130,24 +130,7 @@ public class HomingProjectile : MonoBehaviour
             // Calculate final radius
             float finalRadius = _towerData.explosionRadius * radiusMultiplier;
 
-            Collider[] hits = Physics.OverlapSphere(position, finalRadius);
-            foreach (Collider hit in hits)
-            {
-                if (hit.CompareTag("Enemy"))
-                {
-                    EnemyController enemy = hit.GetComponent<EnemyController>();
-                    if (enemy != null)
-                    {
-                        enemy.TakeExplosion(
-                            _towerData.damage * damageMultiplier, // Apply Damage Mult
-                            _attacker, 
-                            position, 
-                            _towerData.explosionForce, 
-                            finalRadius // Apply Radius Mult
-                        );
-                    }
-                }
-            }
+            ExplosionUtility.DamageEnemiesInRadius(position, finalRadius, _towerData.damage * damageMultiplier, _attacker, _towerData.explosionForce);
         }
 
         if (engineParticles != null)

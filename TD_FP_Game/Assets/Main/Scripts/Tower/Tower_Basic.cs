@@ -1,11 +1,13 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Basic shooter with a simple 4-step level track (range, attack speed, damage, damage)
+/// on top of the regular upgrade paths. Each level is bought through UpgradeTower().
+/// </summary>
 public class Tower_Basic : TowerController
 {
-
     private int currentUpgradeLevel = 0;
     
     [SerializeField] private float level1RangeMult = 1.25f;
@@ -13,47 +15,33 @@ public class Tower_Basic : TowerController
     [SerializeField] private float level3DamageMult = 1.25f;
     [SerializeField] private float level4DamageMult = 1.5f;
 
-    private List<List<Action>> upgradePaths;
-
     private List<Action> path1UpgradeSteps;
-    private List<Action> path2UpgradeSteps;
-    private List<Action> path3UpgradeSteps;
-    private void Awake()
+
+    public bool IsMaxLevel => currentUpgradeLevel >= path1UpgradeSteps.Count;
+
+    protected override void Awake()
     {
+        // Must call base: it sets up the range trigger, audio and tower registration.
+        base.Awake();
 
-        upgradePaths = new List<List<Action>>
-        {
-
-        };
-        //List of each upgrade in order
+        // Each step changes THIS tower's multipliers. (Changing _towerData directly would
+        // permanently edit the shared asset and buff every Basic tower, even in the editor.)
         path1UpgradeSteps = new List<Action>
         {
-            () => _towerData.range *= level1RangeMult,       //Invoked at 0
-            () => _towerData.range *= level2AttackSpeedMult, //Invoked at 1
-            () => _towerData.range *= level3DamageMult,      //Invoked at 2
-            () => _towerData.range *= level4DamageMult       //Invoked at 3
-        };
-
-        path2UpgradeSteps = new List<Action>
-        {
-
-        };
-
-        path3UpgradeSteps = new List<Action>
-        {
-
+            () => _rangeMultiplier *= level1RangeMult,
+            () => _fireRateMultiplier *= level2AttackSpeedMult,
+            () => _damageMultiplier *= level3DamageMult,
+            () => _damageMultiplier *= level4DamageMult
         };
     }
 
-    private void UpgradeTower(int upgradeLevel)
+    public override void UpgradeTower()
     {
-        if (currentUpgradeLevel >= path1UpgradeSteps.Count)
-        {
-            return;
-        }
+        if (IsMaxLevel) return;
 
         path1UpgradeSteps[currentUpgradeLevel].Invoke();
         currentUpgradeLevel++;
+        base.UpgradeTower();
+        RecalculateStats();
     }
-
 }
