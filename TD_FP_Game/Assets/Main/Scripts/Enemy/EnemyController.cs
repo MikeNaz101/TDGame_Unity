@@ -67,6 +67,12 @@ public class EnemyController : MonoBehaviour, IDamageable
     
     // Stance / Movement defaults
     private float _originalMoveSpeed;
+    private float _rankSpeedMult = 1f;
+    // Speed modifiers from towers (slows, paralysis), keyed by source so they stack
+    // properly: the strongest slow wins and one tower leaving can't cancel another.
+    private readonly Dictionary<object, float> _speedModifiers = new Dictionary<object, float>();
+    private float _lastHitEffectTime = -1f;
+    private const float HIT_EFFECT_MIN_INTERVAL = 0.12f;
     private float _originalStoppingDistance;
     
     // Spawner/Queen Logic
@@ -102,7 +108,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         if (coreObj != null) _coreTarget = coreObj.transform;
         
         _currentHealth = enemyData.baseHealth;
-        _agent.speed = enemyData.moveSpeed;
+        _originalMoveSpeed = enemyData.moveSpeed;
+        RefreshSpeed();
         _agent.stoppingDistance = _attackThreshold - 0.5f;
         transform.localScale = Vector3.one * enemyData.baseScale;
         _agent.enabled = true;
@@ -181,7 +188,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         // Rank 0: Quicker
         if (_currentRankLevel >= MilitaryRank.Specialist)
         {
-            _agent.speed = _originalMoveSpeed * 1.5f;
+            _rankSpeedMult = 1.5f;
+            RefreshSpeed();
         }
 
         // Rank 1: Stronger (Health)
@@ -235,8 +243,8 @@ public class EnemyController : MonoBehaviour, IDamageable
         // Original boost was 1.5x (+50%). New boost is 1.25x (+25%).
         if (_currentRankLevel >= MilitaryRank.Specialist)
         {
-            float baseSpeed = enemyData.moveSpeed; // Assuming data holds the original
-            _agent.speed = baseSpeed * 1.25f; 
+            _rankSpeedMult = 1.25f;
+            RefreshSpeed();
         }
         
         // 2. Transparency: Make them more visible (0.2 -> 0.6)
@@ -568,7 +576,6 @@ public class EnemyController : MonoBehaviour, IDamageable
             {
                 if (!_isWeakened)
                 {
-                    Debug.Log("Enemy is in Ghost Mode! Immune.");
                     return; // Total Immunity
                 }
                 else
@@ -590,10 +597,6 @@ public class EnemyController : MonoBehaviour, IDamageable
         float multiplier = DamageMultiplier.GetMultiplier(damageType, enemyData.armorType);
         float finalDamage = amount * multiplier;
 
-        // Optional: Visual logs for weakness/resistance
-        if (multiplier > 1.0f) Debug.Log("Critical Hit! Weakness Exploited!");
-        if (multiplier < 1.0f) Debug.Log("Resisted!");
-
         // --- 4. APPLY DAMAGE ---
         _currentHealth -= finalDamage;
         
@@ -613,6 +616,11 @@ public class EnemyController : MonoBehaviour, IDamageable
     
     private void PlayHitEffects()
     {
+        // Damage-over-time sources (flames, burn) hit many times a second. Throttle the
+        // particles, sounds and flinch so they don't spawn objects every frame.
+        if (Time.time - _lastHitEffectTime < HIT_EFFECT_MIN_INTERVAL) return;
+        _lastHitEffectTime = Time.time;
+
         // 1. Particle Effect
         if (enemyData.hitParticlePrefab != null)
         {
@@ -997,13 +1005,41 @@ public class EnemyController : MonoBehaviour, IDamageable
         Instantiate(prefabToSpawn, randomPos, Quaternion.identity); 
     }
     
+    /// <summary>
+    /// Legacy single-slot slow. Prefer SetSpeedModifier so effects from
+    /// different towers stack instead of overwriting each other.
+    /// </summary>
     public void ApplySpeedModification(float speedMultiplier) 
     { 
-        if (_agent != null) 
+        if (Mathf.Approximately(speedMultiplier, 1f)) ClearSpeedModifier(this);
+        else SetSpeedModifier(this, speedMultiplier);
+    }
+
+    /// <summary>Applies (or updates) a speed multiplier from a specific source, e.g. an Ice tower.</summary>
+    public void SetSpeedModifier(object source, float multiplier)
+    {
+        if (source == null) return;
+        if (_speedModifiers.TryGetValue(source, out float current) && Mathf.Approximately(current, multiplier)) return;
+        _speedModifiers[source] = multiplier;
+        RefreshSpeed();
+    }
+
+    public void ClearSpeedModifier(object source)
+    {
+        if (source != null && _speedModifiers.Remove(source)) RefreshSpeed();
+    }
+
+    private void RefreshSpeed()
+    {
+        if (_agent == null) return;
+
+        // Strongest slow wins (lowest multiplier); slows don't multiply into a permanent freeze.
+        float slow = 1f;
+        foreach (var kvp in _speedModifiers)
         {
-            // Multiply our base speed by the slow factor (e.g., 0.5)
-            _agent.speed = _originalMoveSpeed * speedMultiplier; 
+            if (kvp.Value < slow) slow = kvp.Value;
         }
+        _agent.speed = _originalMoveSpeed * _rankSpeedMult * slow;
     }
     private void RotateTowards(Vector3 targetPosition) { Vector3 direction = (targetPosition - transform.position).normalized; direction.y = 0; if (direction != Vector3.zero) { Quaternion lookRotation = Quaternion.LookRotation(direction); transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f); } }
     

@@ -46,6 +46,28 @@ public class WeaponControllerHS : MonoBehaviour
     [Tooltip("Drag the FPS Arms (with the Animator) here.")]
     public Animator armsAnimator;
 
+    [Header("Procedural Weapon Motion")]
+    [Tooltip("How much the gun lags behind mouse movement.")]
+    public float swayAmount = 0.02f;
+    public float swayMaxOffset = 0.06f;
+    public float swaySmoothing = 8f;
+    [Tooltip("Walk bob size and speed. Scaled by how fast the player is moving.")]
+    public float bobAmount = 0.02f;
+    public float bobFrequency = 9f;
+    [Tooltip("Gun kick per shot, scaled by each weapon's Recoil Kickback.")]
+    public float recoilKickBack = 0.06f;
+    public float recoilKickPitch = 6f;
+    public float recoilRecoverSpeed = 12f;
+    [Tooltip("Raise animation when a weapon is equipped.")]
+    public float equipDuration = 0.35f;
+    [Tooltip("Tilt the gun down while reloading. Only used if no Arms Animator is assigned, so it never fights a real reload animation.")]
+    public bool proceduralReloadTilt = true;
+    [Tooltip("Sway and bob are reduced to this fraction while aiming down sights.")]
+    [Range(0f, 1f)] public float adsMotionScale = 0.2f;
+
+    [Header("Debug")]
+    public bool debugLogs = false;
+
     // --- NEW: State Variables ---
     private EnemyController _pendingTarget; // Enemy currently under crosshair
     private EnemyController _finalLockedTarget; // Enemy fully locked (can shoot anywhere)
@@ -86,6 +108,34 @@ public class WeaponControllerHS : MonoBehaviour
     private AudioSource _audioSource;
     private Animator currentGunAnimator;
 
+    // Procedural motion state
+    private Quaternion hipRotation = Quaternion.identity;
+    private Vector3 adsPosition;
+    private Vector2 swayOffset;
+    private float bobTimer;
+    private float bobBlend;
+    private Vector3 recoilPosition;
+    private float recoilPitch;
+    private float recoilYaw;
+    private float equipBlend = 1f;
+    private float reloadBlend;
+    private float aimBlend;
+    private CharacterController characterController;
+    private bool? crosshairShown;
+    private Coroutine reloadRoutine;
+
+    // Cached per weapon so switching doesn't Instantiate/Destroy models every time
+    private readonly Dictionary<int, GameObject> gunInstances = new Dictionary<int, GameObject>();
+    private readonly Dictionary<int, GameObject> reticleInstances = new Dictionary<int, GameObject>();
+
+    // Reused every shot (no per-shot allocations)
+    private readonly Dictionary<EnemyController, int> enemyHits = new Dictionary<EnemyController, int>();
+    private readonly List<Vector3> pelletHitPoints = new List<Vector3>();
+    private readonly Stack<LineRenderer> tracerPool = new Stack<LineRenderer>();
+    private readonly List<LineRenderer> activeTracers = new List<LineRenderer>();
+    private readonly List<float> activeTracerExpiry = new List<float>();
+    private const float TRACER_LIFETIME = 0.05f;
+
     void Start()
     {
         playerStats = GetComponentInParent<PlayerStats>();
@@ -93,6 +143,9 @@ public class WeaponControllerHS : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         
         if (transform.parent != null) hipPosition = transform.localPosition;
+        hipRotation = transform.localRotation;
+        adsPosition = transform.localPosition;
+        characterController = GetComponentInParent<CharacterController>();
         
         if (mainCamera == null && cameraShake != null) mainCamera = cameraShake.GetComponentInParent<Camera>();
 
@@ -124,11 +177,14 @@ public class WeaponControllerHS : MonoBehaviour
                 if (currentAmmo < maxClip)
                 {
                     inputScript.reload = false; 
-                    StartCoroutine(Reload());
+                    reloadRoutine = StartCoroutine(Reload());
                 }
             }
         }
         wasFiringLastFrame = inputScript.fire;
+
+        UpdateTracers();
+        ApplyWeaponMotion();
     }
 
     // --- NEW: SMART SWITCHING LOGIC ---
@@ -231,23 +287,31 @@ public class WeaponControllerHS : MonoBehaviour
             targetFOV = Mathf.Clamp(baseFOV / zoomFactor, 10f, baseFOV);
         }
         
-        if (hipCrosshairUI != null) hipCrosshairUI.SetActive(!isAiming);
-        if (currentAdsReticleInstance != null) currentAdsReticleInstance.SetActive(isAiming);
+ 
+        // Only touch the UI when the state actually changes
+        if (crosshairShown != !isAiming)
+        {
+            crosshairShown = !isAiming;
+            if (hipCrosshairUI != null) hipCrosshairUI.SetActive(!isAiming);
+            if (currentAdsReticleInstance != null) currentAdsReticleInstance.SetActive(isAiming);
+        }
 
         float lerpSpeed = currentWeapon != null ? currentWeapon.adsSpeed : 10f;
+        float t = 1f - Mathf.Exp(-lerpSpeed * Time.deltaTime);
         
-        // Smoothly move the weapon to the calculated target position
-        transform.localPosition = Vector3.Lerp(transform.localPosition, targetLocalPosition, Time.deltaTime * lerpSpeed);
+        // Smoothly move toward the ADS/hip position. Sway, bob and recoil are layered on top in ApplyWeaponMotion().
+        adsPosition = Vector3.Lerp(adsPosition, targetLocalPosition, t);
+        aimBlend = Mathf.Lerp(aimBlend, isAiming ? 1f : 0f, t);
         
         if (playerVirtualCamera != null)
         {
             var lens = playerVirtualCamera.Lens;
-            lens.FieldOfView = Mathf.Lerp(lens.FieldOfView, targetFOV, Time.deltaTime * lerpSpeed);
+            lens.FieldOfView = Mathf.Lerp(lens.FieldOfView, targetFOV, t);
             playerVirtualCamera.Lens = lens;
         }
         else if (mainCamera != null)
         {
-            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, targetFOV, Time.deltaTime * lerpSpeed);
+            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, targetFOV, t);
         }
     }
 
@@ -273,6 +337,7 @@ public class WeaponControllerHS : MonoBehaviour
         if (currentWeapon.shootSound != null) _audioSource.PlayOneShot(currentWeapon.shootSound);
         if (shootPoint != null) EnemyAIAudioEvents.ReportGunshot(shootPoint.position);
         if (cameraShake != null) cameraShake.Shake(currentWeapon.recoilKickback);
+        AddRecoilKick(currentWeapon.recoilKickback);
 
         // --- CASE 1: ROCKET LAUNCHER (Projectile) ---
         if (currentWeapon.projectilePrefab != null)
@@ -285,9 +350,7 @@ public class WeaponControllerHS : MonoBehaviour
             if (rocket != null)
             {
                 rocket.damageMultiplier = damageMult;
-                // DEBUG 5: Confirm what is being passed
-                if (_finalLockedTarget != null) Debug.Log($"Shoot: Firing homing rocket at {_finalLockedTarget.name}");
-                else Debug.Log("Shoot: Firing dumb rocket (No lock).");
+                if (debugLogs) Debug.Log(_finalLockedTarget != null ? $"Shoot: Firing homing rocket at {_finalLockedTarget.name}" : "Shoot: Firing dumb rocket (No lock).");
                 rocket.Initialize(null, _finalLockedTarget, transform.root); 
                 rocket.Launch();
                 
@@ -310,7 +373,6 @@ public class WeaponControllerHS : MonoBehaviour
                 rb.linearVelocity = mainCamera.transform.forward * currentWeapon.launchForce;
             }
 
-            inputScript.fire = false;
             return; // EXIT FUNCTION HERE for Rockets
         }
 
@@ -318,25 +380,25 @@ public class WeaponControllerHS : MonoBehaviour
         // This logic runs for EVERY hitscan weapon.
         // If it's a Rifle, pellets is 1. If Shotgun, pellets is 8.
 
-        Dictionary<EnemyController, int> enemyHits = new Dictionary<EnemyController, int>();
+        enemyHits.Clear();
+        pelletHitPoints.Clear();
         int totalPellets = Mathf.Max(1, currentWeapon.pellets); // Ensure at least 1 pellet
-
-        // Create the list to hold visuals
-        List<Vector3> pelletHitPoints = new List<Vector3>();
+        Transform camTransform = mainCamera.transform;
 
         // Loop through every pellet
         for (int i = 0; i < totalPellets; i++)
         {
             // Calculate Spread
-            Vector3 forward = mainCamera.transform.forward;
+            Vector3 forward = camTransform.forward;
             if (currentWeapon.spreadAngle > 0)
             {
+                // Spread around the camera's own axes (the old world-space Euler skewed the pattern when looking sideways)
                 float xSpread = Random.Range(-currentWeapon.spreadAngle, currentWeapon.spreadAngle);
                 float ySpread = Random.Range(-currentWeapon.spreadAngle, currentWeapon.spreadAngle);
-                forward = Quaternion.Euler(xSpread, ySpread, 0) * forward;
+                forward = Quaternion.AngleAxis(xSpread, camTransform.right) * Quaternion.AngleAxis(ySpread, camTransform.up) * forward;
             }
 
-            Ray ray = new Ray(mainCamera.transform.position, forward);
+            Ray ray = new Ray(camTransform.position, forward);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer))
@@ -358,8 +420,8 @@ public class WeaponControllerHS : MonoBehaviour
             }
         }
 
-        // 3. Draw Tracers (Now we are 100% sure the list is full)
-        StartCoroutine(FlashMultiMuzzle(pelletHitPoints));
+        // 3. Draw Tracers (pooled)
+        ShowTracers(pelletHitPoints);
 
         // 4. Apply Damage
         foreach (var kvp in enemyHits)
@@ -374,87 +436,135 @@ public class WeaponControllerHS : MonoBehaviour
             if (hits == totalPellets && totalPellets > 1)
             {
                 finalDamage *= currentWeapon.fullHitBonus;
-                Debug.Log($"MEATSHOT! {enemy.name} took bonus damage from full spray.");
+                if (debugLogs) Debug.Log($"MEATSHOT! {enemy.name} took bonus damage from full spray.");
             }
 
             enemy.TakeDamage(finalDamage, transform.root, currentWeapon.damageType);
             shotsHit += hits;
         }
-
-        inputScript.fire = false;
+        enemyHits.Clear();
+        // Note: fire input is no longer cleared here. Automatic weapons keep firing while the
+        // button is held; semi-auto weapons rely on the wasFiringLastFrame edge check.
     }
 
-    IEnumerator FlashMuzzle()
+    // --- POOLED TRACERS ---
+    private void ShowTracers(List<Vector3> hitPoints)
     {
-        if (currentGunTracer == null || shootPoint == null) yield break; 
-        Ray ray = new Ray(mainCamera.transform.position, mainCamera.transform.forward);
-        RaycastHit hit;
-        Vector3 targetPoint;
-        if (Physics.Raycast(ray, out hit, currentWeapon.range, hitScanLayer)) targetPoint = hit.point; 
-        else targetPoint = ray.GetPoint(currentWeapon.range); 
+        if (tracerPrefab == null || shootPoint == null || hitPoints.Count == 0) return;
 
-        currentGunTracer.SetPosition(0, shootPoint.position);
-        currentGunTracer.SetPosition(1, targetPoint);
-        currentGunTracer.enabled = true;
-        yield return new WaitForSeconds(0.05f); 
-        currentGunTracer.enabled = false;
-    }
-    
-    IEnumerator FlashMultiMuzzle(List<Vector3> hitPoints)
-    {
-        // DEBUG 1: Check if the list arrived
-        if (hitPoints == null || hitPoints.Count == 0)
-        {
-            Debug.LogError("FlashMultiMuzzle: No hit points to draw! List is empty or null.");
-            yield break;
-        }
-
-        // DEBUG 2: Check references
-        if (tracerPrefab == null)
-        {
-            Debug.LogError("FlashMultiMuzzle: Tracer Prefab is NULL! Assign it in the Inspector.");
-            yield break;
-        }
-        if (shootPoint == null)
-        {
-            Debug.LogError("FlashMultiMuzzle: Shoot Point is NULL!");
-            yield break;
-        }
-
-        Debug.Log($"FlashMultiMuzzle: Attempting to draw {hitPoints.Count} tracers.");
-
+        Vector3 origin = shootPoint.position;
+        float expiry = Time.time + TRACER_LIFETIME;
         foreach (Vector3 hitPoint in hitPoints)
         {
-            // 1. Create a temporary tracer object
-            GameObject tracerObj = Instantiate(tracerPrefab, shootPoint.position, Quaternion.identity);
-        
-            // DEBUG 3: Check instantiation
-            if (tracerObj == null)
-            {
-                Debug.LogError("FlashMultiMuzzle: Failed to instantiate tracer!");
-                continue;
-            }
+            LineRenderer lr = GetTracer();
+            if (lr == null) return;
+            lr.SetPosition(0, origin);
+            lr.SetPosition(1, hitPoint);
+            lr.gameObject.SetActive(true);
+            activeTracers.Add(lr);
+            activeTracerExpiry.Add(expiry);
+        }
+    }
 
-            LineRenderer lr = tracerObj.GetComponent<LineRenderer>();
+    private LineRenderer GetTracer()
+    {
+        while (tracerPool.Count > 0)
+        {
+            LineRenderer pooled = tracerPool.Pop();
+            if (pooled != null) return pooled;
+        }
 
+        GameObject obj = Instantiate(tracerPrefab);
+        LineRenderer lr = obj.GetComponent<LineRenderer>();
+        if (lr == null)
+        {
+            Debug.LogError("WeaponControllerHS: Tracer Prefab needs a LineRenderer component!");
+            Destroy(obj);
+            return null;
+        }
+        lr.useWorldSpace = true;
+        return lr;
+    }
+
+    private void UpdateTracers()
+    {
+        float now = Time.time;
+        for (int i = activeTracers.Count - 1; i >= 0; i--)
+        {
+            if (now < activeTracerExpiry[i]) continue;
+            LineRenderer lr = activeTracers[i];
             if (lr != null)
             {
-                // 2. Set the positions
-                lr.SetPosition(0, shootPoint.position);
-                lr.SetPosition(1, hitPoint);
-            
-                // DEBUG 4: Confirm positions
-                // Debug.Log($"Drawing line from {shootPoint.position} to {hitPoint}");
+                lr.gameObject.SetActive(false);
+                tracerPool.Push(lr);
             }
-            else
-            {
-                Debug.LogError("FlashMultiMuzzle: Tracer Prefab does not have a LineRenderer component!");
-            }
-
-            // 3. Destroy it after a tiny delay
-            Destroy(tracerObj, 0.05f);
+            activeTracers.RemoveAt(i);
+            activeTracerExpiry.RemoveAt(i);
         }
-        yield return null;
+    }
+
+    // --- PROCEDURAL WEAPON MOTION ---
+    private void AddRecoilKick(float kickback)
+    {
+        float aimDamp = Mathf.Lerp(1f, 0.6f, aimBlend); // steadier when aiming
+        recoilPosition += new Vector3(0f, 0f, -recoilKickBack * kickback * aimDamp);
+        recoilPitch += recoilKickPitch * kickback * aimDamp;
+        recoilYaw += Random.Range(-1f, 1f) * recoilKickPitch * 0.3f * kickback * aimDamp;
+    }
+
+    private void ApplyWeaponMotion()
+    {
+        float dt = Time.deltaTime;
+        if (dt <= 0f) return;
+        float motionScale = Mathf.Lerp(1f, adsMotionScale, aimBlend);
+
+        // 1. Sway: the gun lags slightly behind mouse look
+        Vector2 look = inputScript != null ? inputScript.look : Vector2.zero;
+        Vector2 swayTarget = Vector2.ClampMagnitude(-look * swayAmount, swayMaxOffset) * motionScale;
+        swayOffset = Vector2.Lerp(swayOffset, swayTarget, 1f - Mathf.Exp(-swaySmoothing * dt));
+
+        // 2. Bob: figure-eight while walking, fades out smoothly when stopping or airborne
+        float speed = 0f;
+        bool grounded = true;
+        if (characterController != null)
+        {
+            Vector3 v = characterController.velocity;
+            v.y = 0f;
+            speed = v.magnitude;
+            grounded = characterController.isGrounded;
+        }
+        float targetBob = grounded ? Mathf.Clamp01(speed / 7f) : 0f;
+        bobBlend = Mathf.Lerp(bobBlend, targetBob, 1f - Mathf.Exp(-8f * dt));
+        bobTimer += dt * bobFrequency * Mathf.Lerp(0.6f, 1.3f, Mathf.Clamp01(speed / 12f));
+        Vector3 bob = new Vector3(Mathf.Cos(bobTimer * 0.5f) * bobAmount, Mathf.Abs(Mathf.Sin(bobTimer)) * bobAmount, 0f) * (bobBlend * motionScale);
+
+        // 3. Recoil springs back to rest
+        float recover = 1f - Mathf.Exp(-recoilRecoverSpeed * dt);
+        recoilPosition = Vector3.Lerp(recoilPosition, Vector3.zero, recover);
+        recoilPitch = Mathf.Lerp(recoilPitch, 0f, recover);
+        recoilYaw = Mathf.Lerp(recoilYaw, 0f, recover);
+
+        // 4. Equip raise (ease-out from below)
+        if (equipBlend < 1f) equipBlend = Mathf.MoveTowards(equipBlend, 1f, dt / Mathf.Max(0.01f, equipDuration));
+        float equipInv = 1f - (1f - Mathf.Pow(1f - equipBlend, 3f));
+
+        // 5. Reload dip (only when no real reload animation exists)
+        bool tilt = proceduralReloadTilt && armsAnimator == null && isReloading;
+        reloadBlend = Mathf.Lerp(reloadBlend, tilt ? 1f : 0f, 1f - Mathf.Exp(-10f * dt));
+
+        Vector3 position = adsPosition
+                         + new Vector3(swayOffset.x, swayOffset.y, 0f)
+                         + bob
+                         + recoilPosition
+                         + new Vector3(0f, -0.25f * equipInv - 0.08f * reloadBlend, 0f);
+
+        Quaternion rotation = hipRotation
+                            * Quaternion.Euler(-recoilPitch + 30f * equipInv + 15f * reloadBlend,
+                                               recoilYaw + swayOffset.x * 40f,
+                                               swayOffset.x * -60f + 25f * reloadBlend);
+
+        transform.localPosition = position;
+        transform.localRotation = rotation;
     }
     
     public void RefillCurrentReserve()
@@ -469,14 +579,7 @@ public class WeaponControllerHS : MonoBehaviour
 
         if (currentWeapon.reloadSound != null) _audioSource.PlayOneShot(currentWeapon.reloadSound);
         
-        if (armsAnimator != null)
-        {
-            armsAnimator.SetTrigger("Reload");
-        }
-        else
-        {
-            Debug.LogWarning("Arms Animator is missing! Assign it in WeaponControllerHS.");
-        }
+        if (armsAnimator != null) armsAnimator.SetTrigger("Reload");
         
         yield return new WaitForSeconds(currentWeapon.reloadTime);
         
@@ -501,6 +604,7 @@ public class WeaponControllerHS : MonoBehaviour
         }
         
         isReloading = false;
+        reloadRoutine = null;
     }
     
     private int GetUpgradedClipSize()
@@ -540,7 +644,6 @@ public class WeaponControllerHS : MonoBehaviour
         // 3. Input Check
         if (!inputScript.aim)
         {
-            if (_currentLockTimer > 0 || _finalLockedTarget != null) Debug.Log("LockOn: Aim released. Resetting.");
             ResetLockState();
             return;
         }
@@ -552,7 +655,6 @@ public class WeaponControllerHS : MonoBehaviour
             
             if (_finalLockedTarget._isDead || !_finalLockedTarget.gameObject.activeInHierarchy)
             {
-                Debug.Log("LockOn: Locked target died/vanished. Resetting.");
                 ResetLockState();
             }
             return; // Already locked, nothing to do
@@ -586,9 +688,6 @@ public class WeaponControllerHS : MonoBehaviour
                 // Increment Timer
                 _currentLockTimer += Time.deltaTime;
                 
-                // DEBUG 4: Print Timer progress (Every 0.5s to avoid spam)
-                if (_currentLockTimer % 0.5f < Time.deltaTime) 
-                    Debug.Log($"LockOn: Acquiring... {_currentLockTimer:F1}/{timeToLock}");
 
                 if (_currentLockTimer >= timeToLock)
                 {
@@ -596,7 +695,7 @@ public class WeaponControllerHS : MonoBehaviour
                     _finalLockedTarget = hitEnemy;
                     _pendingTarget = null;
                     if (_currentReticleImage != null) _currentReticleImage.color = lockedReticleColor;
-                    Debug.Log($"LockOn: TARGET LOCKED: {hitEnemy.name}");
+                    if (debugLogs) Debug.Log($"LockOn: TARGET LOCKED: {hitEnemy.name}");
                 }
                 else
                 {
@@ -606,7 +705,6 @@ public class WeaponControllerHS : MonoBehaviour
             }
             else
             {
-                Debug.Log($"LockOn: New Target Found: {hitEnemy.name}. Timer Reset.");
                 _pendingTarget = hitEnemy;
                 _currentLockTimer = 0f;
                 if (_currentReticleImage != null) _currentReticleImage.color = defaultReticleColor;
@@ -614,7 +712,6 @@ public class WeaponControllerHS : MonoBehaviour
         }
         else
         {
-            if (_pendingTarget != null) Debug.Log("LockOn: Lost target. Resetting.");
             _pendingTarget = null;
             _currentLockTimer = 0f;
             if (_currentReticleImage != null) _currentReticleImage.color = defaultReticleColor;
@@ -660,27 +757,46 @@ public class WeaponControllerHS : MonoBehaviour
     void EquipWeapon(int weaponIndex)
     {
         if (weaponIndex < 0 || weaponIndex >= inventory.Length) return;
-        if (currentGunInstance != null) Destroy(currentGunInstance);
-        if (currentAdsReticleInstance != null) Destroy(currentAdsReticleInstance);
+
+        // Cancel a reload in progress so it can't finish on (and refill) the new weapon
+        if (reloadRoutine != null) { StopCoroutine(reloadRoutine); reloadRoutine = null; }
+        ResetLockState();
+
+        // Hide (don't destroy) the previous weapon; models are created once and reused
+        if (currentGunInstance != null) currentGunInstance.SetActive(false);
+        if (currentAdsReticleInstance != null) currentAdsReticleInstance.SetActive(false);
 
         currentWeaponIndex = weaponIndex;
         currentWeapon = inventory[currentWeaponIndex]; 
         if (currentWeapon.equipSound != null) _audioSource.PlayOneShot(currentWeapon.equipSound);
 
-        currentGunInstance = Instantiate(currentWeapon.weaponPrefab, gunHolder);
-        currentGunAnimator = currentGunInstance.GetComponentInChildren<Animator>();
-        
-        if (currentGunAnimator == null) 
+        if (!gunInstances.TryGetValue(weaponIndex, out currentGunInstance) || currentGunInstance == null)
         {
-            Debug.LogWarning($"No Animator found on {currentWeapon.weaponName} or its children!");
+            currentGunInstance = Instantiate(currentWeapon.weaponPrefab, gunHolder);
+            gunInstances[weaponIndex] = currentGunInstance;
         }
-        if (currentWeapon.adsReticlePrefab != null && adsReticleParent != null) {
-            currentAdsReticleInstance = Instantiate(currentWeapon.adsReticlePrefab, adsReticleParent);
+        currentGunInstance.SetActive(true);
+        currentGunAnimator = currentGunInstance.GetComponentInChildren<Animator>();
+
+        if (currentWeapon.adsReticlePrefab != null && adsReticleParent != null)
+        {
+            if (!reticleInstances.TryGetValue(weaponIndex, out currentAdsReticleInstance) || currentAdsReticleInstance == null)
+            {
+                currentAdsReticleInstance = Instantiate(currentWeapon.adsReticlePrefab, adsReticleParent);
+                reticleInstances[weaponIndex] = currentAdsReticleInstance;
+            }
             currentAdsReticleInstance.SetActive(false);
             
             _currentReticleImage = currentAdsReticleInstance.GetComponent<UnityEngine.UI.Image>();
             if (_currentReticleImage != null) _currentReticleImage.color = defaultReticleColor;
-        } else currentAdsReticleInstance = null; 
+        }
+        else
+        {
+            currentAdsReticleInstance = null;
+            _currentReticleImage = null;
+        }
+        crosshairShown = null; // force the crosshair/reticle state to refresh next frame
+        equipBlend = 0f;       // play the raise animation
 
         currentGunTracer = currentGunInstance.GetComponentInChildren<LineRenderer>();
         ShootPointTag tagScript = currentGunInstance.GetComponentInChildren<ShootPointTag>();

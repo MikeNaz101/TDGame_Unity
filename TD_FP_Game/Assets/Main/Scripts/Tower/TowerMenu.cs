@@ -45,9 +45,17 @@ public class TowerMenu : MonoBehaviour
     private int _selectedMainOptionIndex = 0; // NEW: Track main menu selection
     private bool _inUpgradeMenu = false;
 
+    [Header("Animation")]
+    [Tooltip("Seconds for the menu to pop open.")]
+    public float openAnimDuration = 0.15f;
+    private Vector3 _menuBaseScale = Vector3.one;
+    private float _openAnimTime = -1f;
+    private bool _menuScaleCaptured = false;
+
     void Start()
     {
         _playerStats = FindObjectOfType<PlayerStats>();
+        if (menuRoot) { _menuBaseScale = menuRoot.transform.localScale; _menuScaleCaptured = true; }
         CloseMenu(); 
         if(interactPrompt) interactPrompt.SetActive(false);
     }
@@ -57,6 +65,16 @@ public class TowerMenu : MonoBehaviour
         if (_inUpgradeMenu)
         {
             UpdateCarouselPosition();
+        }
+
+        // Pop-open: scale up from 85% with a slight overshoot
+        if (_openAnimTime >= 0f && menuRoot != null && _menuScaleCaptured)
+        {
+            _openAnimTime += Time.unscaledDeltaTime;
+            float n = Mathf.Clamp01(_openAnimTime / Mathf.Max(0.01f, openAnimDuration));
+            float overshoot = Mathf.Sin(n * Mathf.PI) * 0.05f;
+            menuRoot.transform.localScale = _menuBaseScale * (Mathf.Lerp(0.85f, 1f, 1f - (1f - n) * (1f - n)) + overshoot);
+            if (n >= 1f) { menuRoot.transform.localScale = _menuBaseScale; _openAnimTime = -1f; }
         }
     }
 
@@ -135,12 +153,15 @@ public class TowerMenu : MonoBehaviour
         _inUpgradeMenu = false;
         _selectedMainOptionIndex = 0; // Reset to top
         menuRoot.SetActive(true);
-        interactPrompt.SetActive(false);
+        _openAnimTime = 0f;
+        if (interactPrompt) interactPrompt.SetActive(false);
         ShowMainOptions();
     }
 
     public void CloseMenu()
     {
+        _openAnimTime = -1f;
+        if (_menuScaleCaptured) menuRoot.transform.localScale = _menuBaseScale;
         menuRoot.SetActive(false);
         _currentTower = null;
     }
@@ -203,7 +224,8 @@ public class TowerMenu : MonoBehaviour
         
         // 2. Smooth Move
         Vector2 currentPos = carouselContent.anchoredPosition;
-        float newX = Mathf.Lerp(currentPos.x, targetX, Time.deltaTime * scrollSpeed);
+        // Exponential smoothing: same feel at any frame rate (plain Lerp * deltaTime jitters at low FPS)
+        float newX = Mathf.Lerp(currentPos.x, targetX, 1f - Mathf.Exp(-scrollSpeed * Time.unscaledDeltaTime));
         carouselContent.anchoredPosition = new Vector2(newX, currentPos.y);
 
         // 3. Visuals (Scaling Effect)

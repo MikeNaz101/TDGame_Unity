@@ -27,7 +27,14 @@ public class Tower_LightningGun : TowerController
     public float maxChargeSize = 2.0f;
     // ---------------------
 
+    [Tooltip("Upgrades can't push paralyze chance above this.")]
+    public float maxParalyzeChance = 0.9f;
+
     private bool _isCharging = false;
+    private LineRenderer _boltRenderer;
+    private WaitForSeconds _strikeWait;
+    private WaitForSeconds _paralyzeWait;
+    private static readonly WaitForSeconds BoltVisibleWait = new WaitForSeconds(0.2f);
 
     protected override void Awake()
     {
@@ -38,10 +45,12 @@ public class Tower_LightningGun : TowerController
         if (downwardLightning != null)
         {
             downwardLightning.ManualMode = true;
-            // We can disable the LineRenderer to hide it initially
-            var lr = downwardLightning.GetComponent<LineRenderer>();
-            if(lr != null) lr.enabled = false;
+            _boltRenderer = downwardLightning.GetComponent<LineRenderer>();
+            if (_boltRenderer != null) _boltRenderer.enabled = false;
         }
+
+        _strikeWait = new WaitForSeconds(strikeDelay);
+        _paralyzeWait = new WaitForSeconds(paralyzeDuration);
 
         // Initialize Charge Particles
         if (chargeParticles != null)
@@ -52,11 +61,20 @@ public class Tower_LightningGun : TowerController
         }
     }
 
+    protected override void ApplySpecificUpgrade(TowerUpgradeData upgrade)
+    {
+        if (upgrade.effectType == TowerUpgradeType.Lightning_ParalyzeChance)
+        {
+            paralyzeChance = Mathf.Min(maxParalyzeChance, paralyzeChance + upgrade.effectValue);
+        }
+    }
+
     protected override void Update()
     {
         if (_fireCooldown > 0) _fireCooldown -= Time.deltaTime;
+        UpdateRecoil();
 
-        if (_currentTarget == null || !_currentTarget.gameObject.activeInHierarchy)
+        if (!IsValidTarget(_currentTarget))
         {
             UpdateTarget();
             if (_currentTarget == null)
@@ -88,10 +106,12 @@ public class Tower_LightningGun : TowerController
         float chargePercent = 1.0f;
         if (_towerData != null && _towerData.fireRate > 0)
         {
-            float totalRate = _towerData.fireRate / _fireRateMultiplier;
-            if(totalRate > 0.01f)
+            float totalRate = CurrentFireInterval;
+            if (totalRate > 0.01f)
             {
-                chargePercent = 1.0f - Mathf.Clamp01(_fireCooldown / totalRate);
+                // Ease-in so the charge builds slowly then swells right before the strike.
+                float linear = 1.0f - Mathf.Clamp01(_fireCooldown / totalRate);
+                chargePercent = linear * linear;
             }
         }
 
@@ -114,13 +134,11 @@ public class Tower_LightningGun : TowerController
     {
         if (_fireCooldown > 0 || _currentTarget == null || _towerData == null) return;
 
-        float dist = Vector3.Distance(transform.position, _currentTarget.transform.position);
-        if (dist <= _towerData.range)
+        float range = CurrentRange;
+        if ((_currentTarget.transform.position - transform.position).sqrMagnitude <= range * range)
         {
             StartCoroutine(PerformLightningStrike(_currentTarget));
-            
-            float finalFireRate = _towerData.fireRate / (_fireRateMultiplier);
-            _fireCooldown = finalFireRate;
+            _fireCooldown = CurrentFireInterval;
             ResetChargeEffect(); 
         }
     }
@@ -129,17 +147,16 @@ public class Tower_LightningGun : TowerController
     {
         if (_towerData.shootSound != null) _audioSource.PlayOneShot(_towerData.shootSound);
 
-        yield return new WaitForSeconds(strikeDelay);
+        yield return _strikeWait;
 
-        if (target != null && target.gameObject.activeInHierarchy)
+        if (IsValidTarget(target))
         {
-            float damage = _towerData.damage * _damageMultiplier * _globalDamageMult;
+            float damage = CurrentDamage;
+            PlayFireFeedback(false); // the ShootPoint particles here are the charge effect, not a muzzle flash
 
             if (downwardLightning != null)
             {
-                // Enable the Line Renderer so it can be seen
-                var lr = downwardLightning.GetComponent<LineRenderer>();
-                if(lr != null) lr.enabled = true;
+                if (_boltRenderer != null) _boltRenderer.enabled = true;
                 
                 downwardLightning.StartObject = null;
                 downwardLightning.EndObject = null;
@@ -154,31 +171,29 @@ public class Tower_LightningGun : TowerController
                 downwardLightning.Trigger(); 
             }
 
-            //target.TakeDamage(damage, transform);
             target.TakeDamage(damage, transform, DamageType.Electric);
 
             if (Random.value < paralyzeChance)
             {
-                StartCoroutine(ParalyzeEnemy(target));
+                // Run on the enemy so the paralysis still ends if this tower is sold mid-effect
+                target.StartCoroutine(ParalyzeEnemy(target));
             }
             
             // Wait for duration of bolt
-            yield return new WaitForSeconds(0.2f);
+            yield return BoltVisibleWait;
             
-            // Hide it again
-            if (downwardLightning != null)
-            {
-                var lr = downwardLightning.GetComponent<LineRenderer>();
-                if(lr != null) lr.enabled = false;
-            }
+            if (_boltRenderer != null) _boltRenderer.enabled = false;
         }
     }
 
     private IEnumerator ParalyzeEnemy(EnemyController enemy)
     {
-        enemy.ApplySpeedModification(0f); 
-        yield return new WaitForSeconds(paralyzeDuration);
-        if (enemy != null) enemy.ApplySpeedModification(1.0f);
+        // Each paralysis gets its own key, so an Ice tower releasing its slow
+        // (or a second strike ending early) can't cancel this one.
+        object paralyzeKey = new object();
+        enemy.SetSpeedModifier(paralyzeKey, 0f);
+        yield return _paralyzeWait;
+        if (enemy != null) enemy.ClearSpeedModifier(paralyzeKey);
     }
 
     private void RotateBlades(float speedMult)
