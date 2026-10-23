@@ -21,6 +21,17 @@ public class PC_UI_Manager : MonoBehaviour
     public AudioClip playerMenuVoiceLine;   // "Biometrics scanning..."
     public AudioClip botMenuVoiceLine;      // "Drone diagnostics loaded."
     
+    [Header("Desktop Shell")]
+    [Tooltip("Optional. The desktop-OS look around these screens. Added automatically if missing.")]
+    public PC_DesktopShell desktopShell;
+    public string title_MainMenu = "Command Center";
+    public string title_Player = "Operator Upgrades";
+    public string title_WeaponList = "Armory";
+    public string title_WeaponSpecific = "Armory  >  ";
+    public string title_Bot = "Drone Bay";
+    [Tooltip("How often the open screen re-checks prices while you have the PC open (scrap can change while you shop).")]
+    public float liveRefreshInterval = 0.5f;
+
     [Header("Typewriter")]
     public TypeWriterEffect typewriter;
     [Tooltip("The MAIN text display for both the prompt and the welcome message.")]
@@ -81,6 +92,31 @@ public class PC_UI_Manager : MonoBehaviour
     private const int COST_HEAL = 300;
 
     private Coroutine _startupCoroutine;
+    private GameObject _currentScreen;
+    private bool _skipStartup;
+    private bool _startingUp;
+    private bool _interfaceRunning;
+    private int _lastRefreshScrap = int.MinValue;
+    private float _nextRefreshTime;
+
+    private const string AFFORD_COLOR = "#5CF28F";
+    private const string EXPENSIVE_COLOR = "#FF6B6B";
+
+    /// <summary>True while the boot/welcome sequence is playing.</summary>
+    public bool IsStartingUp => _startingUp;
+    public PC_DesktopShell Shell => desktopShell;
+
+    void Awake()
+    {
+        if (desktopShell == null) desktopShell = GetComponent<PC_DesktopShell>();
+        if (desktopShell == null) desktopShell = gameObject.AddComponent<PC_DesktopShell>();
+        desktopShell.Build();
+        desktopShell.ConfigureApps(new[] { "OPERATOR", "ARMORY", "DRONES" }, new[] { "OP", "AR", "DR" });
+        desktopShell.AppClicked += OnTaskbarApp;
+        desktopShell.StartClicked += ShowMainMenu;
+        desktopShell.MinimizeClicked += () => ShowScreen(null);
+        desktopShell.LogOffClicked += LogOff;
+    }
 
     void Start()
     {
@@ -96,37 +132,115 @@ public class PC_UI_Manager : MonoBehaviour
         if (voiceAudioSource == null) voiceAudioSource = GetComponent<AudioSource>();
     }
     
+    void OnDisable()
+    {
+        // Coroutines die with the canvas, so don't stay stuck in the startup state.
+        _startupCoroutine = null;
+        _startingUp = false;
+    }
+
+    void Update()
+    {
+        // Scrap can change while the player is shopping (the bot keeps collecting),
+        // so keep prices and their affordable/too-expensive colours current.
+        if (!_interfaceRunning || _currentScreen == null || _playerStats == null) return;
+        if (Time.unscaledTime < _nextRefreshTime) return;
+        _nextRefreshTime = Time.unscaledTime + liveRefreshInterval;
+        if (_playerStats.scrapMetal == _lastRefreshScrap) return;
+        RefreshCurrentScreen();
+    }
+
     public void StartPCInterface()
     {
+        _interfaceRunning = true;
+        _startingUp = true;
         if (_startupCoroutine != null) StopCoroutine(_startupCoroutine);
         _startupCoroutine = StartCoroutine(StartupRoutine());
     }
 
     public void StopInterface()
     {
+        _interfaceRunning = false;
         if (typewriter != null) typewriter.StopTyping();
         if (_startupCoroutine != null) { StopCoroutine(_startupCoroutine); _startupCoroutine = null; }
+        _startingUp = false;
         ShowScreen(null);
         if(pcDisplay) pcDisplay.gameObject.SetActive(false); 
+        if (desktopShell != null) desktopShell.PlayShutdown();
+    }
+
+    /// <summary>Called when the player clicks during the boot/welcome sequence.</summary>
+    public void SkipStartup()
+    {
+        _skipStartup = true;
+        if (desktopShell != null) desktopShell.SkipBoot();
+        if (typewriter != null) typewriter.CompleteTyping();
     }
 
     private IEnumerator StartupRoutine()
     {
-        if(pcDisplay) pcDisplay.gameObject.SetActive(true);
-        PlayVoice(welcomeVoiceLine);
-        if (typewriter != null && pcDisplay != null) 
-        { 
-            yield return typewriter.DisplayText(pcDisplay, pcWelcomeMessage); 
-            yield return new WaitForSeconds(1f); 
+        _skipStartup = false;
+
+        if (desktopShell != null)
+        {
+            bool firstBoot = !desktopShell.HasBooted;
+            yield return desktopShell.Boot();
+            PlayVoice(welcomeVoiceLine);
+
+            if (firstBoot && typewriter != null && !_skipStartup)
+            {
+                // Full welcome the first time; after that just a quick notification.
+                typewriter.DisplayText(desktopShell.SplashText, pcWelcomeMessage);
+                while (typewriter.IsTyping && !_skipStartup) yield return null;
+                float holdUntil = Time.unscaledTime + 0.8f;
+                while (Time.unscaledTime < holdUntil && !_skipStartup) yield return null;
+                typewriter.StopTyping();
+            }
+            else
+            {
+                desktopShell.Notify("Welcome back. Session restored.", PC_DesktopShell.NoticeType.Info);
+            }
         }
-        ShowMainMenu();
+        else
+        {
+            if(pcDisplay) pcDisplay.gameObject.SetActive(true);
+            PlayVoice(welcomeVoiceLine);
+            if (typewriter != null && pcDisplay != null) 
+            { 
+                yield return typewriter.DisplayText(pcDisplay, pcWelcomeMessage); 
+                yield return new WaitForSeconds(1f); 
+            }
+        }
+
         _startupCoroutine = null;
+        _startingUp = false;
+        ShowMainMenu();
     }
 
-    public void ShowMainMenu() { if(pcDisplay) pcDisplay.gameObject.SetActive(false); ShowScreen(MainMenu_Container); }
+    public void ShowMainMenu()
+    {
+        if (IsStartingUp) return;
+        if(pcDisplay) pcDisplay.gameObject.SetActive(false);
+        ShowScreen(MainMenu_Container);
+    }
 
     public void ShowInteractPrompt(bool show, string message)
     {
+        if (desktopShell != null)
+        {
+            // The monitor shows a lock screen with the prompt instead of bare text.
+            ShowScreen(null);
+            if (pcDisplay) pcDisplay.gameObject.SetActive(false);
+            if (show)
+            {
+                desktopShell.ShowLockScreen();
+                if (typewriter != null) typewriter.DisplayText(desktopShell.LockPromptText, message);
+                else if (desktopShell.LockPromptText) desktopShell.LockPromptText.text = message;
+            }
+            else if (typewriter != null) typewriter.StopTyping();
+            return;
+        }
+
         if (show)
         {
             ShowScreen(null);
@@ -142,6 +256,23 @@ public class PC_UI_Manager : MonoBehaviour
             if(pcDisplay) pcDisplay.gameObject.SetActive(false);
             if (typewriter != null) typewriter.StopTyping();
         }
+    }
+
+    private void OnTaskbarApp(int index)
+    {
+        if (IsStartingUp) return;
+        switch (index)
+        {
+            case 0: OnMainMenu_PlayerClicked(); break;
+            case 1: OnMainMenu_WeaponsClicked(); break;
+            case 2: OnMainMenu_BotzClicked(); break;
+        }
+    }
+
+    private void LogOff()
+    {
+        var interaction = FindObjectOfType<PlayerInteractionManager>();
+        if (interaction != null) interaction.EndPCInteraction();
     }
     
     private void PlayVoice(AudioClip clip)
@@ -181,7 +312,7 @@ public class PC_UI_Manager : MonoBehaviour
 
     public void OnMainMenu_MysteryClicked() 
     { 
-        Type("ERROR: Encrypted Data. Access Denied.");
+        Fail("ERROR: Encrypted Data. Access Denied.");
     }
 
     // --- PLAYER UPGRADES ---
@@ -214,8 +345,9 @@ public class PC_UI_Manager : MonoBehaviour
 
     private void TryBuyGlobal(UpgradeManager.UpgradePath path, string key, string msg)
     {
-        if (UpgradeManager.Instance.TryBuyGlobalUpgrade(path, key)) { UpdatePlayerUI(); Type(msg); }
-        else Type("Insufficient funds.");
+        if (path.currentLevel >= path.maxLevel) { Fail("Already at max level."); return; }
+        if (UpgradeManager.Instance.TryBuyGlobalUpgrade(path, key)) { UpdatePlayerUI(); Success(msg); }
+        else Fail(InsufficientFundsMessage(path.GetCost()));
     }
 
     // --- WEAPON LIST LOGIC ---
@@ -274,7 +406,7 @@ public class PC_UI_Manager : MonoBehaviour
 
                 var buyTxt = row.purchaseButton.GetComponentInChildren<TMP_Text>();
                 // Match User Request: "Purchase for (cost)"
-                if(buyTxt) buyTxt.text = $"Purchase for {cost}";
+                if(buyTxt) buyTxt.text = $"Purchase for {CostLabel(cost)}";
                 
                 row.purchaseButton.interactable = true;
 
@@ -301,14 +433,16 @@ public class PC_UI_Manager : MonoBehaviour
 
         string wName = weaponRows[rowIndex].weaponName;
 
+        if (UpgradeManager.Instance.IsWeaponUnlocked(wName)) { Fail($"{wName} is already installed."); return; }
+
         if (UpgradeManager.Instance.TryUnlockWeapon(wName)) 
         { 
             UpdateWeaponListUI(); 
-            Type($"{wName} Unlocked."); 
+            Success($"{wName} Unlocked."); 
         }
         else 
         { 
-            Type("Insufficient Funds."); 
+            Fail(InsufficientFundsMessage(UpgradeManager.Instance.GetWeaponUnlockCost(wName))); 
         }
     }
 
@@ -321,7 +455,7 @@ public class PC_UI_Manager : MonoBehaviour
 
         if (!UpgradeManager.Instance.IsWeaponUnlocked(weaponName))
         {
-            Type("Access Denied: Weapon not owned.");
+            Fail("Access Denied: Weapon not owned.");
             return;
         }
 
@@ -364,7 +498,7 @@ public class PC_UI_Manager : MonoBehaviour
                 }
                 else
                 {
-                    btnText_SpecialUpgrade.text = $"Unlock Guidance\nCost: {wData.guidanceCost}";
+                    btnText_SpecialUpgrade.text = $"Unlock Guidance\nCost: {CostLabel(wData.guidanceCost)}";
                     if(btn_SpecialUpgrade) btn_SpecialUpgrade.interactable = true;
                 }
             }
@@ -381,51 +515,57 @@ public class PC_UI_Manager : MonoBehaviour
         if (UpgradeManager.Instance == null) return;
 
         // Try to buy "Guidance"
+        var wData = UpgradeManager.Instance.GetWeaponData(_selectedWeaponName);
+        if (wData != null && wData.guidanceUnlocked) { Fail("Guidance system already installed."); return; }
+
         if (UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "Guidance")) 
         { 
             UpdateWeaponSpecificUI(); 
-            Type("Guidance Chipset Installed."); 
+            Success("Guidance Chipset Installed."); 
         }
         else 
         { 
-            Type("Insufficient funds or already owned."); 
+            Fail(wData != null ? InsufficientFundsMessage(wData.guidanceCost) : "Insufficient funds."); 
         }
     }
 
-    public void OnBuy_SpecificDmg()
+    public void OnBuy_SpecificDmg() => TryBuyWeaponStat("Damage", "Ballistics improved.");
+    public void OnBuy_SpecificRate() => TryBuyWeaponStat("Rate", "Mechanism cycled.");
+    public void OnBuy_SpecificMaxAmmo() => TryBuyWeaponStat("MaxAmmo", "Capacity increased.");
+    public void OnBuy_SpecificClip() => TryBuyWeaponStat("ClipSize", "Magazine expanded.");
+
+    private void TryBuyWeaponStat(string stat, string successMsg)
     {
         if (UpgradeManager.Instance == null) return;
-        if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "Damage")) { UpdateWeaponSpecificUI(); Type("Ballistics improved."); }
-        else Type("Insufficient funds.");
+        var path = GetWeaponPath(stat);
+        if (path != null && path.currentLevel >= path.maxLevel) { Fail("Already at max level."); return; }
+
+        if (UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, stat)) { UpdateWeaponSpecificUI(); Success(successMsg); }
+        else Fail(path != null ? InsufficientFundsMessage(path.GetCost()) : "Insufficient funds.");
     }
 
-    public void OnBuy_SpecificRate()
+    private UpgradeManager.UpgradePath GetWeaponPath(string stat)
     {
-        if (UpgradeManager.Instance == null) return;
-        if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "Rate")) { UpdateWeaponSpecificUI(); Type("Mechanism cycled."); }
-        else Type("Insufficient funds.");
-    }
-
-    public void OnBuy_SpecificMaxAmmo()
-    {
-        if (UpgradeManager.Instance == null) return;
-        if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "MaxAmmo")) { UpdateWeaponSpecificUI(); Type("Capacity increased."); }
-        else Type("Insufficient funds.");
-    }
-
-    public void OnBuy_SpecificClip()
-    {
-        if (UpgradeManager.Instance == null) return;
-        if(UpgradeManager.Instance.TryBuyWeaponStat(_selectedWeaponName, "ClipSize")) { UpdateWeaponSpecificUI(); Type("Magazine expanded."); }
-        else Type("Insufficient funds.");
+        var wData = UpgradeManager.Instance != null ? UpgradeManager.Instance.GetWeaponData(_selectedWeaponName) : null;
+        if (wData == null) return null;
+        switch (stat)
+        {
+            case "Damage": return wData.damagePath;
+            case "Rate": return wData.fireRatePath;
+            case "MaxAmmo": return wData.maxAmmoPath;
+            case "ClipSize": return wData.clipSizePath;
+        }
+        return null;
     }
     
     public void OnBuy_RefillAmmo()
     {
+        if (_playerStats == null) return;
+
         // 1. Check money
         if (_playerStats.scrapMetal < ammoCost)
         {
-            Type("Insufficient Funds.");
+            Fail(InsufficientFundsMessage(ammoCost));
             return;
         }
 
@@ -438,22 +578,47 @@ public class PC_UI_Manager : MonoBehaviour
 
             weaponController.RefillCurrentReserve(); 
             _playerStats.SpendScrap(ammoCost);
-            Type("Ammunition Replicated.");
+            Success("Ammunition Replicated.");
+        }
+        else
+        {
+            Fail("No weapon linked to this terminal.");
         }
     }
 
     // --- BOT LOGIC ---
     private void RefreshBotUI()
     {
-        if (_botScript == null) return;
-        if(btn_UpgradeCapacity) { btn_UpgradeCapacity.gameObject.SetActive(_botScript.carryCapacity < 5); btn_UpgradeCapacity.GetComponentInChildren<TMP_Text>().text = $"Expand Cargo\nCost: {COST_CAPACITY}"; }
-        if(btn_UpgradeFlight) { btn_UpgradeFlight.gameObject.SetActive(_botScript.carryCapacity > 1 && !_botScript.canFly); btn_UpgradeFlight.GetComponentInChildren<TMP_Text>().text = $"Flight Systems\nCost: {COST_FLIGHT}"; }
-        if(btn_UpgradeHeal) { btn_UpgradeHeal.gameObject.SetActive(_botScript.canFly && !_botScript.canHeal); btn_UpgradeHeal.GetComponentInChildren<TMP_Text>().text = $"Medical Module\nCost: {COST_HEAL}"; }
-        if(botStatusText) botStatusText.text = $"Load: {_botScript.carryCapacity} | Flight: {(_botScript.canFly?"ON":"OFF")}";
+        if (_botScript == null) _botScript = FindObjectOfType<ScrapCollectorBot>();
+        if (_botScript == null)
+        {
+            if (botStatusText) botStatusText.text = "No drone detected.";
+            return;
+        }
+        SetBotButton(btn_UpgradeCapacity, _botScript.carryCapacity < 5, "Expand Cargo", COST_CAPACITY);
+        SetBotButton(btn_UpgradeFlight, _botScript.carryCapacity > 1 && !_botScript.canFly, "Flight Systems", COST_FLIGHT);
+        SetBotButton(btn_UpgradeHeal, _botScript.canFly && !_botScript.canHeal, "Medical Module", COST_HEAL);
+        if(botStatusText) botStatusText.text = $"Load: {_botScript.carryCapacity} | Flight: {(_botScript.canFly?"ON":"OFF")} | Medic: {(_botScript.canHeal?"ON":"OFF")}";
     }
-    public void OnBuy_BotCapacity() { if(_playerStats.SpendScrap(COST_CAPACITY)) { _botScript.UpgradeCapacity(_botScript.carryCapacity+2); RefreshBotUI(); Type("Bot Upgraded."); } else Type("No Cash."); }
-    public void OnBuy_BotFlight() { if(_playerStats.SpendScrap(COST_FLIGHT)) { _botScript.UpgradeFlight(); RefreshBotUI(); Type("Bot Upgraded."); } else Type("No Cash."); }
-    public void OnBuy_BotHeal() { if(_playerStats.SpendScrap(COST_HEAL)) { _botScript.UpgradeHealing(); RefreshBotUI(); Type("Bot Upgraded."); } else Type("No Cash."); }
+
+    private void SetBotButton(Button button, bool available, string label, int cost)
+    {
+        if (button == null) return;
+        button.gameObject.SetActive(available);
+        var txt = button.GetComponentInChildren<TMP_Text>();
+        if (txt) txt.text = $"{label}\nCost: {CostLabel(cost)}";
+    }
+
+    public void OnBuy_BotCapacity() => TryBuyBot(COST_CAPACITY, () => _botScript.UpgradeCapacity(_botScript.carryCapacity + 2), "Cargo bay expanded.");
+    public void OnBuy_BotFlight() => TryBuyBot(COST_FLIGHT, () => _botScript.UpgradeFlight(), "Flight systems online.");
+    public void OnBuy_BotHeal() => TryBuyBot(COST_HEAL, () => _botScript.UpgradeHealing(), "Medical module installed.");
+
+    private void TryBuyBot(int cost, System.Action apply, string successMsg)
+    {
+        if (_botScript == null || _playerStats == null) { Fail("No drone detected."); return; }
+        if (_playerStats.SpendScrap(cost)) { apply(); RefreshBotUI(); Success(successMsg); }
+        else Fail(InsufficientFundsMessage(cost));
+    }
 
     // --- HELPERS ---
 
@@ -462,21 +627,54 @@ public class PC_UI_Manager : MonoBehaviour
         if (txt == null) return;
         if (path.currentLevel >= path.maxLevel) 
         {
-            txt.text = $"{desc}\nMAX LEVEL";
+            txt.text = $"{desc}\n<color={AFFORD_COLOR}>MAX LEVEL</color>";
         }
         else 
         {
-            txt.text = $"{desc} (Lvl {path.currentLevel})\nCost: {path.GetCost()}";
+            txt.text = $"{desc} (Lvl {path.currentLevel}/{path.maxLevel})\nCost: {CostLabel(path.GetCost())}";
         }
     }
 
-    private void Type(string msg)
+    /// <summary>Cost text coloured green if the player can afford it right now, red if not.</summary>
+    private string CostLabel(int cost)
     {
+        bool canAfford = _playerStats == null || _playerStats.scrapMetal >= cost;
+        return $"<color={(canAfford ? AFFORD_COLOR : EXPENSIVE_COLOR)}>{cost:N0}</color>";
+    }
+
+    private string InsufficientFundsMessage(int cost)
+    {
+        if (_playerStats == null) return "Insufficient funds.";
+        return $"Insufficient funds. Need {Mathf.Max(0, cost - _playerStats.scrapMetal):N0} more scrap.";
+    }
+
+    private void Success(string msg) => Feedback(msg, PC_DesktopShell.NoticeType.Success);
+    private void Fail(string msg) => Feedback(msg, PC_DesktopShell.NoticeType.Error);
+    private void Type(string msg) => Feedback(msg, PC_DesktopShell.NoticeType.Info);
+
+    private void Feedback(string msg, PC_DesktopShell.NoticeType type)
+    {
+        if (desktopShell != null)
+        {
+            desktopShell.Notify(msg, type);
+            if (type != PC_DesktopShell.NoticeType.Info) desktopShell.PulseLastClicked(type == PC_DesktopShell.NoticeType.Success);
+            return;
+        }
         if(typewriter) typewriter.DisplayText(pcDisplay, msg);
     }
 
     public void BackToMainMenu() { ShowMainMenu(); }
     public void BackToWeaponList() { OnMainMenu_WeaponsClicked(); }
+
+    private void RefreshCurrentScreen()
+    {
+        if (_playerStats != null) _lastRefreshScrap = _playerStats.scrapMetal;
+        if (_currentScreen == null) return;
+        if (_currentScreen == PlayerUpgrade_Container) UpdatePlayerUI();
+        else if (_currentScreen == WeaponList_Container) UpdateWeaponListUI();
+        else if (_currentScreen == WeaponSpecific_Container) UpdateWeaponSpecificUI();
+        else if (_currentScreen == BotUpgrade_Container) RefreshBotUI();
+    }
 
     private void ShowScreen(GameObject screenToShow)
     {
@@ -487,5 +685,34 @@ public class PC_UI_Manager : MonoBehaviour
         if(WeaponSpecific_Container) WeaponSpecific_Container.SetActive(false);
         
         if (screenToShow != null) screenToShow.SetActive(true);
+        _currentScreen = screenToShow;
+        if (_playerStats != null) _lastRefreshScrap = _playerStats.scrapMetal;
+
+        if (desktopShell != null)
+        {
+            desktopShell.ShowWindow(screenToShow, WindowTitle(screenToShow), WindowCloseAction(screenToShow));
+            desktopShell.SetActiveApp(screenToShow == PlayerUpgrade_Container ? 0
+                : screenToShow == WeaponList_Container || screenToShow == WeaponSpecific_Container ? 1
+                : screenToShow == BotUpgrade_Container ? 2 : -1);
+        }
+    }
+
+    private string WindowTitle(GameObject screen)
+    {
+        if (screen == null) return "";
+        if (screen == MainMenu_Container) return title_MainMenu;
+        if (screen == PlayerUpgrade_Container) return title_Player;
+        if (screen == WeaponList_Container) return title_WeaponList;
+        if (screen == WeaponSpecific_Container) return title_WeaponSpecific + _selectedWeaponName;
+        if (screen == BotUpgrade_Container) return title_Bot;
+        return screen.name;
+    }
+
+    private System.Action WindowCloseAction(GameObject screen)
+    {
+        // Closing a window goes back one level, and closing the Command Center logs off.
+        if (screen == WeaponSpecific_Container) return BackToWeaponList;
+        if (screen == MainMenu_Container) return LogOff;
+        return ShowMainMenu;
     }
 }

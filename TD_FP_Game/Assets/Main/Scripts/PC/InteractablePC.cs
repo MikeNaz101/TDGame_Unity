@@ -69,6 +69,9 @@ public class InteractablePC : MonoBehaviour
 
     void Update()
     {
+        // While the player is already using the PC, E means "log off"; PlayerInteractionManager handles that.
+        if (playerInteractionManager != null && playerInteractionManager.IsInteracting) return;
+
         if (canInteract && playerInput != null && playerInput.interact)
         {
             playerInput.interact = false;
