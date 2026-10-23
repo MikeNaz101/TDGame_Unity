@@ -64,6 +64,10 @@ public class EnemyController : MonoBehaviour, IDamageable
     private Transform _attackSource;
     private float _sensorCooldown = 0f;
     private float _pathCheckTimer = 0f;
+    private DoorHealth _targetDoor; // Set while we're breaking down a door to reach the Core
+    private NavMeshPath _corePathProbe;
+    private Vector3 _doorAttackPoint;
+    private bool _hasDoorAttackPoint;
     
     // Stance / Movement defaults
     private float _originalMoveSpeed;
@@ -312,58 +316,132 @@ public class EnemyController : MonoBehaviour, IDamageable
             if (_attackSource != null) { SetNewTarget(_attackSource.GetComponent<IDamageable>()); _attackSource = null; return; }
             if (fov != null && _playerTarget != null && fov.IsTargetVisible(_playerTarget)) { _lastKnownPlayerPos = _playerTarget; SetNewTarget(_playerTarget.GetComponent<IDamageable>()); return; }
         }
+        // Keep hammering a door we've committed to; the pursue state decides when the Core is reachable again.
+        if (_targetDoor != null && (Object)_currentTarget == _targetDoor) return;
         if (_currentTarget.transform != _playerTarget && _coreTarget != null) { SetNewTarget(_coreTarget.GetComponent<IDamageable>()); }
     }
 
     private void UpdatePursueState() 
     { 
         _agent.isStopped = false;
+        _pathCheckTimer += Time.deltaTime;
+        bool timeToCheckPath = _pathCheckTimer > _pathCheckInterval;
+        if (timeToCheckPath) _pathCheckTimer = 0f;
         
         // --- BLOCKED PATH CHECK ---
-        if (_currentTarget.transform == _coreTarget)
+        // Intact doors carve the NavMesh, so while they stand the path to the Core comes back partial.
+        if (timeToCheckPath && _currentTarget.transform == _coreTarget)
         {
-            _pathCheckTimer += Time.deltaTime;
-            if (_pathCheckTimer > _pathCheckInterval)
+            if (!_agent.pathPending && !CanReachCore())
             {
-                _pathCheckTimer = 0f;
-                
-                if (!_agent.pathPending && (_agent.pathStatus == NavMeshPathStatus.PathPartial || _agent.pathStatus == NavMeshPathStatus.PathInvalid))
+                DoorHealth bestDoor = FindBestDoor();
+                if (bestDoor != null)
                 {
-                    GameObject bestDoor = FindBestDoor();
-                    if (bestDoor != null)
-                    {
-                        SetNewTarget(bestDoor.GetComponent<IDamageable>());
-                        Debug.Log($"Path to Core blocked. {name} switching target to Door: {bestDoor.name}");
-                    }
+                    SetNewTarget(bestDoor);
+                    Debug.Log($"Path to Core blocked. {name} switching target to Door: {bestDoor.name}");
                 }
             }
         }
+        // --- DOOR BROKEN ELSEWHERE? ---
+        // If another door went down and the Core is reachable now, stop bashing this one and go for the Core.
+        else if (timeToCheckPath && _targetDoor != null && (Object)_currentTarget == _targetDoor && CanReachCore())
+        {
+            SetNewTarget(_coreTarget.GetComponent<IDamageable>());
+        }
         
-        if (Vector3.Distance(transform.position, _currentTarget.transform.position) <= _agent.stoppingDistance) { _state = EnemyState.Attacking; return; }
-        _agent.SetDestination(_currentTarget.transform.position);
+        if (DistanceToTarget() <= AttackRange()) { _state = EnemyState.Attacking; return; }
+        _agent.SetDestination(GetTargetDestination(timeToCheckPath));
     }
     
-    // --- UPDATED: RANDOM DOOR SELECTION ---
-    private GameObject FindBestDoor()
+    // Picks a door to break. Prefers the closest doors, but picks randomly among the ones that are
+    // about as close as the nearest so a wave spreads out instead of all queueing on one door.
+    private DoorHealth FindBestDoor()
     {
-        // 1. Find all doors in the scene
-        GameObject[] doors = GameObject.FindGameObjectsWithTag("Door");
-        
-        if (doors.Length == 0) return null;
+        List<DoorHealth> doors = DoorHealth.ActiveDoors;
+        if (doors.Count == 0) return null;
 
-        // 2. Filter out doors that might be null or destroyed (just in case)
-        // and pick a RANDOM one from the list.
-        // This ensures enemies spread out to different doors.
-        GameObject randomDoor = doors[Random.Range(0, doors.Length)];
+        float closest = float.MaxValue;
+        foreach (DoorHealth door in doors)
+        {
+            if (door == null || door.IsBroken) continue;
+            float d = Vector3.Distance(transform.position, door.ClosestPoint(transform.position));
+            if (d < closest) closest = d;
+        }
+        if (closest == float.MaxValue) return null;
 
-        return randomDoor;
+        float cutoff = closest * 1.5f + 3f;
+        DoorHealth pick = null;
+        int candidates = 0;
+        foreach (DoorHealth door in doors)
+        {
+            if (door == null || door.IsBroken) continue;
+            float d = Vector3.Distance(transform.position, door.ClosestPoint(transform.position));
+            if (d > cutoff) continue;
+            candidates++;
+            if (Random.Range(0, candidates) == 0) pick = door; // Reservoir pick: uniform among candidates
+        }
+        return pick;
     }
-    // --------------------------------------
+
+    // True if we can walk up to the Core. A partial path still counts when it ends right next to
+    // the Core (the Core's own mesh can sit slightly off the NavMesh).
+    private bool CanReachCore()
+    {
+        if (_coreTarget == null || !_agent.isOnNavMesh) return false;
+        if (_corePathProbe == null) _corePathProbe = new NavMeshPath();
+
+        Vector3 corePos = _coreTarget.position;
+        if (NavMesh.SamplePosition(corePos, out NavMeshHit coreHit, 3f, _agent.areaMask)) corePos = coreHit.position;
+
+        if (!NavMesh.CalculatePath(transform.position, corePos, _agent.areaMask, _corePathProbe)) return false;
+        if (_corePathProbe.status == NavMeshPathStatus.PathComplete) return true;
+        if (_corePathProbe.status == NavMeshPathStatus.PathInvalid || _corePathProbe.corners.Length == 0) return false;
+
+        Vector3 end = _corePathProbe.corners[_corePathProbe.corners.Length - 1];
+        return Vector3.Distance(end, _coreTarget.position) <= _agent.stoppingDistance + 1f;
+    }
+
+    private const float DOOR_STAND_OFF = 0.75f;
+
+    // Doors are measured to their surface and approached at a stand-off point, so allow for that gap.
+    private float AttackRange()
+    {
+        if (_targetDoor != null && (Object)_currentTarget == _targetDoor) return _agent.stoppingDistance + DOOR_STAND_OFF;
+        return _agent.stoppingDistance;
+    }
+
+    // Doors are wide and their middle is carved out of the NavMesh, so measure to the door's
+    // surface rather than its center. Everything else uses its pivot like before.
+    private float DistanceToTarget()
+    {
+        if (_targetDoor != null && (Object)_currentTarget == _targetDoor)
+        {
+            Vector3 p = _targetDoor.ClosestPoint(transform.position);
+            p.y = transform.position.y;
+            return Vector3.Distance(transform.position, p);
+        }
+        return Vector3.Distance(transform.position, _currentTarget.transform.position);
+    }
+
+    private Vector3 GetTargetDestination(bool refresh)
+    {
+        if (_targetDoor != null && (Object)_currentTarget == _targetDoor)
+        {
+            // Our own spot along the door's face; only re-sampled now and then since doors don't move.
+            if (!_hasDoorAttackPoint || refresh)
+            {
+                _doorAttackPoint = _targetDoor.GetAttackPosition(transform.position, DOOR_STAND_OFF);
+                _hasDoorAttackPoint = true;
+            }
+            return _doorAttackPoint;
+        }
+        return _currentTarget.transform.position;
+    }
 
     private void UpdateAttackState() { 
-        if (Vector3.Distance(transform.position, _currentTarget.transform.position) > _agent.stoppingDistance + 1.5f) { _state = EnemyState.Pursuing; return; }
+        if (DistanceToTarget() > AttackRange() + 1.5f) { _state = EnemyState.Pursuing; return; }
         _agent.isStopped = true; 
-        RotateTowards(_currentTarget.transform.position);
+        RotateTowards(_targetDoor != null && (Object)_currentTarget == _targetDoor ? _targetDoor.ClosestPoint(transform.position) : _currentTarget.transform.position);
         if (_timeSinceLastAttack >= enemyData.attackCooldown)
         {
             TryAttack();
@@ -899,14 +977,20 @@ public class EnemyController : MonoBehaviour, IDamageable
         _state = EnemyState.Pursuing;
     }
 
-    private void SetNewTarget(IDamageable newTarget) { if (newTarget == null || newTarget == _currentTarget) return; _currentTarget = newTarget; _state = EnemyState.Pursuing; }
+    private void SetNewTarget(IDamageable newTarget) { if (newTarget == null || newTarget == _currentTarget) return; _currentTarget = newTarget; _targetDoor = newTarget as DoorHealth; _hasDoorAttackPoint = false; _state = EnemyState.Pursuing; }
 
     private void ActivateRagdoll() { SetRagdollActive(true); if (_mainCollider != null) _mainCollider.enabled = false; if (_animator != null) _animator.enabled = false; }
     private void DeactivateRagdoll() { SetRagdollActive(false); if (_mainCollider != null) _mainCollider.enabled = true; if (_animator != null) _animator.enabled = true; }
 
     private void SetRagdollActive(bool isActive) {
         if (_ragdollRigidbodies == null || _ragdollRigidbodies.Length == 0) return;
-        foreach (Rigidbody rb in _ragdollRigidbodies) { if (rb != null) rb.isKinematic = !isActive; }
+        foreach (Rigidbody rb in _ragdollRigidbodies)
+        {
+            if (rb == null) continue;
+            rb.isKinematic = !isActive;
+            // Speculative CCD stops a launched ragdoll from tunnelling through a thin door.
+            rb.collisionDetectionMode = isActive ? CollisionDetectionMode.ContinuousSpeculative : CollisionDetectionMode.Discrete;
+        }
     }
     
     void HandleGunshot(Vector3 soundPosition) 
